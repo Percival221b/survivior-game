@@ -71,7 +71,7 @@ Survivor（暂定）
   - boolean isColliding(Collidable o);  （碰撞检测）
   - void onCollision(Collidable o);  （碰撞效果）
 - **EnemyAI**
-  - boolean isAlive();
-  - void setTarget(Charactor c);
-  - Vector2D getNextMove();
-  - void update(double tpf);
+  - boolean isAlive();  （检测是否渲染）
+  - void setTarget(Charactor c);  （设定目标）
+  - Vector2D getNextMove();  （获取行动方向）
+  - void update(double tpf);  （每帧调用）
