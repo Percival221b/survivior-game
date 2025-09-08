@@ -41,8 +41,8 @@ Survivor（暂定）
       - EnemyAI.java <<interface>>  （敌人ai）
     - SimpleChaseAI.java (implements EnemyAI)  （直线追击ai）
     - ZigZagAI.java (implements EnemyAI)  （之字形游击ai）<不一定需要>
-    - close-inAi.java (implements EnemyAI)  （近战怪）
-    - long-rangeAi.java (implements EnemyAI)  （远程怪）
+    - closeInAi.java (implements EnemyAI)  （近战怪）
+    - longRangeAi.java (implements EnemyAI)  （远程怪）
     - BossAI.java (implements EnemyAI)  （boss ai） <不一定需要>
   - **ui** （界面与交互）
     - HUD.java （游玩界面）
