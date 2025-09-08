@@ -52,9 +52,26 @@ Survivor（暂定）
   - **system** （系统工具）
     - ResourceLoader.java  （游戏资源）
     - SoundManager.java  （音效）
-    - Config.java  （配置？ 。。。。。）
+    - Config.java  （配置）
   - **util** （工具类）
-    - Vector2D.java  （地图？。。。。。）
+    - Vector2D.java  （地图）
     - RandomUtils.java  （随机工具）
 
 ## 四、项目接口
+- **Charactor**
+  - void move(double x,double y);  （移动）
+  - void takeDamage(int amount);  （受伤）
+  - void attack();  （攻击）
+- **Weapon**
+  - void use();  （使用）
+  - void getDamage();  （返回伤害值）
+- **Renderable**
+  - void render(GraphicsContext gc);  （渲染在画布上）
+- **Collidable**
+  - boolean isColliding(Collidable o);  （碰撞检测）
+  - void onCollision(Collidable o);  （碰撞效果）
+- **EnemyAI**
+  - boolean isAlive();
+  - void setTarget(Charactor c);
+  - Vector2D getNextMove();
+  - void update(double tpf);
