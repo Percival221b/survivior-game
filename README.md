@@ -28,7 +28,8 @@ Survivor（暂定）
     - Monster.java (implements Character, Collidable, Renderable)  
     - Boss.java (implements Character, Collidable, Renderable)  
     - Bullet.java (implements Collidable, Renderable)  
-    - Item.java (implements Collidable, Renderable)  
+    - Item.java (implements Collidable, Renderable) // 比如血瓶、加速道具
+    - ExperienceOrb.java   (implements Collidable, Renderable)   // 敌人死亡掉落
   - **weapon** （武器 / 技能）
     - **interfaces**
       - Weapon.java <<interface>>  
@@ -38,13 +39,13 @@ Survivor（暂定）
   - **ai** （敌人 AI）
     - **interfaces**
       - EnemyAI.java <<interface>>  
-    - SimpleChaseAI.java (implements EnemyAI)  
-    - ZigZagAI.java (implements EnemyAI)  
-    - BossAI.java (implements EnemyAI)  
+    - close-inAi.java (implements EnemyAI)  //近战怪
+    - long-rangeAi.java (implements EnemyAI)  //远程怪 
   - **ui** （界面与交互）
     - HUD.java  
     - MenuUI.java  
-    - UpgradeDialog.java  
+    - UpgradeDialog.java
+    - WinScreen.java
   - **system** （系统工具）
     - ResourceLoader.java  
     - SoundManager.java  
