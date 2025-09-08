@@ -34,7 +34,7 @@ com.survivor
 │ ├─ Bullet.java (implements Collidable, Renderable)
 │ └─ Item.java (implements Collidable, Renderable)
 │
-├─ weapon # 武器/技能
+├─ weapon # 武器 / 技能
 │ ├─ interfaces
 │ │ └─ Weapon.java <<interface>>
 │ │
@@ -63,5 +63,6 @@ com.survivor
 └─ util # 工具类
 ├─ Vector2D.java
 └─ RandomUtils.java
+
 
 ## 四、项目接口
