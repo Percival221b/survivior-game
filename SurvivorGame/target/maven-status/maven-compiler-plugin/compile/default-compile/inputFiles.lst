@@ -7,12 +7,14 @@ C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\surviv
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ai\interfaces\EnemyAI.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\util\RandomUtils.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Bullet.java
+C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\core\UIManager.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\system\SoundManager.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ai\ZigZagAI.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ui\HUD.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ai\CloseInAI.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\weapon\Fireball.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ui\GameOverUI.java
+C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ui\UI.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ai\BossAI.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ui\UpgradeDialog.java
 C:\Users\11706\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Boss.java

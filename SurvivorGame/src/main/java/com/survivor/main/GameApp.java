@@ -2,17 +2,12 @@ package com.survivor.main;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
-import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.SpawnData;
-import com.almasb.fxgl.entity.Spawns;
-import com.almasb.fxgl.dsl.FXGL;
-
-//import com.survivor.core.GameSceneManager;
-
+import com.survivor.core.GameSceneManager;
 import java.util.Map;
+
 public class GameApp extends GameApplication {
 
-    //private GameSceneManager sceneManager;
+    private GameSceneManager sceneManager;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -20,11 +15,6 @@ public class GameApp extends GameApplication {
         settings.setHeight(720);
         settings.setTitle("Survivor Game");
         settings.setVersion("0.1");
-        settings.setAppIcon("icon.png"); // 资源目录 /assets/textures/icon.png
-    }
-
-    public enum EntityType {
-        PLAYER, ENEMY, BULLET
     }
 
     @Override
@@ -35,44 +25,11 @@ public class GameApp extends GameApplication {
 
     @Override
     protected void initGame() {
-
-        //sceneManager = new GameSceneManager(this);
-        //sceneManager.showMenu(); // 启动时显示主菜单
-
-        // 生成玩家
-        /*FXGL.entityBuilder()
-                .type(EntityType.PLAYER)
-                .at(600, 350)
-                .viewWithBBox("player.png")
-                .with(new com.almasb.fxgl.dsl.components.KeepOnScreenComponent())
-                .buildAndAttach();*/
-    }
-
-    //public GameSceneManager getSceneManager() {
-    //    return sceneManager;
-    //}
-
-    @Override
-    protected void initInput() {
-        FXGL.onKey(javafx.scene.input.KeyCode.W, "Move Up",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateY(-1)));
-
-        FXGL.onKey(javafx.scene.input.KeyCode.S, "Move Down",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateY(1)));
-
-        FXGL.onKey(javafx.scene.input.KeyCode.A, "Move Left",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateX(-1)));
-
-        FXGL.onKey(javafx.scene.input.KeyCode.D, "Move Right",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateX(1)));
+        sceneManager = new GameSceneManager(this);
+        sceneManager.showMenu();  // 启动时显示主菜单
     }
 
     public static void main(String[] args) {
-        launch(args); // This calls JavaFX Application.launch()
+        launch(args); // 启动 JavaFX 应用
     }
-
 }

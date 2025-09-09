@@ -1,1 +1,3 @@
-com\survivor\main\GameApp$EntityType.class
+com\survivor\core\UIManager.class
+com\survivor\ui\UI.class
+com\survivor\core\GameSceneManager.class
