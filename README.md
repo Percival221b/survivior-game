@@ -4,7 +4,7 @@
 Survivor（暂定）
 
 ## 二、开发工具
-- JDK 21  
+- JDK 17  
 - FXGL 17.3  
 - Maven 3.9.9  
 - Maven Plugin 0.0.8
