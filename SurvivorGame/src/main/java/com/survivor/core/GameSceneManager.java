@@ -19,7 +19,7 @@ public class GameSceneManager {
         uiManager.registerUI("menu", menuUI.createContent());
 
         // 创建并注册 HUD UI
-        HUD hud = new HUD();
+        HUD hud = new HUD(1280, 720, 100,50,this);
         uiManager.registerUI("hud", hud.createContent());
     }
 

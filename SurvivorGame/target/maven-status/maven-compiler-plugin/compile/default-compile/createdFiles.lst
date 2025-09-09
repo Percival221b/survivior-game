@@ -1,3 +1,4 @@
 com\survivor\core\UIManager.class
+com\survivor\ui\HUD$ExpBar.class
 com\survivor\ui\UI.class
 com\survivor\core\GameSceneManager.class
