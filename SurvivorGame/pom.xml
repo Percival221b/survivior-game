@@ -1,11 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.example</groupId>
+  <groupId>com.survivor</groupId>  <!-- 改为匹配你的包名 -->
   <artifactId>SurvivorGame</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <!-- <packaging>jar</packaging> 默认即可省略 -->
 
   <name>SurvivorGame</name>
   <url>http://maven.apache.org</url>
@@ -13,32 +14,32 @@
   <properties>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <javafx.version>17</javafx.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  <!-- 移除重复 -->
     <fxgl.version>17.3</fxgl.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencies>
+    <!-- 只保留 FXGL，它内置 JavaFX 17，无需单独添加 javafx-controls/fxml -->
     <dependency>
       <groupId>com.github.almasb</groupId>
       <artifactId>fxgl</artifactId>
-      <version>17.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-controls</artifactId>
-      <version>${javafx.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-fxml</artifactId>
-      <version>${javafx.version}</version>
+      <version>${fxgl.version}</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <!-- 添加编译器插件，确保 JDK 17 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>  <!-- 最新稳定版 -->
+        <configuration>
+          <release>17</release>
+        </configuration>
+      </plugin>
+
+      <!-- JavaFX 插件，用于运行和打包 -->
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
@@ -46,8 +47,16 @@
         <configuration>
           <mainClass>com.survivor.main.GameApp</mainClass>
         </configuration>
+        <!-- 绑定到 package 阶段，自动运行 -->
+        <executions>
+          <execution>
+            <id>default-cli</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
-
 </project>

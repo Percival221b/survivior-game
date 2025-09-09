@@ -21,7 +21,7 @@ public class MenuUI {
 
     public void show() {
         // 背景图
-        Image bgImage = new Image(getClass().getResource("/images/menuUi.png").toExternalForm());
+        Image bgImage = new Image(getClass().getResource("/images/menuUI.png").toExternalForm());
         ImageView bgView = new ImageView(bgImage);
         bgView.setFitWidth(800);
         bgView.setFitHeight(600);
