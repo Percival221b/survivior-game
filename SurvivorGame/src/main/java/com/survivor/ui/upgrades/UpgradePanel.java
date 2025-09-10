@@ -22,6 +22,24 @@ public class UpgradePanel extends StackPane {
 
     private final StackPane scrim = new StackPane();
     private final HBox cardsBox = new HBox(18);
+    // === 装饰边框相关（根据你的资源路径改） ===
+    private static final String FRAME_PATH = "ui/upgrades/frame.png";
+    // 目标卡片宽度（与原来接近；外观会更饱满）
+    private static final double CARD_TARGET_WIDTH = 360;
+    // 内容与边框的内边距（让内容别贴边框）
+    private static final double FRAME_INNER_PADDING = 24;
+
+    private static javafx.scene.image.Image img(String path) {
+        try {
+            var im = new javafx.scene.image.Image(path, false);
+            if (!im.isError()) return im;
+        } catch (Exception ignored) {}
+        try {
+            var url = UpgradePanel.class.getResource(path.startsWith("/") ? path : ("/" + path));
+            if (url != null) return new javafx.scene.image.Image(url.toExternalForm());
+        } catch (Exception ignored) {}
+        return new javafx.scene.image.WritableImage(1, 1); // 占位，不崩溃
+    }
 
     public UpgradePanel(List<UpgradeOption> options, Consumer<UpgradeOption> onChosen) {
         this.options = options;
@@ -63,28 +81,64 @@ public class UpgradePanel extends StackPane {
     }
 
     private VBox buildCard(UpgradeOption opt, int idx) {
+        // 1) 读取边框图片，计算卡片宽高（等比于边框）
+        var frameImage = img(FRAME_PATH);
+        double frameW = frameImage.getWidth();
+        double frameH = frameImage.getHeight();
+        // 边框图可能还没读到像素（异步），做个保底比例：3:4
+        double aspect = (frameW > 0 && frameH > 0) ? (frameW / frameH) : (3.0 / 4.0);
+
+        double cardW = CARD_TARGET_WIDTH;
+        double cardH = Math.round(cardW / aspect);
+
+        // 2) 内容：图标 + 标题 + 描述（和你原来一样，只是字号/对齐更适合置中）
         ImageView icon = new ImageView(opt.icon());
-        icon.setFitWidth(64); icon.setFitHeight(64); icon.setPreserveRatio(true);
+        icon.setFitWidth(168);
+        icon.setFitHeight(168);
+        icon.setPreserveRatio(true);
+        VBox.setMargin(icon, new Insets(0, 0, 10, 0));
 
         Label title = new Label(opt.title());
-        title.getStyleClass().add("upgrade-title");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
         Label desc = new Label(opt.description());
-        desc.getStyleClass().add("upgrade-desc");
         desc.setWrapText(true);
-        desc.setMaxWidth(320);
+        desc.setMaxWidth(cardW - FRAME_INNER_PADDING * 2); // 根据卡宽动态限制
+        desc.setAlignment(Pos.CENTER);
+        desc.setStyle("-fx-font-size: 16px; -fx-text-fill: #DDDDDD;");
 
-        VBox box = new VBox(10, icon, title, desc);
-        box.setAlignment(Pos.TOP_LEFT);
-        box.setPadding(new Insets(16));
-        box.getStyleClass().add("upgrade-card");
-        box.setMaxWidth(360);
-        box.setPrefWidth(320);
+        VBox content = new VBox(20, icon, title, desc);
+        content.setAlignment(Pos.CENTER);
+        content.setPadding(new Insets(FRAME_INNER_PADDING));
 
-        box.setOnMouseClicked(e -> pick(idx));
-        box.setOnMouseEntered(e -> box.getStyleClass().add("hover"));
-        box.setOnMouseExited(e -> box.getStyleClass().remove("hover"));
-        return box;
+        // 3) 边框层（完整 PNG）；保持比例填满 cardRoot
+        ImageView frameView = new ImageView(frameImage);
+        frameView.setPreserveRatio(true);
+        // 用 fitWidth 优先撑满宽度，高度跟着等比；若想完全铺满可改成 setPreserveRatio(false)+同时设宽高
+        frameView.setFitWidth(cardW);
+
+        // 4) 卡根节点：StackPane，尺寸与边框一致；底层 frame，上面 content
+        StackPane cardRoot = new StackPane(frameView, content);
+        cardRoot.setPrefSize(cardW, cardH);
+        cardRoot.setMaxSize(cardW, cardH);
+        cardRoot.setMinSize(cardW, cardH);
+        cardRoot.getStyleClass().add("upgrade-card"); // 继续复用你的 hover 等类
+        StackPane.setAlignment(content, Pos.CENTER);
+
+        // 5) 把交互绑定在 cardRoot（整张卡区域）
+        cardRoot.setOnMouseClicked(e -> pick(idx));
+        cardRoot.setOnMouseEntered(e -> cardRoot.getStyleClass().add("hover"));
+        cardRoot.setOnMouseExited(e -> cardRoot.getStyleClass().remove("hover"));
+
+        // 6) 为了兼容你现有代码返回 VBox，这里用一个“壳”VBox 包一下（也可以把返回类型换成 StackPane）
+        VBox shell = new VBox(cardRoot);
+        shell.setAlignment(Pos.CENTER);
+        // HBox 间距已在 cardsBox 里设了；这里不用 padding
+        // 但为了和旧代码对齐，我们仍然让 shell 看起来像“卡片容器”
+        shell.setPrefWidth(cardW);
+        shell.setMaxWidth(cardW);
+
+        return shell;
     }
 
     public void playIn() {

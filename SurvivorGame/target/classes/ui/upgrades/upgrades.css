@@ -1,0 +1,32 @@
+.upgrade-root {
+    -fx-font-family: "Segoe UI", "PingFang SC", "Microsoft Yahei", sans-serif;
+}
+
+.upgrade-card {
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(255,255,255,0.08);
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 20, 0.3, 0, 6);
+    -fx-background-color: linear-gradient(to bottom, #2E2F33, #1E1F23);
+    -fx-cursor: hand;
+}
+
+.upgrade-card.hover {
+    -fx-background-color: rgba(40,42,48,0.98);
+    -fx-border-color: rgba(255,255,255,0.16);
+}
+
+.upgrade-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #EAEAEA;
+    -fx-font-family: "Press Start 2P";
+    -fx-font-size: 22px;
+}
+
+
+.upgrade-desc {
+    -fx-font-size: 13px;
+    -fx-text-fill: #C9C9C9;
+}

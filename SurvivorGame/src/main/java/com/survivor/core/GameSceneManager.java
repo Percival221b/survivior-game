@@ -12,19 +12,19 @@ import java.util.List;
 
 import static com.almasb.fxgl.dsl.FXGL.*;
 import javafx.scene.input.KeyCode;
-import com.almasb.fxgl.input.UserAction;
+
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import java.net.URL;
 
 public class GameSceneManager {
 
-    // 字段
-    private HUD hud;
-
+    private HUD hud;                       // ✅ 字段
     private final GameApplication app;
     private final UIManager uiManager;
     private final AudioManager audioManager;
     private GameLoop gameLoop;
 
-    // 保存当前弹出的升级面板实例
     private UpgradePanel currentUpgradePanel;
 
     public GameSceneManager(GameApplication app) {
@@ -37,10 +37,10 @@ public class GameSceneManager {
         MenuUI menuUI = new MenuUI(this);
         uiManager.registerUI("menu", menuUI.createContent());
 
-        // HUD
-        HUD hud = new HUD(1280, 720, 100, 50, this);
-        hud.setOnLevelUp(this::showUpgradeChoices);   // 升级时弹出
-        uiManager.registerUI("hud", hud.createContent());
+        // HUD（✅ 不要新建同名局部变量）
+        this.hud = new HUD(1280, 720, 100, 50, this);
+        this.hud.setOnLevelUp(this::showUpgradeChoices);
+        uiManager.registerUI("hud", this.hud.createContent());
     }
 
     public void showMenu() {
@@ -51,11 +51,12 @@ public class GameSceneManager {
 
     public void startGame() {
         uiManager.showUI("hud");
-        URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
-        // 调试：U 直接打开升级面板；G 增加 150 经验
-//        onKeyDown(KeyCode.U, () -> showUpgradeChoices(1));
-//        onKeyDown(KeyCode.G, () -> hud.addExp(150));
 
+        // 调试：U 打开升级；G 加经验（✅ 现在 hud 不为 null 了）
+        onKeyDown(KeyCode.U, () -> showUpgradeChoices(1));
+        onKeyDown(KeyCode.G, () -> hud.addExp(150));
+
+        URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
     }
 
@@ -68,11 +69,11 @@ public class GameSceneManager {
 
         var options = List.of(
                 new UpgradeOption("atk_up","狂热斩击 +20%","基础攻击力 +20%，并小幅提升硬直稳定性。",
-                        new Image(getClass().getResource("/images/atk.png").toExternalForm())),
+                        img("ui/upgrades/1.png")),
                 new UpgradeOption("spd_up","疾风步 +15%","移动速度 +15%，冲刺冷却 -0.5s。",
-                        new Image(getClass().getResource("/images/spd.png").toExternalForm())),
+                        img("ui/upgrades/1.png")),
                 new UpgradeOption("hp_up","不屈之心 +1","最大生命 +1，并立即回复 50% 生命。",
-                        new Image(getClass().getResource("/images/hp.png").toExternalForm()))
+                        img("ui/upgrades/1.png"))
         );
 
         currentUpgradePanel = new UpgradePanel(options, chosen -> {
@@ -81,10 +82,29 @@ public class GameSceneManager {
             getGameLoop().resume();
         });
 
-        currentUpgradePanel.setPrefSize(1280, 720); // 覆盖全屏
+        currentUpgradePanel.setPrefSize(1280, 720);
         uiManager.addOverlay(currentUpgradePanel);
         currentUpgradePanel.playIn();
     }
+
+    /** 安全加载图片：先走与 HUD 相同的字符串路径，其次 getResource，最后用占位（可移除） */
+
+
+    private Image img(String path) {
+        try {
+            Image im = new Image(path, false);     // 试 1：直接用字符串路径
+            if (!im.isError()) return im;
+        } catch (Exception ignored) {}
+
+        try {                                      // 试 2：用 getResource 找 URL
+            String p = path.startsWith("/") ? path : ("/" + path);
+            URL url = getClass().getResource(p);
+            if (url != null) return new Image(url.toExternalForm());
+        } catch (Exception ignored) {}
+
+        return new WritableImage(1, 1);            // 兜底：1×1 透明像素，避免 NPE
+    }
+
 
     /** 实际应用升级（按你的数据结构改） */
     private void applyUpgrade(UpgradeOption opt) {
@@ -102,38 +122,3 @@ public class GameSceneManager {
         System.out.println("Applied upgrade: " + opt.id());
     }
 }
-
-/*package com.survivor.core;
-
-import com.almasb.fxgl.app.GameApplication;
-import com.almasb.fxgl.dsl.FXGL;
-import com.survivor.ui.GameOverUI;
-import com.survivor.ui.HUD;
-import com.survivor.ui.MenuUI;
-import javafx.scene.control.Label;
-import javafx.scene.layout.StackPane;
-
-public class GameSceneManager {
-
-    private final GameApplication app;
-    private MenuUI menuUI;
-    private HUD hud;
-
-    public GameSceneManager(GameApplication app) {
-        this.app = app;
-        menuUI = new MenuUI();
-        hud = new HUD();
-    }
-
-    // 显示主菜单
-    public void showMenu() {
-        FXGL.getGameScene().clearUINodes();
-        menuUI.show();
-    }
-
-    // 开始游戏
-    public void startGame() {
-        FXGL.getGameScene().clearUINodes();
-        hud.show();
-    }
-}*/
