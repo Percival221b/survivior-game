@@ -4,26 +4,34 @@ import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.app.GameSettings;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.level.Level;
+import com.almasb.fxgl.entity.level.tiled.TMXLevelLoader;
+import com.almasb.fxgl.entity.Entity;
+import java.net.URL;
+import java.util.Map;
 
+import com.survivor.system.ResourceLoader;
 import com.survivor.core.GameLoop;
 import com.survivor.core.GameSceneManager;
 
-import java.util.Map;
+import static com.almasb.fxgl.dsl.FXGLForKtKt.getGameWorld;
+
 public class GameApp extends GameApplication {
 
-    public enum EntityType {
-        PLAYER, ENEMY, BULLET
-    }
+    final int MAP_WIDTH = 9600;
+    final int MAP_HEIGHT = 5600;
     private GameSceneManager sceneManager;
     private GameLoop gameLoop;
 
+    private Entity player;
+
+
     @Override
     protected void initSettings(GameSettings settings) {
-        settings.setWidth(960);
-        settings.setHeight(640);
+        settings.setWidth(1280);
+        settings.setHeight(720);
         settings.setTitle("Survivor Game");
         settings.setVersion("1.0");
-        settings.setAppIcon("icon.png"); // 资源目录 /assets/textures/icon.png
+        settings.setAppIcon("icon.png");
     }
 
     @Override
@@ -36,27 +44,34 @@ public class GameApp extends GameApplication {
     protected void initGame() {
         gameLoop = new GameLoop();
         sceneManager = new GameSceneManager(this);
-        sceneManager.showMenu(); // 启动时显示主菜单
+        sceneManager.showMenu();
 
-        FXGL.setLevelFromMap("testmap.tmx");
+        getGameWorld().addEntityFactory(new ResourceLoader());
+
+        URL url = getClass().getResource("/assets/levels/Bigdongeonmap.tmx");
+        Level baseLevel = new TMXLevelLoader().load(url, FXGL.getGameWorld());
+
+        FXGL.getGameWorld().setLevel(baseLevel);
+
+
+        //FXGL.setLevelFromMap("dongeonmap.tmx");
 
         // 生成玩家
-        FXGL.entityBuilder()
+        player = FXGL.entityBuilder()
                 .type(EntityType.PLAYER)
-                .at(480, 360)
+                .at(6000, 3000)
                 .viewWithBBox("player.png")
                 .with(new com.almasb.fxgl.dsl.components.KeepOnScreenComponent())
                 .buildAndAttach();
+
+        FXGL.getGameScene().getViewport().bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
     }
+
 
     @Override
     protected void onUpdate(double tpf) {
         gameLoop.update(tpf);
-        System.out.println("Elapsed time: " + gameLoop.getElapsedTime());
-    }
-
-    public GameSceneManager getSceneManager() {
-        return sceneManager;
+        //System.out.println("Elapsed time: " + gameLoop.getElapsedTime());
     }
 
     @Override
@@ -78,6 +93,9 @@ public class GameApp extends GameApplication {
                         .forEach(e -> e.translateX(2)));
     }
 
+    public GameSceneManager getSceneManager() {
+        return sceneManager;
+    }
     public static void main(String[] args) {
         launch(args);
     }
