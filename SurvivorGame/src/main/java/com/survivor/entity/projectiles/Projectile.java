@@ -27,7 +27,4 @@ public abstract class Projectile extends Component implements Renderable{
         entity.translateY(direction.y * speed * tpf);
 
     }
-    public abstract void remove() {
-
-    }
 }
