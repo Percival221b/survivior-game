@@ -2,14 +2,29 @@ package com.survivor.entity.Player;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
-import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.PlayerMovementComponent;
+import com.survivor.entity.Player.HealthComponent;
 
+import java.util.function.BiConsumer;
+
+/**
+ * XPComponent 用于处理经验值和等级管理。
+ */
 public class XPComponent extends Component {
 
     private int level = 1;
     private int currentXP = 0;
     private int xpToNextLevel = 10;
+
+    // 经验变化回调
+    private BiConsumer<Integer, Integer> onXPChange;
+
+    /**
+     * 设置经验变化的回调。
+     */
+    public void setOnXPChange(BiConsumer<Integer, Integer> callback) {
+        this.onXPChange = callback;
+    }
 
     /**
      * 角色获得经验值时调用。
@@ -17,7 +32,12 @@ public class XPComponent extends Component {
      */
     public void gainXP(int amount) {
         currentXP += amount;
-        FXGL.getNotificationService().pushNotification("XP");
+        FXGL.getNotificationService().pushNotification("获得经验: " + amount);
+
+        // 每次经验变化后，调用回调，通知更新
+        if (onXPChange != null) {
+            onXPChange.accept(currentXP, xpToNextLevel);  // 传递当前经验和下一级经验
+        }
 
         checkLevelUp();
     }
@@ -32,23 +52,7 @@ public class XPComponent extends Component {
             currentXP -= xpToNextLevel; // 减去所需的经验值
 
             // 增加下一级所需的经验值（例如，指数增长）
-            xpToNextLevel = (int) (100 * Math.pow(1.3, level ));
-
-            entity.getComponentOptional(PlayerMovementComponent.class).ifPresent(move -> {
-                double oldSpeed = move.getSpeed();
-                move.setSpeed(oldSpeed * 1.25);  // 移动速度 +5%
-                FXGL.getNotificationService().pushNotification("移速提升到 " + (int) move.getSpeed());
-            });
-
-            entity.getComponentOptional(HealthComponent.class).ifPresent(hp -> {
-                // 假设 HealthComponent 里有 setMaxHP / getMaxHP / getHP / setHP 方法
-                int dMax =  10 * (level^2);;
-                hp.increaseMaxHP(dMax);
-                // 回一点血
-                FXGL.getNotificationService().pushNotification("最大生命加成");
-            });
-
-            FXGL.getNotificationService().pushNotification("等级提升");
+            xpToNextLevel = (int) (100 * Math.pow(1.3, level));
 
             // 如果玩家一次性获得足够升多级的经验，则再次检查
             checkLevelUp();
