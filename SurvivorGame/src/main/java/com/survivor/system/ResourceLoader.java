@@ -93,15 +93,32 @@ public class ResourceLoader implements EntityFactory {
                     hud.setMaxHealth(health.getMaxHp());
                     hud.setHealth(health.getHP());
 
-                    // 如果 XPComponent 有 maxXP/currentXP 方法
-                    //hud.setMaxExp(xp.getMaxXP());
-                    //hud.addExp(xp.getCurrentXP());
+                    hud.setMaxExp(xp.getXpToNextLevel());
+                    hud.setExp(xp.getCurrentXP());
                 }
             });
         }, Duration.seconds(0.1));  // 等待 UI 初始化完成后执行
 
+        health.setOnHealthChange((hp, maxHp) -> {
+            FXGL.getGameScene().getUINodes().forEach(node -> {
+                if (node instanceof HUD hud) {
+                    hud.setMaxHealth(maxHp);
+                    hud.setHealth(hp);
+                }
+            });
+        });
+
+        xp.setOnXPChange((currentXP, maxXP) -> {
+            FXGL.getGameScene().getUINodes().forEach(node -> {
+                if (node instanceof HUD hud) {
+                    hud.setMaxExp(maxXP);
+                    hud.setExp(currentXP);
+                }
+            });
+        });
         return player;
     }
+
 
 
     @Spawns("xpOrb")

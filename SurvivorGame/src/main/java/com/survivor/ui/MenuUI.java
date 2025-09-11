@@ -26,7 +26,7 @@ public class MenuUI {
         this.sceneManager = sceneManager;
 
         // 设置背景
-        setBackground("images/image (5).jpg");
+        setBackground("images/menuUI.png");
 
         // 创建自定义按钮
         startButton = createCustomButton("", "images/Start Game(1).png", () -> sceneManager.startGame());

@@ -20,7 +20,6 @@ public class GameApp extends GameApplication {
     final int MAP_WIDTH = 9600;
     final int MAP_HEIGHT = 5600;
     private GameSceneManager sceneManager;
-    //private GameLoop gameLoop;
 
     private Entity player;
 
@@ -81,24 +80,3 @@ public class GameApp extends GameApplication {
     }
 
 }
-
-    //FXGL.setLevelFromMap("dongeonmap.tmx");
-
-    /*@Override
-    protected void initInput() {
-        FXGL.onKey(javafx.scene.input.KeyCode.W, "Move Up",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateY(-2)));
-
-        FXGL.onKey(javafx.scene.input.KeyCode.S, "Move Down",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateY(2)));
-
-        FXGL.onKey(javafx.scene.input.KeyCode.A, "Move Left",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateX(-2)));
-
-        FXGL.onKey(javafx.scene.input.KeyCode.D, "Move Right",
-                () -> FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
-                        .forEach(e -> e.translateX(2)));
-    }*/
