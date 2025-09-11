@@ -141,28 +141,49 @@ public class HUD extends StackPane {
         private Rectangle bar;
         private Label text;
         private double maxValue;
-        private double currentValue=0;
+        private double currentValue = 0;
+
+        private ImageView healthView;
+        private double fullWidth = 292;   // healthbar.png 原始宽度
+        private double barHeight = 46;   // 图片高度
         private final boolean showFraction;
+
 
         public ExpBar(double width, double height, double maxValue, Color color, boolean showFraction) {
             this.maxValue = maxValue;
             this.currentValue = maxValue;
             this.showFraction = showFraction;
 
-            background = new Rectangle(width, height);
-            background.setFill(Color.DARKGRAY);
-            background.setArcWidth(8);
-            background.setArcHeight(8);
+            if (showFraction) {
+                healthView = new ImageView(new Image(
+                        getClass().getResource("/images/healthbar.png").toExternalForm()
+                ));
+                healthView.setFitHeight(barHeight);
+                healthView.setPreserveRatio(false);
 
-            bar = new Rectangle(width, height);
-            bar.setFill(color);
-            bar.setArcWidth(8);
-            bar.setArcHeight(8);
+                text = new Label();
+                text.setTextFill(Color.WHITE);
 
-            text = new Label();
-            text.setTextFill(Color.WHITE);
+                getChildren().addAll(healthView, text);
+                updateUI();
+            } else {
+                // ========= 原经验条 =========
+                background = new Rectangle(width, height);
+                background.setFill(Color.DARKGRAY);
+                background.setArcWidth(8);
+                background.setArcHeight(8);
 
-            getChildren().addAll(background, bar, text);
+                bar = new Rectangle(width, height);
+                bar.setFill(color);
+                bar.setArcWidth(8);
+                bar.setArcHeight(8);
+
+                text = new Label();
+                text.setTextFill(Color.WHITE);
+
+                getChildren().addAll(background, bar, text);
+            }
+
             updateUI();
         }
 
@@ -186,11 +207,25 @@ public class HUD extends StackPane {
 
         private void updateUI() {
             double progress = currentValue / maxValue;
-            bar.setWidth(background.getWidth() * progress);
             if (showFraction) {
-                text.setText(String.format("%.0f / %.0f", currentValue, maxValue));
+                // ==== 血条：用 viewport 裁剪 ====
+                double visibleWidth = fullWidth * progress;
+
+                if (healthView != null) {
+                    healthView.setViewport(new javafx.geometry.Rectangle2D(0, 0, visibleWidth, barHeight));
+                }
+                healthView.setTranslateX(0);
+
+                if (text != null) {
+                    text.setText(String.format("%.0f / %.0f", currentValue, maxValue));
+                }
             } else {
-                text.setText(String.format("%.0f%%", progress * 100));
+                // ==== 经验条：用矩形 ====
+                double barWidth = background.getWidth() * progress;
+                bar.setWidth(barWidth);
+                if (text != null) {
+                    text.setText(String.format("%.0f%%", progress * 100));
+                }
             }
         }
     }

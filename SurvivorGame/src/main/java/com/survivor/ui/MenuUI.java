@@ -29,7 +29,7 @@ public class MenuUI {
         setBackground("images/menuUI.png");
 
         // 创建自定义按钮
-        startButton = createCustomButton("", "images/Start Game(1).png", () -> sceneManager.startGame());
+        startButton = createCustomButton("", "images/startbtn.png", () -> sceneManager.startGame());
         exitButton = createCustomButton("", "images/exit(1).png", () -> System.exit(0));
     }
 
