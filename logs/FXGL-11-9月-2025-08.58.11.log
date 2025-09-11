@@ -1,0 +1,121 @@
+08:58:08.806 [main                     ] DEBUG Logger               - Configured Logger
+08:58:08.824 [main                     ] DEBUG GameApplication      - Logging settings
+Title: Survivor Game
+Version: 1.0
+Width: 1280
+Height: 720
+Fullscreen: false
+Intro: false
+Profiling: false
+Single step:false
+App Mode: DEVELOPER
+Menu Key: ESCAPE
+Stage Style: DECORATED
+Scene Factory: class com.almasb.fxgl.app.scene.SceneFactory
+
+08:58:09.324 [JavaFX Application Thread] DEBUG FXGLApplication      - Initializing FXGL
+08:58:09.327 [JavaFX Application Thread] INFO  Engine               - FXGL-17.3 (30.03.2023 11.49) on WINDOWS (J:17.0.16 FX:20)
+08:58:09.327 [JavaFX Application Thread] DEBUG Engine               - JRE Vendor Name: Microsoft
+08:58:09.327 [JavaFX Application Thread] DEBUG Engine               - Running on OS: Windows 11 version 10.0
+08:58:09.327 [JavaFX Application Thread] DEBUG Engine               - Architecture: amd64
+08:58:09.327 [JavaFX Application Thread] INFO  Engine               - Source code and latest versions at: https://github.com/AlmasB/FXGL
+08:58:09.327 [JavaFX Application Thread] INFO  Engine               -       Ask questions and discuss at: https://github.com/AlmasB/FXGL/discussions
+08:58:09.327 [JavaFX Application Thread] INFO  Engine               -              Join the FXGL chat at: https://gitter.im/AlmasB/FXGL
+08:58:09.407 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Creating a JavaFX scene
+08:58:09.491 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Target settings size: 1280.0 x 720.0
+08:58:09.491 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled scene size:    1280.0 x 720.0
+08:58:09.491 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled ratio: (1.0, 1.0)
+08:58:09.492 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Set initial scene to FXGLStartupScene
+08:58:09.494 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Opening main window
+08:58:09.561 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Window border size: (14.6666259765625, 37.33331298828125)
+08:58:09.561 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled size: 1280.0 x 720.0
+08:58:09.562 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scaled ratio: (1.0, 1.0)
+08:58:09.562 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Scene size: 1280.0 x 720.0
+08:58:09.562 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Stage size: 1294.6666259765625 x 757.3333129882812
+08:58:09.567 [FXGL Background Thread 1 ] DEBUG Engine               - Initializing environment variables
+08:58:09.588 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - User app class for loading assets: class com.survivor.main.GameApp
+08:58:09.588 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Applying CSS: fxgl_dark.css
+08:58:09.589 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/css/fxgl_dark.css
+08:58:09.617 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Initializing application scenes
+08:58:09.664 [FXGL Background Thread 1 ] DEBUG GameWorld            - Game world initialized
+08:58:09.696 [FXGL Background Thread 1 ] DEBUG PhysicsWorld         - Physics world initialized: appHeight=720, physics.ppm=50.0
+08:58:09.697 [FXGL Background Thread 1 ] DEBUG PhysicsWorld         - Using strategy: BRUTE_FORCE
+08:58:09.700 [FXGL Background Thread 1 ] DEBUG GameScene            - Game scene initialized: 1280x720
+08:58:09.708 [FXGL Background Thread 1 ] DEBUG FXGL.DefaultMenu     - createMenuBodyGameMenu()
+08:58:09.717 [FXGL Background Thread 1 ] DEBUG FXGL.DefaultMenu     - createOptionsMenu()
+08:58:09.725 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/textures/particles/smoke.png
+08:58:09.791 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/textures/particles/trace_horizontal.png
+08:58:09.814 [FXGL Background Thread 1 ] DEBUG GameApplicationServi - Application scenes initialized
+08:58:09.833 [FXGL Background Thread 1 ] DEBUG SystemBundleService  - Loading default FXGL system data
+08:58:09.833 [FXGL Background Thread 1 ] DEBUG UpdaterService       - Checking for updates
+08:58:09.835 [FXGL Background Thread 4 ] DEBUG FXGLApplication      - Loading fonts
+08:58:09.836 [FXGL Background Thread 1 ] DEBUG FXGLApplication      - Loading default localization
+08:58:09.836 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/VarelaRound-Regular.ttf
+08:58:09.836 [FXGL Background Thread 1 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/languages/english.lang
+08:58:09.850 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/Abel-Regular.ttf
+08:58:09.858 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/TerminalLandMono-Regular.otf
+08:58:09.863 [FXGL Background Thread 1 ] INFO  FXGLApplication      - FXGL initialization took: 0.295 sec
+08:58:09.864 [JavaFX Application Thread] DEBUG FXGLAssetLoaderServi - Loading from file system: file:/D:/javaproject/survivior-game/SurvivorGame/target/classes/assets/textures/icon.png
+08:58:09.868 [FXGL Background Thread 4 ] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/ui/fonts/Courier-Prime.ttf
+08:58:09.871 [JavaFX Application Thread] DEBUG FXGLAssetLoaderServi - Loading from file system: jar:file:/C:/Users/zrj/.m2/repository/com/github/almasb/fxgl/17.3/fxgl-17.3.jar!/fxglassets/textures/fxgl_default_cursor.png
+08:58:09.887 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Screenshot - CTRL+8
+08:58:09.889 [JavaFX Application Thread] DEBUG Input                - Registered new binding: System info dump - CTRL+9
+08:58:09.890 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Restart - CTRL+R
+08:58:09.890 [JavaFX Application Thread] DEBUG Input                - Registered new binding: Toggle Debug Camera - CTRL+7
+08:58:09.895 [JavaFX Application Thread] DEBUG LoopRunner           - Starting loop
+08:58:09.895 [JavaFX Application Thread] DEBUG LoopRunner           - Initializing JavaFX AnimationTimerLoop
+08:58:09.896 [JavaFX Application Thread] DEBUG GameApplicationServi - Starting new game
+08:58:09.896 [JavaFX Application Thread] DEBUG Input                - Clearing active input actions
+08:58:09.905 [JavaFX Application Thread] DEBUG GameApplicationServi - Removing overlay from FXGLStartupScene and adding to FXGLLoadingScene
+08:58:09.906 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - FXGLStartupScene -> FXGLLoadingScene
+08:58:09.906 [JavaFX Application Thread] DEBUG GameApplicationServi - Clearing previous game
+08:58:09.906 [JavaFX Application Thread] DEBUG GameScene            - Clearing game scene
+08:58:09.906 [JavaFX Application Thread] DEBUG GameWorld            - Clearing game world
+08:58:09.906 [JavaFX Application Thread] DEBUG PhysicsWorld         - Clearing physics world
+08:58:09.908 [JavaFX Application Thread] DEBUG FXGLApplication      - Registering font factories with UI factory
+08:58:09.908 [FXGL Background Thread 4 ] DEBUG FXGLApplication      - Initializing game
+08:58:09.946 [JavaFX Application Thread] DEBUG LoopRunner           - Stopping loop
+08:58:09.947 [JavaFX Application Thread] FATAL FXGLApplication      - Uncaught Exception:
+java.lang.RuntimeException: Initialization failed
+	at com.almasb.fxgl.app.FXGLApplication$InitAppTask.failed(FXGLApplication.kt:343)
+	at javafx.concurrent.Task.setState(Task.java:710)
+	at javafx.concurrent.Task$TaskCallable.lambda$call$2(Task.java:1456)
+	at com.sun.javafx.application.PlatformImpl.lambda$runLater$10(PlatformImpl.java:456)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:399)
+	at com.sun.javafx.application.PlatformImpl.lambda$runLater$11(PlatformImpl.java:455)
+	at com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
+	at com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+	at com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:185)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.IllegalArgumentException: Invalid URL: Invalid URL or resource not found
+	at javafx.scene.image.Image.validateUrl(Image.java:1138)
+	at javafx.scene.image.Image.<init>(Image.java:628)
+	at com.survivor.ui.MenuUI.setBackground(MenuUI.java:37)
+	at com.survivor.ui.MenuUI.<init>(MenuUI.java:29)
+	at com.survivor.core.GameSceneManager.<init>(GameSceneManager.java:37)
+	at com.survivor.main.GameApp.initGame(GameApp.java:46)
+	at com.almasb.fxgl.app.FXGLApplication$InitAppTask.initGame(FXGLApplication.kt:339)
+	at com.almasb.fxgl.app.FXGLApplication$InitAppTask.call(FXGLApplication.kt:319)
+	at com.almasb.fxgl.app.FXGLApplication$InitAppTask.call(FXGLApplication.kt:311)
+	at javafx.concurrent.Task$TaskCallable.call(Task.java:1426)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	... 1 more
+Caused by: java.lang.IllegalArgumentException: Invalid URL or resource not found
+	at javafx.scene.image.Image.validateUrl(Image.java:1123)
+	... 15 more
+
+08:58:09.948 [JavaFX Application Thread] FATAL FXGLApplication      - Application will now exit
+08:58:09.961 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Push state: ErrorSubScene
+08:58:09.961 [JavaFX Application Thread] DEBUG Input                - Clearing active input actions
+08:58:09.964 [JavaFX Application Thread] DEBUG GameApplicationServi - Removing overlay from FXGLLoadingScene and adding to ErrorSubScene
+08:58:09.964 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - FXGLLoadingScene -> ErrorSubScene
+08:58:10.472 [FXGL Background Thread 2 ] INFO  UpdaterService       - Your current version:  17.3
+08:58:10.472 [FXGL Background Thread 2 ] INFO  UpdaterService       - Latest stable version: 21.1
+08:58:11.946 [JavaFX Application Thread] DEBUG FXGLApplication      - Exiting FXGL
+08:58:11.946 [JavaFX Application Thread] DEBUG Async                - Shutting down background threads
+08:58:11.946 [JavaFX Application Thread] DEBUG PrimaryStageWindow   - Closing main window
+08:58:11.959 [JavaFX Application Thread] DEBUG Logger               - Closing Logger
