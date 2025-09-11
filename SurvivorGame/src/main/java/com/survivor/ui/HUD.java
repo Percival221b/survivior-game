@@ -67,7 +67,7 @@ public class HUD extends StackPane {
         pauseButton.setGraphic(pauseIcon);
         pauseButton.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
         pauseButton.setOnAction(e -> togglePauseMenu());
-        AnchorPane.setTopAnchor(pauseButton, 20.0);
+        AnchorPane.setTopAnchor(pauseButton, 25.0);
         AnchorPane.setRightAnchor(pauseButton, 20.0);
         root.getChildren().add(pauseButton);
 
