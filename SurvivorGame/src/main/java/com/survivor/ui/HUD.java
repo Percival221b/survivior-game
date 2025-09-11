@@ -67,7 +67,7 @@ public class HUD extends StackPane {
         pauseButton.setGraphic(pauseIcon);
         pauseButton.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
         pauseButton.setOnAction(e -> togglePauseMenu());
-        AnchorPane.setTopAnchor(pauseButton, 20.0);
+        AnchorPane.setTopAnchor(pauseButton, 25.0);
         AnchorPane.setRightAnchor(pauseButton, 20.0);
         root.getChildren().add(pauseButton);
 
@@ -102,6 +102,11 @@ public class HUD extends StackPane {
         root.getChildren().add(pauseMenu);
 
         getChildren().add(root);
+
+        // ====== NEW: 初始化数值（血量满、经验空）======
+        healthBar.setValue(maxHealth); // 血条满
+        setExp(0);                     // 经验条清零（不用直接改 expBar，走统一接口）
+        // ============================================
     }
 
     public StackPane createContent() {
@@ -137,12 +142,12 @@ public class HUD extends StackPane {
         private Rectangle bar;
         private Label text;
         private double maxValue;
-        private double currentValue;
+        private double currentValue = 0;
         private final boolean showFraction;
 
         public ExpBar(double width, double height, double maxValue, Color color, boolean showFraction) {
             this.maxValue = maxValue;
-            this.currentValue = maxValue;
+            this.currentValue = maxValue; // 默认满格，便于血条
             this.showFraction = showFraction;
 
             background = new Rectangle(width, height);
