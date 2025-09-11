@@ -4,12 +4,12 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
+import com.survivor.entity.Player.PlayerMovementComponent;
 import javafx.util.Duration;
 
-
 /**
- * 主角动画组件
- * 依赖 PlayerMovementComponent 来切换 Idle / Walk
+ * 主角动画组件：保证攻击最少播放一遍且不可被打断；长按连击。
+ * 依赖 PlayerMovementComponent 的按键状态（true/false）。
  */
 public class PlayerAnimationComponent extends Component {
 
@@ -25,91 +25,78 @@ public class PlayerAnimationComponent extends Component {
     private enum State { WALK ,ATTACK,IDLE,DASH}
     private State state = State.IDLE;
 
+    // === 关键：攻击锁，确保一旦开始就播完一轮；以及边沿检测 ===
+    private boolean attackInProgress = false;   // 正在播放攻击（期间禁止其它动画切换）
+    private boolean prevAttackInput  = false;   // 上一帧是否按着 J/K（用来捕捉“刚按下”）
+
     @Override
     public void onAdded() {
-        // 初始化动画通道
         idle = new AnimationChannel(
-                FXGL.image("Idle.png"),
-                10,   // 帧数
-                135, 135, // 单帧大小
-                Duration.seconds(0.5), // 一轮动画时长
-                0, 9
+                FXGL.image("Idle.png"), 10, 135, 135, Duration.seconds(0.5), 0, 9
         );
-
         walk = new AnimationChannel(
-                FXGL.image("Run.png"),
-                6,
-                135, 135,
-                Duration.seconds(0.7),
-                0, 5
+                FXGL.image("Run.png"), 6, 135, 135, Duration.seconds(0.7), 0, 5
         );
-
         attack = new AnimationChannel(
-                FXGL.image("Attack3.png"),
-                5,      // 帧数（按你的攻击图集来改）
-                135, 135,
-                Duration.seconds(0.6),
-                0, 4
+                FXGL.image("Attack3.png"), 5, 135, 135, Duration.seconds(0.6), 0, 4
         );
         dash = new AnimationChannel(
-                FXGL.image("Run.png"),
-                6,      // 帧数（按你的攻击图集来改）
-                135, 135,
-                Duration.seconds(0.2),
-                0, 5
+                FXGL.image("Run.png"), 6, 135, 135, Duration.seconds(0.2), 0, 5
         );
 
-
         texture = new AnimatedTexture(idle);
-        texture.loopAnimationChannel(idle);
         texture.setScaleX(2.5);
         texture.setScaleY(2.5);
         entity.getViewComponent().addChild(texture);
+        texture.loopAnimationChannel(idle);
 
-        // 依赖移动组件
         movement = entity.getComponent(PlayerMovementComponent.class);
-
     }
 
     @Override
     public void onUpdate(double tpf) {
-        if (movement.isMovingLeft()) {
+        // 朝向：优先用攻击方向，其次移动方向
+        if ( movement.isMovingLeft()) {
             texture.setScaleX(-2.5);
-        } else if (movement.isMovingRight()) {
+        } else if ( movement.isMovingRight()) {
             texture.setScaleX(2.5);
         }
-
         if (movement.isAttackingLeft()) {
             texture.setScaleX(-2.5);
         } else if (movement.isAttackingRight()) {
             texture.setScaleX(2.5);
         }
 
-        if (movement.isAttackingLeft()||movement.isAttackingRight()) {
-            if (state != State.ATTACK) {
-                state = State.ATTACK;
-
-
-                // 播放一次攻击动画
-                texture.playAnimationChannel(attack);
-
-                // 动画播完后才回到 Idle（或者根据是否在移动回到 Walk）
-                texture.setOnCycleFinished(() -> {
-                    if (movement.isMoving()) {
-                        state = State.WALK;
-                        texture.loopAnimationChannel(walk);
-                    } else {
-                        state = State.IDLE;
-                        texture.loopAnimationChannel(idle);
-                    }
-                });
-            }
-
-            return; // 攻击时完全屏蔽后续移动/Idle 切换逻辑
+        // 攻击进行中：完全锁住，禁止任何其它动画打断
+        if (attackInProgress) {
+            return;
         }
 
-        boolean moving = movement.isMoving();
+        // 捕捉“刚按下”触发一次攻击（即使很快松手，也能完整播完一轮）
+        boolean attackPressed = movement.isAttackingLeft() || movement.isAttackingRight();
+        if (attackPressed && !prevAttackInput) {
+            startAttack();      // 开始第一轮攻击
+            prevAttackInput = attackPressed;
+            return;             // 攻击优先级最高
+        }
+        prevAttackInput = attackPressed;
 
+        // 冲刺（只有在不攻击时才允许切换）
+        if (movement.isDashing()) {
+            if (state != State.DASH) {
+                state = State.DASH;
+                texture.playAnimationChannel(dash);
+                texture.setOnCycleFinished(() -> {
+                    if (attackInProgress) return; // 若期间被触发攻击，保持攻击优先
+                    state = movement.isMoving() ? State.WALK : State.IDLE;
+                    texture.loopAnimationChannel(state == State.WALK ? walk : idle);
+                });
+            }
+            return;
+        }
+
+        // 行走 / 待机 切换（只有不攻击、不冲刺时才切）
+        boolean moving = movement.isMoving();
         if (moving && state != State.WALK) {
             state = State.WALK;
             texture.loopAnimationChannel(walk);
@@ -117,21 +104,35 @@ public class PlayerAnimationComponent extends Component {
             state = State.IDLE;
             texture.loopAnimationChannel(idle);
         }
-
-
-
-        if (movement.isDashing()) {
-            if (state != State.DASH) {
-                state = State.DASH;
-                texture.playAnimationChannel(dash);
-                texture.setOnCycleFinished(() -> {
-                    state = State.IDLE;
-                    texture.loopAnimationChannel(idle);
-                });
-            }
-            return;
-        }
     }
 
+    /** 开始或续播一轮攻击：一旦进入就加锁，直到本轮攻击完整结束 */
+    private void startAttack() {
+        state = State.ATTACK;
+        attackInProgress = true;
 
+        // 根据当前按键方向再确认一下朝向
+
+
+        texture.playAnimationChannel(attack);
+
+        // 本轮攻击播完后的处理：要么连击、要么解锁回闲/走
+        texture.setOnCycleFinished(() -> {
+            boolean stillHolding = movement.isAttackingLeft() || movement.isAttackingRight();
+            if (stillHolding) {
+                // 长按：无缝进入下一轮攻击（注意：这里不解锁，持续连击）
+                startAttack();
+            } else {
+                // 松手：解锁，并回到 Idle/Walk
+                attackInProgress = false;
+                if (movement.isMoving()) {
+                    state = State.WALK;
+                    texture.loopAnimationChannel(walk);
+                } else {
+                    state = State.IDLE;
+                    texture.loopAnimationChannel(idle);
+                }
+            }
+        });
+    }
 }

@@ -32,12 +32,19 @@ public class GameApp extends GameApplication {
         settings.setTitle("Survivor Game");
         settings.setVersion("1.0");
         settings.setAppIcon("icon.png");
+        settings.setTicksPerSecond(120);
     }
 
     @Override
     protected void initGameVars(Map<String, Object> vars) {
         vars.put("score", 0);
         vars.put("timeSurvived", 0.0);
+    }
+
+    @Override
+    protected void initPhysics() {
+        // 关闭重力（顶视角）
+        FXGL.getPhysicsWorld().setGravity(0, 0);
     }
 
     @Override
