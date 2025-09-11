@@ -36,6 +36,9 @@ public class PlayerMovementComponent extends Component {
     private double dashCooldownMax = 2.0; // 冲刺冷却 2 秒
     private double dashCooldownTimer = 0; // 冷却计时器
 
+    // 新增暂停标志
+    private boolean paused = false;
+
     @Override
     public void onAdded() {
         this.physics = entity.getComponent(PhysicsComponent.class);
@@ -43,35 +46,35 @@ public class PlayerMovementComponent extends Component {
         // 注册输入绑定（WASD）
         FXGL.getInput().addAction(new UserAction("Move Up") {
             @Override
-            protected void onAction() { movingUp = true; }
+            protected void onAction() { if (!paused) movingUp = true; }
             @Override
-            protected void onActionEnd() { movingUp = false; }
+            protected void onActionEnd() {  if (!paused) movingUp = false; }
         }, KeyCode.W);
 
         FXGL.getInput().addAction(new UserAction("Move Down") {
             @Override
-            protected void onAction() { movingDown = true; }
+            protected void onAction() {  if (!paused) movingDown = true; }
             @Override
-            protected void onActionEnd() { movingDown = false; }
+            protected void onActionEnd() {  if (!paused) movingDown = false; }
         }, KeyCode.S);
 
         FXGL.getInput().addAction(new UserAction("Move Left") {
             @Override
-            protected void onAction() { movingLeft = true; }
+            protected void onAction() {  if (!paused) movingLeft = true; }
             @Override
-            protected void onActionEnd() { movingLeft = false; }
+            protected void onActionEnd() {  if (!paused) movingLeft = false; }
         }, KeyCode.A);
 
         FXGL.getInput().addAction(new UserAction("Move Right") {
             @Override
-            protected void onAction() { movingRight = true; }
+            protected void onAction() {  if (!paused) movingRight = true; }
             @Override
-            protected void onActionEnd() { movingRight = false; }
+            protected void onActionEnd() {  if (!paused) movingRight = false; }
         }, KeyCode.D);
 
         FXGL.getInput().addAction(new UserAction("AttackLeft") {
             @Override protected void onActionBegin() {
-                attackingLeft = true;
+                if (!paused) attackingLeft = true;
                 FXGL.getNotificationService().pushNotification("攻击开始！");
             }
             @Override protected void onActionEnd() {
@@ -82,7 +85,7 @@ public class PlayerMovementComponent extends Component {
 
         FXGL.getInput().addAction(new UserAction("AttackRight") {
             @Override protected void onActionBegin() {
-                attackingRight = true;
+                if (!paused) attackingRight = true;
                 FXGL.getNotificationService().pushNotification("攻击开始！");
             }
             @Override protected void onActionEnd() {
@@ -94,7 +97,7 @@ public class PlayerMovementComponent extends Component {
         FXGL.getInput().addAction(new UserAction("Dash") {
             @Override
             protected void onActionBegin() {
-                if (!dashing && dashCooldownTimer <= 0) { // 冷却完成才能冲刺
+                if (!paused && !dashing && dashCooldownTimer <= 0) { // 冷却完成才能冲刺
                     dashing = true;
                     dashTimer = dashDuration;
                     dashCooldownTimer = dashCooldownMax; // 开始进入冷却
@@ -108,6 +111,12 @@ public class PlayerMovementComponent extends Component {
 
     @Override
     public void onUpdate(double tpf) {
+        if (paused) {
+            // 停止一切移动
+            physics.setVelocityX(0);
+            physics.setVelocityY(0);
+            return;
+        }
         double dx = 0, dy = 0;
 
         if (movingLeft)  dx -= 1;
@@ -175,6 +184,13 @@ public class PlayerMovementComponent extends Component {
     public void stop() {
         movingUp = movingDown = movingLeft = movingRight = false;
         physics.setBodyLinearVelocity(new Vec2(0, 0));
+    }
+
+    public void setPaused(boolean paused) {
+        this.paused = paused;
+        if (paused) {
+            stop();
+        }
     }
 
     public void setSpeed(double speed) { this.speed = speed; }
