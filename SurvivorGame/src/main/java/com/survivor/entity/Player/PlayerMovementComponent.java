@@ -72,22 +72,22 @@ public class PlayerMovementComponent extends Component {
         FXGL.getInput().addAction(new UserAction("AttackLeft") {
             @Override protected void onActionBegin() {
                 attackingLeft = true;
-                FXGL.getNotificationService().pushNotification("攻击开始！");
+//                FXGL.getNotificationService().pushNotification("攻击开始！");
             }
             @Override protected void onActionEnd() {
                 attackingLeft= false;
-                FXGL.getNotificationService().pushNotification("攻击结束！");
+//                FXGL.getNotificationService().pushNotification("攻击结束！");
             }
         }, KeyCode.J);
 
         FXGL.getInput().addAction(new UserAction("AttackRight") {
             @Override protected void onActionBegin() {
                 attackingRight = true;
-                FXGL.getNotificationService().pushNotification("攻击开始！");
+//                FXGL.getNotificationService().pushNotification("攻击开始！");
             }
             @Override protected void onActionEnd() {
                 attackingRight= false;
-                FXGL.getNotificationService().pushNotification("攻击结束！");
+//                FXGL.getNotificationService().pushNotification("攻击结束！");
             }
         }, KeyCode.K);
 
@@ -98,7 +98,7 @@ public class PlayerMovementComponent extends Component {
                     dashing = true;
                     dashTimer = dashDuration;
                     dashCooldownTimer = dashCooldownMax; // 开始进入冷却
-                    FXGL.getNotificationService().pushNotification("冲刺！");
+//                    FXGL.getNotificationService().pushNotification("冲刺！");
                 }
             }
         }, KeyCode.L);

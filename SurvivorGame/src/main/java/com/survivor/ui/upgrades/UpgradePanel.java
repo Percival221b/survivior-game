@@ -22,7 +22,6 @@ public class UpgradePanel extends StackPane {
 
     private final StackPane scrim = new StackPane();
     private final HBox cardsBox = new HBox(18);
-
     // === 装饰边框相关（根据你的资源路径改） ===
     private static final String FRAME_PATH = "ui/upgrades/frame.png";
     // 目标卡片宽度（与原来接近；外观会更饱满）
@@ -93,17 +92,16 @@ public class UpgradePanel extends StackPane {
         double cardH = Math.round(cardW / aspect);
 
         // 2) 内容：图标 + 标题 + 描述（和你原来一样，只是字号/对齐更适合置中）
-        ImageView icon = new ImageView(opt.icon());
+        ImageView icon = new ImageView(opt.getImage());
         icon.setFitWidth(168);
         icon.setFitHeight(168);
         icon.setPreserveRatio(true);
         VBox.setMargin(icon, new Insets(0, 0, 10, 0));
 
-        Label title = new Label(opt.title());
+        Label title = new Label(opt.getTitle());
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
 
-        Label desc = new Label(opt.description());
-        desc.getStyleClass().add("upgrade-desc");
+        Label desc = new Label(opt.getDescription());
         desc.setWrapText(true);
         desc.setMaxWidth(cardW - FRAME_INNER_PADDING * 2); // 根据卡宽动态限制
         desc.setAlignment(Pos.CENTER);

@@ -5,20 +5,22 @@ import com.survivor.ui.MenuUI;
 import com.survivor.ui.HUD;
 import com.survivor.ui.upgrades.UpgradeOption;
 import com.survivor.ui.upgrades.UpgradePanel;
+import com.survivor.ui.upgrades.UpgradeRepository;
 import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyCode;
 
 import java.net.URL;
-
 import java.util.List;
 
-import static com.almasb.fxgl.dsl.FXGLForKtKt.onKeyDown;
+import static com.almasb.fxgl.dsl.FXGL.*;
+import javafx.scene.input.KeyCode;
+
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import java.net.URL;
 
 public class GameSceneManager {
 
-    private HUD hud;
-
+    private HUD hud;                       // ✅ 字段
     private final GameApplication app;
     private final UIManager uiManager;
     private final AudioManager audioManager;
@@ -36,7 +38,7 @@ public class GameSceneManager {
         MenuUI menuUI = new MenuUI(this);
         uiManager.registerUI("menu", menuUI.createContent());
 
-        // HUD
+        // HUD（✅ 不要新建同名局部变量）
         this.hud = new HUD(1280, 720, 100, 50, this);
         this.hud.setOnLevelUp(this::showUpgradeChoices);
         uiManager.registerUI("hud", this.hud.createContent());
@@ -44,7 +46,6 @@ public class GameSceneManager {
 
     public void showMenu() {
         uiManager.showUI("menu");
-        gameLoop.stop();
         URL resource = getClass().getResource("/sounds/Perennial_Respite_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
     }
@@ -53,12 +54,11 @@ public class GameSceneManager {
         uiManager.showUI("hud");
 
         // 调试：U 打开升级；G 加经验（✅ 现在 hud 不为 null 了）
-        //onKeyDown(KeyCode.U, () -> showUpgradeChoices(1));
-        //onKeyDown(KeyCode.G, () -> hud.addExp(150));
+//        onKeyDown(KeyCode.U, () -> showUpgradeChoices(1));
+//        onKeyDown(KeyCode.G, () -> hud.addExp(150));
 
         URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
-        gameLoop.start();
     }
 
     public GameLoop getGameLoop() { return gameLoop; }
@@ -68,14 +68,7 @@ public class GameSceneManager {
     private void showUpgradeChoices(int level) {
         getGameLoop().pause();
 
-        var options = List.of(
-                new UpgradeOption("atk_up","狂热斩击 +20%","基础攻击力 +20%，并小幅提升硬直稳定性。",
-                        img("ui/upgrades/1.png")),
-                new UpgradeOption("spd_up","疾风步 +15%","移动速度 +15%，冲刺冷却 -0.5s。",
-                        img("ui/upgrades/1.png")),
-                new UpgradeOption("hp_up","不屈之心 +1","最大生命 +1，并立即回复 50% 生命。",
-                        img("ui/upgrades/1.png"))
-        );
+        var options = UpgradeRepository.getRandomOptions();
 
         currentUpgradePanel = new UpgradePanel(options, chosen -> {
             applyUpgrade(chosen);
@@ -83,10 +76,14 @@ public class GameSceneManager {
             getGameLoop().resume();
         });
 
-        currentUpgradePanel.setPrefSize(1280, 720); // 覆盖全屏
+        currentUpgradePanel.setPrefSize(1280, 720);
         uiManager.addOverlay(currentUpgradePanel);
         currentUpgradePanel.playIn();
     }
+
+
+    /** 安全加载图片：先走与 HUD 相同的字符串路径，其次 getResource，最后用占位（可移除） */
+
 
     private Image img(String path) {
         try {
@@ -104,10 +101,9 @@ public class GameSceneManager {
     }
 
 
-
     /** 实际应用升级（按你的数据结构改） */
     private void applyUpgrade(UpgradeOption opt) {
-        switch (opt.id()) {
+        switch (opt.getId()) {   // ✅ 这里要用 getId()
             case "atk_up" -> {
                 // TODO: 增加玩家攻击力 20%
             }
@@ -118,6 +114,7 @@ public class GameSceneManager {
                 // TODO: 最大生命 +1，并恢复 50% 当前生命
             }
         }
-        System.out.println("Applied upgrade: " + opt.id());
+        System.out.println("Applied upgrade: " + opt.getId());
     }
+
 }

@@ -78,7 +78,7 @@ public class HealthComponent extends Component {
         // 同时增加当前生命值，给玩家即时反馈
         this.hp += amount;
         notifyHealthChange();
-        FXGL.getNotificationService().pushNotification("最大生命值增加 " + amount + " 点！");
+//        FXGL.getNotificationService().pushNotification("最大生命值增加 " + amount + " 点！");
     }
 }
 

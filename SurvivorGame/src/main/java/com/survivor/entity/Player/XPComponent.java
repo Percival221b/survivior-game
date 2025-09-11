@@ -27,7 +27,6 @@ public class XPComponent extends Component {
      */
     public void gainXP(int amount) {
         currentXP += amount;
-        FXGL.getNotificationService().pushNotification("获得经验: " + amount);
 
         // 每次经验变化后，调用回调，通知更新
         if (onXPChange != null) {
