@@ -29,6 +29,13 @@ public class CollisionSystem {
             }
         });
 
+//        FXGL.getPhysicsWorld().addCollisionHandler(new CollisionHandler(EntityType.PROJECTILESENSOR,EntityType.HERO) {
+//            @Override
+//            protected void onCollisionBegin(Entity projectile, Entity hero) {
+//                if (projectile.getType().equals(EntityType.PROJECTILEX))
+//
+//            }
+//        });
         // 如果有更多碰撞类型，可以在这里继续添加
     }
 
@@ -58,4 +65,7 @@ public class CollisionSystem {
         // 游戏结束
 //        FXGL.getGameController().exit();
     }
+//    private void handleProjectileHeroCollision(Entity projectile,Entity hero){
+//
+//    }
 }
