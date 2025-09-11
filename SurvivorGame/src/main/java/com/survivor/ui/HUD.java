@@ -1,6 +1,9 @@
 package com.survivor.ui;
 
+import com.almasb.fxgl.entity.Entity;
 import com.survivor.core.GameSceneManager;
+import com.survivor.entity.Player.HealthComponent;
+import com.survivor.entity.Player.XPComponent;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -236,4 +239,19 @@ public class HUD extends StackPane {
     public void setHealth(double value) { healthBar.setValue(value); }
     public void addHealth(double value) { healthBar.addValue(value); }
     public void setMaxHealth(double value) { healthBar.setMaxValue(value); }
+
+    //
+    public void updateFromPlayer(Entity player) {
+        player.getComponentOptional(XPComponent.class).ifPresent(xp -> {
+            expBar.setMaxValue(xp.getXpToNextLevel());
+            expBar.setValue(xp.getCurrentXP());
+            levelLabel.setText("等级: " + xp.getLevel());
+        });
+
+        player.getComponentOptional(HealthComponent.class).ifPresent(hp -> {
+            healthBar.setMaxValue(hp.getMaxHp());
+            healthBar.setValue(hp.getHP());
+        });
+    }
+
 }

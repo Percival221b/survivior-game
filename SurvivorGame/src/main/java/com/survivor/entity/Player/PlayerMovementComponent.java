@@ -29,9 +29,12 @@ public class PlayerMovementComponent extends Component {
     private boolean attackingRight = false;
 
     private boolean dashing = false;
-    private double dashSpeed = 2000;   // 冲刺速度，可以自己调
-    private double dashDuration = 0.2; // 持续时间（秒）
+    // 冲刺速度，可以自己调
+    private double dashDuration = 0.1; // 持续时间（秒）
     private double dashTimer = 0;      // 冲刺剩余时间
+
+    private double dashCooldownMax = 2.0; // 冲刺冷却 2 秒
+    private double dashCooldownTimer = 0; // 冷却计时器
 
     @Override
     public void onAdded() {
@@ -72,7 +75,7 @@ public class PlayerMovementComponent extends Component {
                 FXGL.getNotificationService().pushNotification("攻击开始！");
             }
             @Override protected void onActionEnd() {
-                attackingLeft = false;
+                attackingLeft= false;
                 FXGL.getNotificationService().pushNotification("攻击结束！");
             }
         }, KeyCode.J);
@@ -91,9 +94,10 @@ public class PlayerMovementComponent extends Component {
         FXGL.getInput().addAction(new UserAction("Dash") {
             @Override
             protected void onActionBegin() {
-                if (!dashing) {
+                if (!dashing && dashCooldownTimer <= 0) { // 冷却完成才能冲刺
                     dashing = true;
                     dashTimer = dashDuration;
+                    dashCooldownTimer = dashCooldownMax; // 开始进入冷却
                     FXGL.getNotificationService().pushNotification("冲刺！");
                 }
             }
@@ -114,7 +118,7 @@ public class PlayerMovementComponent extends Component {
         Point2D velocity = new Point2D(dx, dy);
 
         if (dashing) {
-            velocity = velocity.normalize().multiply(dashSpeed).multiply(0.01/tpf*1.0);
+            velocity = velocity.normalize().multiply(speed+1000).multiply(0.01/tpf*1.0);
             dashTimer -= tpf;
             if (dashTimer <= 0) {
                 dashing = false; // 冲刺结束
@@ -136,6 +140,9 @@ public class PlayerMovementComponent extends Component {
             state = PlayerState.ATTACKRIGHT;
         } else {
             state = PlayerState.IDLE;
+        }
+        if (dashCooldownTimer > 0) {
+            dashCooldownTimer -= tpf;
         }
     }
 
@@ -171,4 +178,9 @@ public class PlayerMovementComponent extends Component {
     }
 
     public void setSpeed(double speed) { this.speed = speed; }
+
+    public void resetAttack() {
+        attackingLeft = false;
+        attackingRight = false;
+    }
 }
