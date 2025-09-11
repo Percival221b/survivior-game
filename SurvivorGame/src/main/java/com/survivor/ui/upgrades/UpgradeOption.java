@@ -3,20 +3,31 @@ package com.survivor.ui.upgrades;
 import javafx.scene.image.Image;
 
 public class UpgradeOption {
-    private final String id;
-    private final String title;
-    private final String description;
-    private final Image icon;
+    private String id;
+    private String title;
+    private String description;
+    private String icon; // 从 JSON 读出来的路径，不直接存 Image
 
-    public UpgradeOption(String id, String title, String description, Image icon) {
+    public UpgradeOption() {
+        // Jackson 需要无参构造函数
+    }
+
+    public UpgradeOption(String id, String title, String description, String icon) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.icon = icon;
     }
 
-    public String id() { return id; }
-    public String title() { return title; }
-    public String description() { return description; }
-    public Image icon() { return icon; }
+    // getter / setter
+    public String getId() { return id; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public String getIcon() { return icon; }
+
+    // 提供一个方法把路径转成 Image
+    public Image getImage() {
+        var url = UpgradeOption.class.getResource("/" + icon);
+        return new Image(url.toExternalForm());
+    }
 }

@@ -5,15 +5,13 @@ import com.survivor.ui.MenuUI;
 import com.survivor.ui.HUD;
 import com.survivor.ui.upgrades.UpgradeOption;
 import com.survivor.ui.upgrades.UpgradePanel;
+import com.survivor.ui.upgrades.UpgradeRepository;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
+import static com.almasb.fxgl.dsl.FXGL.*;
 import javafx.scene.input.KeyCode;
-
 import java.net.URL;
-
 import java.util.List;
-
-import static com.almasb.fxgl.dsl.FXGLForKtKt.onKeyDown;
 
 public class GameSceneManager {
 
@@ -52,10 +50,6 @@ public class GameSceneManager {
     public void startGame() {
         uiManager.showUI("hud");
 
-        // 调试：U 打开升级；G 加经验（✅ 现在 hud 不为 null 了）
-        //onKeyDown(KeyCode.U, () -> showUpgradeChoices(1));
-        //onKeyDown(KeyCode.G, () -> hud.addExp(150));
-
         URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
         gameLoop.start();
@@ -68,14 +62,7 @@ public class GameSceneManager {
     private void showUpgradeChoices(int level) {
         getGameLoop().pause();
 
-        var options = List.of(
-                new UpgradeOption("atk_up","狂热斩击 +20%","基础攻击力 +20%，并小幅提升硬直稳定性。",
-                        img("ui/upgrades/1.png")),
-                new UpgradeOption("spd_up","疾风步 +15%","移动速度 +15%，冲刺冷却 -0.5s。",
-                        img("ui/upgrades/1.png")),
-                new UpgradeOption("hp_up","不屈之心 +1","最大生命 +1，并立即回复 50% 生命。",
-                        img("ui/upgrades/1.png"))
-        );
+        var options = UpgradeRepository.getRandomOptions();
 
         currentUpgradePanel = new UpgradePanel(options, chosen -> {
             applyUpgrade(chosen);
@@ -107,7 +94,7 @@ public class GameSceneManager {
 
     /** 实际应用升级（按你的数据结构改） */
     private void applyUpgrade(UpgradeOption opt) {
-        switch (opt.id()) {
+        switch (opt.getId()) {
             case "atk_up" -> {
                 // TODO: 增加玩家攻击力 20%
             }
@@ -118,6 +105,6 @@ public class GameSceneManager {
                 // TODO: 最大生命 +1，并恢复 50% 当前生命
             }
         }
-        System.out.println("Applied upgrade: " + opt.id());
+        System.out.println("Applied upgrade: " + opt.getId());
     }
 }

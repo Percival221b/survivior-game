@@ -26,10 +26,10 @@ public class MenuUI {
         this.sceneManager = sceneManager;
 
         // 设置背景
-        setBackground("images/menuUI.png");
+        setBackground("images/image (5).png");
 
         // 创建自定义按钮
-        startButton = createCustomButton("", "images/startbtn.png", () -> sceneManager.startGame());
+        startButton = createCustomButton("", "images/Start Game(1).png", () -> sceneManager.startGame());
         exitButton = createCustomButton("", "images/exit(1).png", () -> System.exit(0));
     }
 
@@ -73,7 +73,7 @@ public class MenuUI {
         button.setMinSize(220, 80);
 
         ImageView bg = new ImageView(new Image(imagePath));
-        bg.setFitWidth(220);
+        bg.setFitWidth(338);
         bg.setFitHeight(80);
 
         Label label = new Label(text);

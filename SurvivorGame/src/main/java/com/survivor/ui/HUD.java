@@ -233,7 +233,7 @@ public class HUD extends StackPane {
     private StackPane createCustomButton(String text, String imagePath, Runnable onClick) {
         StackPane button = new StackPane();
         ImageView bg = new ImageView(new Image(imagePath));
-        bg.setFitWidth(220);
+        bg.setFitWidth(338);
         bg.setFitHeight(80);
 
         Label label = new Label(text);
