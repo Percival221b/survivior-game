@@ -50,6 +50,10 @@ public class EnemyComponent extends Component  {
      *
      * @param player 目标玩家实体
      */
+    public EnemyComponent() {
+        this(null);   // 新增：复用带参分支，避免 texture 未初始化
+    }
+
     public EnemyComponent(Entity player) {
         this.player = player;
 
@@ -114,6 +118,27 @@ public class EnemyComponent extends Component  {
     public void setExpValue(int expValue) {
         this.expValue = expValue;
     }
+    /* ====================== 新增：5 个动画通道 setter ====================== */
+    public void setAnimIdle(AnimationChannel idle) {
+        this.animIdle = idle;
+    }
+
+    public void setAnimWalk(AnimationChannel walk) {
+        this.animWalk = walk;
+    }
+
+    public void setAnimAttack(AnimationChannel attack) {
+        this.animAttack = attack;
+    }
+
+    public void setAnimDeath(AnimationChannel death) {
+        this.animDeath = death;
+    }
+
+    public void setAnimHit(AnimationChannel hit) {
+        this.animHit = hit;
+    }
+    /* ==================================================================== */
 
 }
  /*   @Override

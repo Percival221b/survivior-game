@@ -6,16 +6,26 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
+import com.survivor.entity.EnemyAnimationPool;
 import com.survivor.entity.EnemyComponent;
+import com.survivor.entity.EnemyFactory;
+import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 import javafx.scene.effect.ColorAdjust;
-import javafx.scene.paint.Color;         // 添加这行导入
 
-public class EnemyAnimationTest extends GameApplication {
+/**
+ * 新版小怪动画测试工具
+ * 按键 Z/X/C/V 切换 NORMAL/TANK/SPEED/WIZARD 小怪，其余操作不变
+ */
+public class EnemyAnimationTestV2 extends GameApplication {
+
+    /* ============================== 新增字段 ============================== */
+    private EnemyFactory.EnemyType currentType = EnemyFactory.EnemyType.NORMAL; // 默认初始小怪
+    /* ==================================================================== */
 
     private Entity enemy;
     private EnemyComponent enemyComponent;
@@ -23,7 +33,7 @@ public class EnemyAnimationTest extends GameApplication {
 
     @Override
     protected void initSettings(GameSettings settings) {
-        settings.setTitle("Enemy Animation Test");
+        settings.setTitle("Enemy Animation Test V2 — Z/X/C/V 切换小怪");
         settings.setWidth(800);
         settings.setHeight(600);
         settings.setDeveloperMenuEnabled(true);
@@ -31,26 +41,44 @@ public class EnemyAnimationTest extends GameApplication {
 
     @Override
     protected void initGame() {
-        // 创建一个虚拟的"玩家"实体作为目标
+        createEnemyByType(currentType);   // 修改：抽取成独立方法，方便复用
+    }
+
+    /* ============================== 新增方法 ============================== */
+    // 根据类型重新创建小怪实体，并绑定动画
+    private void createEnemyByType(EnemyFactory.EnemyType type) {
+        // 如果场景里已有旧实体，先移除
+        if (enemy != null) {
+            enemy.removeFromWorld();
+        }
+
+        // 创建一个假玩家作为追踪目标（坐标随意）
         Entity dummyPlayer = FXGL.entityBuilder()
                 .at(400, 300)
-                .view("role.png") // 假设有这个图片资源
+                .view("role.png")   // 需要实际资源
                 .buildAndAttach();
 
-        // 创建测试用的敌人
-        enemy = FXGL.entityBuilder()
-                .at(100, 100)
-                .with(new EnemyComponent(dummyPlayer))
-                .scaleOrigin(0.5, 0.5)  // 设置缩放原点为中心
-                .scale(2.0, 2.0)        // 放大两倍
-                .buildAndAttach();
-
+        // 通过工厂生成指定类型小怪
+        enemy = EnemyFactory.spawnEnemy(type, new Point2D(100, 100));
         enemyComponent = enemy.getComponent(EnemyComponent.class);
+
+        /* ---------- 关键：把工厂里用的动画换成我们测试想看的动画 ---------- */
+        EnemyAnimationPool.EnemyAnimationSet animSet = EnemyAnimationPool.get(type);
+
+        // 重新设置动画通道（保证与工厂属性一致，且能完整播放）
+        enemyComponent.setAnimIdle(animSet.idle);
+        enemyComponent.setAnimWalk(animSet.walk);
+        enemyComponent.setAnimAttack(animSet.attack);
+        enemyComponent.setAnimDeath(animSet.death);
+        enemyComponent.setAnimHit(animSet.hit);
+
+        // 把动画纹理重新绑定到实体视图
+        enemyComponent.getTexture().loopAnimationChannel(animSet.idle);
     }
+    /* ==================================================================== */
 
     @Override
     protected void initUI() {
-        // 添加操作说明
         instructionText = new Text();
         instructionText.setTranslateX(10);
         instructionText.setTranslateY(20);
@@ -61,9 +89,12 @@ public class EnemyAnimationTest extends GameApplication {
                         "鼠标左键: 播放攻击动画\n" +
                         "鼠标右键: 播放受伤效果\n" +
                         "R键: 重置敌人状态\n" +
-                        "K键: 播放死亡动画"
+                        "K键: 播放死亡动画\n" +
+                        "Z键: 切换 NORMAL 小怪\n" +      // 新增
+                        "X键: 切换 TANK 小怪\n" +       // 新增
+                        "C键: 切换 SPEED 小怪\n" +      // 新增
+                        "V键: 切换 WIZARD 小怪"         // 新增
         );
-
         FXGL.getGameScene().addUINode(instructionText);
     }
 
@@ -71,7 +102,41 @@ public class EnemyAnimationTest extends GameApplication {
     protected void initInput() {
         Input input = FXGL.getInput();
 
-        // 方向键控制移动(触发行走动画)
+        /* ========================== 新增：Z/X/C/V 切换小怪 ========================== */
+        input.addAction(new UserAction("Switch to NORMAL") {
+            @Override
+            protected void onActionBegin() {
+                currentType = EnemyFactory.EnemyType.NORMAL;
+                createEnemyByType(currentType);
+            }
+        }, KeyCode.Z);
+
+        input.addAction(new UserAction("Switch to TANK") {
+            @Override
+            protected void onActionBegin() {
+                currentType = EnemyFactory.EnemyType.TANK;
+                createEnemyByType(currentType);
+            }
+        }, KeyCode.X);
+
+        input.addAction(new UserAction("Switch to SPEED") {
+            @Override
+            protected void onActionBegin() {
+                currentType = EnemyFactory.EnemyType.SPEED;
+                createEnemyByType(currentType);
+            }
+        }, KeyCode.C);
+
+        input.addAction(new UserAction("Switch to WIZARD") {
+            @Override
+            protected void onActionBegin() {
+                currentType = EnemyFactory.EnemyType.WIZARD;
+                createEnemyByType(currentType);
+            }
+        }, KeyCode.V);
+        /* ========================================================================== */
+
+        // 以下原有逻辑不变，仅把对 enemy/enemyComponent 的引用换成最新实体即可
         input.addAction(new UserAction("Move Up") {
             @Override
             protected void onAction() {
@@ -104,7 +169,6 @@ public class EnemyAnimationTest extends GameApplication {
             }
         }, KeyCode.RIGHT);
 
-        // 鼠标左键播放攻击动画
         input.addAction(new UserAction("Play Attack Animation") {
             @Override
             protected void onActionBegin() {
@@ -112,38 +176,23 @@ public class EnemyAnimationTest extends GameApplication {
             }
         }, MouseButton.PRIMARY);
 
-        // 鼠标右键播放受伤效果(短暂闪烁红色)
         input.addAction(new UserAction("Play Hit Effect") {
             @Override
             protected void onActionBegin() {
-                // ========== 添加的代码开始 ==========
-                // 创建红色闪烁效果
                 ColorAdjust redEffect = new ColorAdjust();
-                redEffect.setHue(-0.8);       // 红色色调
-                redEffect.setSaturation(0.9);  // 高饱和度
-                redEffect.setBrightness(0.2);  // 稍微变亮
-
-                // 应用红色效果
+                redEffect.setHue(-0.8);
+                redEffect.setSaturation(0.9);
+                redEffect.setBrightness(0.2);
                 enemyComponent.getTexture().setEffect(redEffect);
-                // ========== 添加的代码结束 ==========
-
-                // 播放受击动画（原有代码保持不变）
                 enemyComponent.getTexture().playAnimationChannel(enemyComponent.getAnimHit());
 
-                // 动画播放完成后恢复空闲状态（修改了这部分）
                 FXGL.getGameTimer().runOnceAfter(() -> {
-                    // ========== 修改的代码开始 ==========
-                    // 移除红色效果
                     enemyComponent.getTexture().setEffect(null);
-                    // ========== 修改的代码结束 ==========
-
-                    // 恢复空闲动画（原有代码保持不变）
                     enemyComponent.getTexture().loopAnimationChannel(enemyComponent.getAnimIdle());
                 }, Duration.seconds(0.3));
             }
         }, MouseButton.SECONDARY);
 
-        // R键重置敌人状态(回到空闲动画)
         input.addAction(new UserAction("Reset Enemy") {
             @Override
             protected void onActionBegin() {
@@ -152,16 +201,13 @@ public class EnemyAnimationTest extends GameApplication {
             }
         }, KeyCode.R);
 
-        // K键播放死亡动画
         input.addAction(new UserAction("Play Death Animation") {
             @Override
             protected void onActionBegin() {
                 enemyComponent.getTexture().playAnimationChannel(enemyComponent.getAnimDeath());
             }
         }, KeyCode.K);
-
     }
-
 
     public static void main(String[] args) {
         launch(args);
