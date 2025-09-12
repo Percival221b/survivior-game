@@ -25,7 +25,7 @@ public class HUD extends StackPane {
     private int level = 1;  // 初始等级
     private Label levelLabel;  // 等级显示标签
 
-    // ==== 新增：升级事件回调 ====
+    // 等级更新回调
     private java.util.function.Consumer<Integer> onLevelUp;
     public void setOnLevelUp(java.util.function.Consumer<Integer> cb) { this.onLevelUp = cb; }
 
@@ -102,14 +102,61 @@ public class HUD extends StackPane {
         root.getChildren().add(pauseMenu);
 
         getChildren().add(root);
-        // ====== NEW: 初始化数值（血量满、经验空）======
-        healthBar.setValue(maxHealth); // 血条满
-        setExp(0);                     // 经验条清零（不用直接改 expBar，走统一接口）
-        // ============================================
+
+        // 初始化
+        healthBar.setValue(maxHealth);
+        setExp(0);
     }
 
     public StackPane createContent() {
         return this;
+    }
+    public void setLevel(int level) {
+        levelLabel.setText("等级: " + level);
+    }
+
+    // 更新经验值显示
+    public void setExp(double value) {
+        expBar.setValue(value);  // 仅更新经验条
+    }
+
+
+    // 更新血量
+    public void setHealth(double value) {
+        healthBar.setValue(value);
+    }
+
+    public void addHealth(double value) {
+        healthBar.addValue(value);
+    }
+
+    public void setMaxHealth(double value) {
+        healthBar.setMaxValue(value);
+    }
+
+    // 添加自定义按钮等 UI 组件
+    private StackPane createCustomButton(String text, String imagePath, Runnable onClick) {
+        StackPane button = new StackPane();
+        ImageView bg = new ImageView(new Image(imagePath));
+        bg.setFitWidth(338);
+        bg.setFitHeight(80);
+
+        Label label = new Label(text);
+        label.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20; -fx-text-fill: #FFD700;");
+
+        button.getChildren().addAll(bg, label);
+        button.setAlignment(Pos.CENTER);
+        button.setOnMouseClicked(e -> onClick.run());
+        button.setOnMouseEntered(e -> scaleNode(button, 1.1));
+        button.setOnMouseExited(e -> scaleNode(button, 1.0));
+        return button;
+    }
+
+    private void scaleNode(StackPane node, double scale) {
+        ScaleTransition st = new ScaleTransition(Duration.seconds(0.2), node);
+        st.setToX(scale);
+        st.setToY(scale);
+        st.play();
     }
 
     private StackPane createPauseMenu(double width, double height) {
@@ -136,12 +183,38 @@ public class HUD extends StackPane {
         }
     }
 
+    public void reset() {
+        level = 1;
+        levelLabel.setText("等级: 1");
+
+        setExp(0);
+    }
+
+    public void setMaxExp(double value) {
+        expBar.setMaxValue(value);
+    }
+
+    public void addExp(double value) {
+        setExp(expBar.currentValue + value);
+    }
+
+    // 获取当前血量
+    public double getHealth() {
+        return healthBar.getValue();
+    }
+
+    // 获取当前经验
+    public double getExp() {
+        return expBar.getValue();
+    }
+
+    // 内部的经验条组件
     private static class ExpBar extends StackPane {
         private Rectangle background;
         private Rectangle bar;
         private Label text;
         private double maxValue;
-        private double currentValue=0;
+        private double currentValue = 0;
         private final boolean showFraction;
 
         public ExpBar(double width, double height, double maxValue, Color color, boolean showFraction) {
@@ -184,6 +257,10 @@ public class HUD extends StackPane {
             updateUI();
         }
 
+        public double getValue() {
+            return currentValue;
+        }
+
         private void updateUI() {
             double progress = currentValue / maxValue;
             bar.setWidth(background.getWidth() * progress);
@@ -194,50 +271,4 @@ public class HUD extends StackPane {
             }
         }
     }
-
-    private StackPane createCustomButton(String text, String imagePath, Runnable onClick) {
-        StackPane button = new StackPane();
-        ImageView bg = new ImageView(new Image(imagePath));
-        bg.setFitWidth(338);
-        bg.setFitHeight(80);
-
-        Label label = new Label(text);
-        label.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20; -fx-text-fill: #FFD700;");
-
-        button.getChildren().addAll(bg, label);
-        button.setAlignment(Pos.CENTER);
-        button.setOnMouseClicked(e -> onClick.run());
-        button.setOnMouseEntered(e -> scaleNode(button, 1.1));
-        button.setOnMouseExited(e -> scaleNode(button, 1.0));
-        return button;
-    }
-
-    private void scaleNode(StackPane node, double scale) {
-        ScaleTransition st = new ScaleTransition(Duration.seconds(0.2), node);
-        st.setToX(scale);
-        st.setToY(scale);
-        st.play();
-    }
-
-    // 外部接口
-    public void setExp(double value) {
-        double currentMaxExp = expBar.maxValue;
-        if (value >= currentMaxExp) {
-            level++;
-            value -= currentMaxExp;
-            currentMaxExp *= 1.2;
-            expBar.setMaxValue(currentMaxExp);
-            levelLabel.setText("等级: " + level);
-
-            // ==== 新增：触发升级回调 ====
-            if (onLevelUp != null) onLevelUp.accept(level);
-        }
-        expBar.setValue(value);
-    }
-
-    public void addExp(double value) { setExp(expBar.currentValue + value); }
-    public void setMaxExp(double value) { expBar.setMaxValue(value); }
-    public void setHealth(double value) { healthBar.setValue(value); }
-    public void addHealth(double value) { healthBar.addValue(value); }
-    public void setMaxHealth(double value) { healthBar.setMaxValue(value); }
 }

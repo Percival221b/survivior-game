@@ -40,68 +40,68 @@ public class PlayerMovementComponent extends Component {
     public void onAdded() {
         this.physics = entity.getComponent(PhysicsComponent.class);
 
-        // 注册输入绑定（WASD）
-        FXGL.getInput().addAction(new UserAction("Move Up") {
-            @Override
-            protected void onAction() { movingUp = true; }
-            @Override
-            protected void onActionEnd() { movingUp = false; }
-        }, KeyCode.W);
-
-        FXGL.getInput().addAction(new UserAction("Move Down") {
-            @Override
-            protected void onAction() { movingDown = true; }
-            @Override
-            protected void onActionEnd() { movingDown = false; }
-        }, KeyCode.S);
-
-        FXGL.getInput().addAction(new UserAction("Move Left") {
-            @Override
-            protected void onAction() { movingLeft = true; }
-            @Override
-            protected void onActionEnd() { movingLeft = false; }
-        }, KeyCode.A);
-
-        FXGL.getInput().addAction(new UserAction("Move Right") {
-            @Override
-            protected void onAction() { movingRight = true; }
-            @Override
-            protected void onActionEnd() { movingRight = false; }
-        }, KeyCode.D);
-
-        FXGL.getInput().addAction(new UserAction("AttackLeft") {
-            @Override protected void onActionBegin() {
-                attackingLeft = true;
-//                FXGL.getNotificationService().pushNotification("攻击开始！");
-            }
-            @Override protected void onActionEnd() {
-                attackingLeft= false;
-//                FXGL.getNotificationService().pushNotification("攻击结束！");
-            }
-        }, KeyCode.J);
-
-        FXGL.getInput().addAction(new UserAction("AttackRight") {
-            @Override protected void onActionBegin() {
-                attackingRight = true;
-//                FXGL.getNotificationService().pushNotification("攻击开始！");
-            }
-            @Override protected void onActionEnd() {
-                attackingRight= false;
-//                FXGL.getNotificationService().pushNotification("攻击结束！");
-            }
-        }, KeyCode.K);
-
-        FXGL.getInput().addAction(new UserAction("Dash") {
-            @Override
-            protected void onActionBegin() {
-                if (!dashing && dashCooldownTimer <= 0) { // 冷却完成才能冲刺
-                    dashing = true;
-                    dashTimer = dashDuration;
-                    dashCooldownTimer = dashCooldownMax; // 开始进入冷却
-//                    FXGL.getNotificationService().pushNotification("冲刺！");
-                }
-            }
-        }, KeyCode.L);
+//        // 注册输入绑定（WASD）
+//        FXGL.getInput().addAction(new UserAction("Move Up") {
+//            @Override
+//            protected void onAction() { movingUp = true; }
+//            @Override
+//            protected void onActionEnd() { movingUp = false; }
+//        }, KeyCode.W);
+//
+//        FXGL.getInput().addAction(new UserAction("Move Down") {
+//            @Override
+//            protected void onAction() { movingDown = true; }
+//            @Override
+//            protected void onActionEnd() { movingDown = false; }
+//        }, KeyCode.S);
+//
+//        FXGL.getInput().addAction(new UserAction("Move Left") {
+//            @Override
+//            protected void onAction() { movingLeft = true; }
+//            @Override
+//            protected void onActionEnd() { movingLeft = false; }
+//        }, KeyCode.A);
+//
+//        FXGL.getInput().addAction(new UserAction("Move Right") {
+//            @Override
+//            protected void onAction() { movingRight = true; }
+//            @Override
+//            protected void onActionEnd() { movingRight = false; }
+//        }, KeyCode.D);
+//
+//        FXGL.getInput().addAction(new UserAction("AttackLeft") {
+//            @Override protected void onActionBegin() {
+//                attackingLeft = true;
+////                FXGL.getNotificationService().pushNotification("攻击开始！");
+//            }
+//            @Override protected void onActionEnd() {
+//                attackingLeft= false;
+////                FXGL.getNotificationService().pushNotification("攻击结束！");
+//            }
+//        }, KeyCode.J);
+//
+//        FXGL.getInput().addAction(new UserAction("AttackRight") {
+//            @Override protected void onActionBegin() {
+//                attackingRight = true;
+////                FXGL.getNotificationService().pushNotification("攻击开始！");
+//            }
+//            @Override protected void onActionEnd() {
+//                attackingRight= false;
+////                FXGL.getNotificationService().pushNotification("攻击结束！");
+//            }
+//        }, KeyCode.K);
+//
+//        FXGL.getInput().addAction(new UserAction("Dash") {
+//            @Override
+//            protected void onActionBegin() {
+//                if (!dashing && dashCooldownTimer <= 0) { // 冷却完成才能冲刺
+//                    dashing = true;
+//                    dashTimer = dashDuration;
+//                    dashCooldownTimer = dashCooldownMax; // 开始进入冷却
+////                    FXGL.getNotificationService().pushNotification("冲刺！");
+//                }
+//            }
+//        }, KeyCode.L);
 
     }
 
@@ -182,5 +182,22 @@ public class PlayerMovementComponent extends Component {
     public void resetAttack() {
         attackingLeft = false;
         attackingRight = false;
+    }
+
+    public void setMovingUp(boolean value) { movingUp = value; }
+    public void setMovingDown(boolean value) { movingDown = value; }
+    public void setMovingLeft(boolean value) { movingLeft = value; }
+    public void setMovingRight(boolean value) { movingRight = value; }
+
+    public void setAttackingLeft(boolean value) { attackingLeft = value; }
+    public void setAttackingRight(boolean value) { attackingRight = value; }
+
+    public void startDash() {
+        if (!dashing && dashCooldownTimer <= 0) {
+            dashing = true;
+            dashTimer = dashDuration;
+            dashCooldownTimer = dashCooldownMax;
+            FXGL.getNotificationService().pushNotification("冲刺！");
+        }
     }
 }

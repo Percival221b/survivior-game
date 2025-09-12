@@ -22,18 +22,21 @@ public class UIManager {
 
     // 显示 UI
     public void showUI(String name) {
+        // 如果当前 UI 存在，则先移除它
         if (currentUI != null) {
             clearUI(currentUI);
         }
+
+        // 获取新的 UI 内容并添加到场景
         Parent uiContent = uiMap.get(name);
         if (uiContent != null) {
             FXGL.getGameScene().addUINode(uiContent);
-            currentUI = name;
+            currentUI = name;  // 更新当前 UI 为新的 UI
         }
     }
 
     // 销毁 UI
-    private void clearUI(String name) {
+    public void clearUI(String name) {
         Parent uiContent = uiMap.get(name);
         if (uiContent != null) {
             FXGL.getGameScene().removeUINode(uiContent);

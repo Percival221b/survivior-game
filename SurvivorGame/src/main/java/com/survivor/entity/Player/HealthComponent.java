@@ -1,31 +1,16 @@
 package com.survivor.entity.Player;
-import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.SpawnData;
+
 import com.almasb.fxgl.entity.component.Component;
+import com.almasb.fxgl.dsl.FXGL;
+
 import java.util.function.BiConsumer;
 
 public class HealthComponent extends Component {
-    private int hp;
-    private int maxHp;
+    private int hp;         // 当前血量
+    private int maxHp;      // 最大血量
+    private BiConsumer<Integer, Integer> onHealthChange; // 血量变化回调
 
-    private BiConsumer<Integer, Integer> onHealthChange;
-
-    public HealthComponent(SpawnData data) {
-        Object healthValue = data.hasKey("health") ? data.get("health") : 100;
-
-        // 检查值是否为 null，以防 SpawnData 中没有 "health" 键
-        if (healthValue != null) {
-            // 将值强制转换为 Number 类型，然后调用 intValue()
-            this.maxHp = ((Number) healthValue).intValue();
-        } else {
-            // 如果 SpawnData 中未提供生命值，则使用默认值
-            this.maxHp = 100;
-        }
-
-        this.hp = maxHp;
-
-    }
-
+    // 构造器
     public HealthComponent(int maxHp) {
         this.maxHp = maxHp;
         this.hp = maxHp;
@@ -36,49 +21,55 @@ public class HealthComponent extends Component {
         this.onHealthChange = callback;
     }
 
-    // 通知 UI
+    // 通知 UI 更新血量
     private void notifyHealthChange() {
         if (onHealthChange != null) {
-            onHealthChange.accept(hp, maxHp);
+            onHealthChange.accept(hp, maxHp);  // 通知 UI 更新血量
         }
     }
 
-
-
-    public int getHP() { return hp; }
-    public int getMaxHp() { return maxHp; }
-
-    public void setHp(int hp) {
-        this.hp = hp;
-        notifyHealthChange();
+    // 获取当前血量
+    public int getHP() {
+        return hp;
     }
+
+    // 获取最大血量
+    public int getMaxHp() {
+        return maxHp;
+    }
+
+    // 设置当前血量
+    public void setHp(int hp) {
+        this.hp = Math.max(0, hp);  // 血量不能小于 0
+        notifyHealthChange();       // 通知 UI 更新
+    }
+
+    // 设置最大血量
     public void setMaxHp(int maxHp) {
         this.maxHp = maxHp;
-        notifyHealthChange();
+        notifyHealthChange();       // 通知 UI 更新
     }
 
+    // 扣除血量
     public void takeDamage(int dmg) {
         hp -= dmg;
         if (hp <= 0) {
             hp = 0;
             FXGL.getNotificationService().pushNotification("玩家死亡！");
         }
-        notifyHealthChange();
+        notifyHealthChange();       // 通知 UI 更新
     }
 
-
+    // 治疗
     public void heal(int amount) {
-        hp = Math.min(maxHp, hp + amount);
-        notifyHealthChange();
+        hp = Math.min(maxHp, hp + amount); // 确保血量不超过最大血量
+        notifyHealthChange();       // 通知 UI 更新
     }
-    public void increaseMaxHP(int amount) {
-        // 增加最大生命值
-        this.maxHp += amount;
 
-        // 同时增加当前生命值，给玩家即时反馈
-        this.hp += amount;
-        notifyHealthChange();
-//        FXGL.getNotificationService().pushNotification("最大生命值增加 " + amount + " 点！");
+    // 增加最大血量
+    public void increaseMaxHP(int amount) {
+        this.maxHp += amount;
+        this.hp += amount;           // 增加最大血量时，当前血量也增加
+        notifyHealthChange();       // 通知 UI 更新
     }
 }
-

@@ -9,23 +9,19 @@ import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.BoundingShape;
 import com.survivor.core.SpawnArea;
 import com.survivor.entity.Player.HealthComponent;
-import com.survivor.entity.Player.PlayerAnimationComponent;
-import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.entity.Player.XPComponent;
-import com.survivor.ui.HUD;
+import com.survivor.entity.Player.PlayerMovementComponent;
+import com.survivor.entity.Player.PlayerAnimationComponent;
 import javafx.geometry.Point2D;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.survivor.main.EntityType;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.survivor.entity.ExperienceOrb;
-import com.survivor.entity.HealthPotionComponent;
+import com.survivor.ui.HUD;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.util.Duration;
+import javafx.scene.shape.Rectangle;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class ResourceLoader implements EntityFactory {
     private static final List<SpawnArea> spawnAreas = new ArrayList<>();
@@ -49,6 +45,42 @@ public class ResourceLoader implements EntityFactory {
         return spawnAreas;
     }
 
+    @Spawns("player")
+    public Entity newPlayer(SpawnData data) {
+        // 创建物理组件并设置为动态
+        PhysicsComponent physics = new PhysicsComponent();
+        physics.setBodyType(BodyType.DYNAMIC);
+
+        HealthComponent health = new HealthComponent(100);
+        XPComponent xp = new XPComponent();
+
+        Entity player = FXGL.entityBuilder(data)
+                .type(EntityType.PLAYER)
+                .with(physics) // 使用动态物理组件
+                .with(new PlayerMovementComponent()) // 移动组件
+                .with(health) // 生命值组件
+                .with(xp) // 经验值组件
+                .with(new PlayerAnimationComponent()) // 动画组件
+                .collidable()
+                .scale(0.5, 0.5)
+                .build();
+
+        // 设置回调
+        xp.setOnXPChange((currentXP, maxXP) -> {
+            updateXPUI(currentXP, maxXP);
+        });
+
+        xp.setOnLevelUp(level -> {
+            updateLevelUI(level);
+        });
+
+        health.setOnHealthChange((hp, maxHp) -> {
+            updateHealthUI(hp, maxHp);
+        });
+
+        return player;
+    }
+
     @Spawns("wall")
     public Entity newWall(SpawnData data) {
         int w = data.get("width");
@@ -57,97 +89,42 @@ public class ResourceLoader implements EntityFactory {
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.STATIC);
 
+        // 返回带有物理碰撞组件的实体
         return FXGL.entityBuilder(data)
                 .type(EntityType.WALL)
-                .bbox(new HitBox(new Point2D(0, 0), BoundingShape.box(w, h)))
+                .bbox(new HitBox(new Point2D(0, 0), BoundingShape.box(w, h)))  // 设置碰撞盒子
                 .with(physics)
+                //.view(new Rectangle(w, h, Color.GRAY))  // 设置视图，灰色矩形作为墙体
+                .collidable()  // 确保墙壁是可碰撞的
                 .build();
     }
 
-    @Spawns("player")
-    public Entity newPlayer(SpawnData data) {
-        // 创建物理组件并设置为动态
-        PhysicsComponent physics = new PhysicsComponent();
-        physics.setBodyType(BodyType.DYNAMIC);
-
-        HealthComponent health = new HealthComponent(data);
-        XPComponent xp = new XPComponent();
-
-        Entity player =  FXGL.entityBuilder(data)
-                .type(EntityType.PLAYER)
-                .with(physics) // 使用动态物理组件
-                .with(new PlayerMovementComponent()) // 移动组件
-                .with(health) // 生命值组件
-                .with(xp) // 经验值组件
-                // 蓝色小球
-                .with(new PlayerAnimationComponent())
-                .collidable()
-                .scale(0.5, 0.5)
-                .build();
-
-        // ---- 绑定到 UI ----
-        FXGL.runOnce(() -> {
-            // 设置初始血条
-            FXGL.getGameScene().getUINodes().forEach(node -> {
-                if (node instanceof HUD hud) {
-                    hud.setMaxHealth(health.getMaxHp());
-                    hud.setHealth(health.getHP());
-
-                    hud.setMaxExp(xp.getXpToNextLevel());
-                    hud.setExp(xp.getCurrentXP());
-                }
-            });
-        }, Duration.seconds(0.1));  // 等待 UI 初始化完成后执行
-
-        health.setOnHealthChange((hp, maxHp) -> {
-            FXGL.getGameScene().getUINodes().forEach(node -> {
-                if (node instanceof HUD hud) {
-                    hud.setMaxHealth(maxHp);
-                    hud.setHealth(hp);
-                }
-            });
+    private void updateXPUI(int currentXP, int xpToNextLevel) {
+        // 通知 HUD 更新经验条
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setMaxExp(xpToNextLevel);
+                hud.setExp(currentXP);
+            }
         });
+    }
 
-        xp.setOnXPChange((currentXP, maxXP) -> {
-            FXGL.getGameScene().getUINodes().forEach(node -> {
-                if (node instanceof HUD hud) {
-                    hud.setMaxExp(maxXP);
-                    hud.setExp(currentXP);
-                }
-            });
+    private void updateLevelUI(int level) {
+        // 通知 HUD 更新等级
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setLevel(level); // 假设 HUD 有 setLevel 方法
+            }
         });
-        return player;
     }
 
-
-
-    @Spawns("xpOrb")
-    public Entity newXPOrb(SpawnData data) {
-        int xpAmount = data.get("xpAmount");
-
-        PhysicsComponent physics = new PhysicsComponent();
-        physics.setBodyType(BodyType.DYNAMIC);
-
-        return FXGL.entityBuilder(data)
-                .type(EntityType.XP_ORB)
-                .with(new ExperienceOrb(xpAmount))
-                .with(physics) // 经验球也用动态，方便碰撞检测
-                .view(new Circle(5, Color.LIMEGREEN))
-                .collidable()
-                .build();
-    }
-
-    @Spawns("healthPotion")
-    public Entity newHealthPotion(SpawnData data) {
-        PhysicsComponent physics = new PhysicsComponent();
-        physics.setBodyType(BodyType.DYNAMIC);
-
-        return FXGL.entityBuilder(data)
-                .type(EntityType.HEALTH_POTION)
-                .with(new HealthPotionComponent())   // 回复 10% 最大血量
-                .with(physics)
-                .view(new Circle(7, Color.RED))      // 临时红球作为血瓶
-                .collidable()
-                .build();
+    private void updateHealthUI(int hp, int maxHp) {
+        // 通知 HUD 更新血量
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setMaxHealth(maxHp);
+                hud.setHealth(hp);
+            }
+        });
     }
 }
