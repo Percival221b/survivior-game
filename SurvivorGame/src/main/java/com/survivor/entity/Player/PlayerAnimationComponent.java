@@ -1,11 +1,14 @@
 package com.survivor.entity.Player;
 
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.survivor.entity.Player.PlayerMovementComponent;
 import javafx.util.Duration;
+import javafx.geometry.Point2D;
 
 /**
  * 主角动画组件：保证攻击最少播放一遍且不可被打断；长按连击。
@@ -50,12 +53,31 @@ public class PlayerAnimationComponent extends Component {
         entity.getViewComponent().addChild(texture);
         texture.loopAnimationChannel(idle);
 
+        javafx.scene.shape.Circle centerDebug = new javafx.scene.shape.Circle(3, javafx.scene.paint.Color.RED);
+        entity.getViewComponent().addChild(centerDebug);
+//
+        double x = entity.getPosition().getX()+50;
+        double y = entity.getPosition().getY()+36;
+
+        Entity debugCircle = FXGL.entityBuilder()
+                .at(x, y) // 直接放在这个位置
+                .view(new javafx.scene.shape.Circle(5, javafx.scene.paint.Color.BLUE))
+                .buildAndAttach();
+
+// 生成一个蓝色圆，放在 entity.getPosition() 的坐标点
         movement = entity.getComponent(PlayerMovementComponent.class);
     }
 
     @Override
     public void onUpdate(double tpf) {
         // 朝向：优先用攻击方向，其次移动方向
+
+
+
+        // 攻击进行中：完全锁住，禁止任何其它动画打断
+        if (attackInProgress) {
+            return;
+        }
         if ( movement.isMovingLeft()) {
             texture.setScaleX(-2.5);
         } else if ( movement.isMovingRight()) {
@@ -65,11 +87,6 @@ public class PlayerAnimationComponent extends Component {
             texture.setScaleX(-2.5);
         } else if (movement.isAttackingRight()) {
             texture.setScaleX(2.5);
-        }
-
-        // 攻击进行中：完全锁住，禁止任何其它动画打断
-        if (attackInProgress) {
-            return;
         }
 
         // 捕捉“刚按下”触发一次攻击（即使很快松手，也能完整播完一轮）
@@ -110,20 +127,41 @@ public class PlayerAnimationComponent extends Component {
     private void startAttack() {
         state = State.ATTACK;
         attackInProgress = true;
+        movement.triggerAttackSlow(0.6);
 
-        // 根据当前按键方向再确认一下朝向
-
+        boolean leftAttack = movement.isAttackingLeft();
+        boolean rightAttack = movement.isAttackingRight();
 
         texture.playAnimationChannel(attack);
 
-        // 本轮攻击播完后的处理：要么连击、要么解锁回闲/走
+        // 关键：在攻击动画的关键帧触发攻击逻辑
+        FXGL.runOnce(() -> {
+            if (leftAttack) {
+                //if (movement.isAttackingLeft()) {
+                FXGL.spawn("fireX", new SpawnData( entity.getCenter())
+                        .put("startPos",  entity.getCenter())
+                        .put("speed", 150f)
+                        .put("damage", 10f)
+                        .put("center", new Point2D(entity.getPosition().getX()+50,entity.getPosition().getY()+67))
+                        .put("hitCenter",entity.getCenter())
+                        .put("hitRadius", 40f)
+                        .put("offsetPos",new Point2D(0f,0f))
+                );
+                entity.getComponent(PlayerSoundComponent.class).playAttack();
+
+                //  );
+            } else if (rightAttack) {
+                entity.getComponent(PlayerSoundComponent.class).playAttack();
+                //  } else if (movement.isAttackingRight()) {
+                FXGL.spawn("xpOrb", new SpawnData(entity.getCenter()).put("xpAmount", 10));
+            }
+        }, Duration.seconds(0.6*0.6)); // 动画一半时出招
+
         texture.setOnCycleFinished(() -> {
             boolean stillHolding = movement.isAttackingLeft() || movement.isAttackingRight();
             if (stillHolding) {
-                // 长按：无缝进入下一轮攻击（注意：这里不解锁，持续连击）
-                startAttack();
+                startAttack(); // 长按连续攻击
             } else {
-                // 松手：解锁，并回到 Idle/Walk
                 attackInProgress = false;
                 if (movement.isMoving()) {
                     state = State.WALK;

@@ -84,11 +84,7 @@ public class SpawnManager {
 
             // 判定是否在允许距离范围之外
             if (distance >= minDist && distance <= maxDist) {
-                FXGL.entityBuilder()
-                        .type(EntityType.ENEMY)
-                        .at(x, y)
-                        .viewWithBBox("enemy.png")
-                        .buildAndAttach();
+                  FXGL.spawn("enemy", x, y);
 
                 System.out.println("Spawned enemy at (" + x + ", " + y + "), distance=" + distance);
                 return;
