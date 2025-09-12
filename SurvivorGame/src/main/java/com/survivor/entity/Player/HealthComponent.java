@@ -2,13 +2,36 @@ package com.survivor.entity.Player;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
+import com.survivor.main.GameApp;
+
 import java.util.function.BiConsumer;
 
 public class HealthComponent extends Component {
     private int hp;
     private int maxHp;
+    private int regenHp = 0;
+    private int shield = 0;
 
     private BiConsumer<Integer, Integer> onHealthChange;
+    private double regenTimer = 0;
+
+    @Override
+    public void onUpdate(double tpf) {
+        if(!FXGL.<GameApp>getAppCast().getSceneManager().getGameLoop().isRunning()){
+            return;
+        }
+        regenTimer += tpf;
+        if (regenTimer >= 5) {   // 每 5 秒触发一次
+            regenTimer = 0;
+            if (regenHp > 0 && hp > 0 && hp + regenHp <= maxHp) {
+                heal(regenHp);
+                FXGL.getNotificationService().pushNotification("恢复生命 +" + regenHp);
+            }
+            else if (regenHp > 0 && hp + regenHp <= maxHp) {
+                setHp(maxHp);
+            }
+        }
+    }
 
     public HealthComponent(SpawnData data) {
         Object healthValue = data.hasKey("health") ? data.get("health") : 100;
@@ -43,10 +66,10 @@ public class HealthComponent extends Component {
         }
     }
 
-
-
     public int getHP() { return hp; }
     public int getMaxHp() { return maxHp; }
+    public int getRegenHp() { return regenHp; }
+    public int getShield() { return shield; }
 
     public void setHp(int hp) {
         this.hp = hp;
@@ -58,6 +81,11 @@ public class HealthComponent extends Component {
     }
 
     public void takeDamage(int dmg) {
+        if (shield > 0) {
+            shield--;
+            notifyHealthChange();
+            return;
+        }
         hp -= dmg;
         if (hp <= 0) {
             hp = 0;
@@ -66,19 +94,26 @@ public class HealthComponent extends Component {
         notifyHealthChange();
     }
 
-
     public void heal(int amount) {
         hp = Math.min(maxHp, hp + amount);
         notifyHealthChange();
     }
+
     public void increaseMaxHP(int amount) {
         // 增加最大生命值
         this.maxHp += amount;
 
-        // 同时增加当前生命值，给玩家即时反馈
         this.hp += amount;
         notifyHealthChange();
         FXGL.getNotificationService().pushNotification("最大生命值增加 " + amount + " 点！");
+    }
+
+    public void increaseRegenHP(int amount) {
+        regenHp += amount;
+    }
+
+    public void increaseShield(int amount) {
+        shield += amount;
     }
 }
 

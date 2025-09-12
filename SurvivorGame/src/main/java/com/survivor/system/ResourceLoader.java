@@ -108,7 +108,7 @@ public class ResourceLoader implements EntityFactory {
             // 设置初始血条
             FXGL.getGameScene().getUINodes().forEach(node -> {
                 if (node instanceof HUD hud) {
-                    hud.setMaxHealth(health.getMaxHp());
+                    hud.setMaxHealth(100);
                     hud.setHealth(health.getHP());
 
                     hud.setMaxExp(xp.getXpToNextLevel());

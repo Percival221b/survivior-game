@@ -1,6 +1,11 @@
 package com.survivor.core;
 
 import com.almasb.fxgl.app.GameApplication;
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
+import com.survivor.entity.Player.HealthComponent;
+import com.survivor.entity.Player.PlayerMovementComponent;
+import com.survivor.main.EntityType;
 import com.survivor.ui.HUD;
 import com.survivor.ui.MenuUI;
 import com.survivor.ui.upgrades.UpgradeOption;
@@ -92,15 +97,40 @@ public class GameSceneManager {
 
     /** 实际应用升级（按你的数据结构改） */
     private void applyUpgrade(UpgradeOption opt) {
+        Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
+        if (player == null) return;
         switch (opt.getId()) {
             case "atk_up" -> {
-                // TODO: 增加玩家攻击力 20%
+                player.getComponent(PlayerMovementComponent.class).increaseAttack(0.2);
             }
             case "spd_up" -> {
-                // TODO: 移动速度 +15%，冲刺冷却 -0.5s
+                player.getComponent(PlayerMovementComponent.class).increaseSpeed(0.1);
+                player.getComponent(PlayerMovementComponent.class).decreaseDashCooldown(0.2);
             }
             case "hp_up" -> {
-                // TODO: 最大生命 +1，并恢复 50% 当前生命
+                player.getComponent(HealthComponent.class).increaseMaxHP(20);
+                player.getComponent(HealthComponent.class).heal(50);
+            }
+            case "crit_up" -> {
+
+            }
+            case "regen_up" ->{
+                player.getComponent(HealthComponent.class).increaseRegenHP(10);
+            }
+            case "aoe_up" ->{
+
+            }
+            case "tool_up" ->{
+
+            }
+            case "shield_up"->{
+                player.getComponent(HealthComponent.class).increaseShield(3);
+            }
+            case "cooldown_up" ->{
+
+            }
+            case "xp_up"->{
+
             }
         }
         System.out.println("Applied upgrade: " + opt.getId());

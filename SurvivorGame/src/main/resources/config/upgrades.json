@@ -14,7 +14,7 @@
   {
     "id": "hp_up",
     "title": "不屈之心",
-    "description": "最大生命 +10%，并立即回复 50% 生命。",
+    "description": "最大生命 +20，并立即回复 50 生命。",
     "icon": "ui/upgrades/heart.png"
   },
   {
@@ -26,7 +26,7 @@
   {
     "id": "regen_up",
     "title": "坚毅体魄",
-    "description": "每 5 秒恢复 5 点生命值。",
+    "description": "每 5 秒恢复 10 点生命值。",
     "icon": "ui/upgrades/muscle.png"
   },
   {
@@ -36,7 +36,7 @@
     "icon": "ui/upgrades/wave.png"
   },
   {
-    "id": "gold_up",
+    "id": "tool_up",
     "title": "贪婪之手",
     "description": "击败敌人时掉落道具的概率增加10%。",
     "icon": "ui/upgrades/rich.png"

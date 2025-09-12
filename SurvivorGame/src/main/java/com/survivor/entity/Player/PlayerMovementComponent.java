@@ -18,6 +18,7 @@ public class PlayerMovementComponent extends Component {
     public PlayerState state = PlayerState.IDLE;
 
     private double speed = 400; // 单位：像素/秒
+    private double attack = 10;       // 基础攻击
 
     // 移动方向状态
     private boolean movingUp = false;
@@ -198,6 +199,20 @@ public class PlayerMovementComponent extends Component {
     public boolean isDashing() {
         return dashing;
     }
+
+
+    public void increaseAttack(double percent) {
+        attack *= (1 + percent);
+    }
+
+    public void increaseSpeed(double percent) {
+        speed *= (1 + percent);
+    }
+
+    public void decreaseDashCooldown(double percent) {
+        dashCooldownMax *= (1 + percent);
+    }
+
 
     public void stop() {
         movingUp = movingDown = movingLeft = movingRight = false;

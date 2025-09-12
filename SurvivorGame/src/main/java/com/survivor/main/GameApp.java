@@ -34,8 +34,6 @@ public class GameApp extends GameApplication {
         settings.setVersion("1.0");
         settings.setAppIcon("icon.png");
         settings.setTicksPerSecond(60);
-
-
     }
 
     @Override
@@ -72,7 +70,7 @@ public class GameApp extends GameApplication {
 
         FXGL.run(() -> {
             player.getComponentOptional(com.survivor.entity.Player.HealthComponent.class)
-                    .ifPresent(hp -> hp.setHp(hp.getHP() - 1));
+                    .ifPresent(hp -> hp.takeDamage(1));
         }, Duration.seconds(1));
 
         FXGL.getGameScene().getViewport().bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
