@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 public class XPComponent extends Component {
     private int level = 1;           // 玩家等级
     private int currentXP = 0;       // 当前经验
-    private int xpToNextLevel = 140; // 升级所需经验
+    private int xpToNextLevel = 100; // 升级所需经验
 
     private BiConsumer<Integer, Integer> onXPChange;  // 经验变化回调
     private Consumer<Integer> onLevelUp;               // 升级回调
@@ -46,8 +46,15 @@ public class XPComponent extends Component {
             System.out.println("Level up triggered. Current Level: " + level);
 
             if (onLevelUp != null) {
-                System.out.println("Calling onLevelUp callback");
-                onLevelUp.accept(level);  // 通知 UI 更新等级
+                System.out.println("Calling onLevelUp callback - Consumer class: " + onLevelUp.getClass().getName());  // 打印 Consumer 类型（应是 $$Lambda$... 或您的类）
+                System.out.println("Consumer identity hash: " + System.identityHashCode(onLevelUp));  // 唯一 ID，比较是否匹配 HUD 设置的
+                try {
+                    onLevelUp.accept(level);
+                    System.out.println("accept() returned without exception");
+                } catch (Exception e) {
+                    System.err.println("Exception in onLevelUp.accept(): " + e);
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -67,14 +74,5 @@ public class XPComponent extends Component {
         return xpToNextLevel;
     }
 
-    // 重置经验与等级
-    public void reset() {
-        level = 1;
-        currentXP = 0;
-        xpToNextLevel = 140;
 
-        if (onXPChange != null) {
-            onXPChange.accept(currentXP, xpToNextLevel);  // 通知 UI 更新
-        }
-    }
 }

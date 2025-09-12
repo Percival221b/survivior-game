@@ -7,24 +7,38 @@ import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.EntityFactory;
 import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.BoundingShape;
+import com.survivor.core.GameSceneManager;
 import com.survivor.core.SpawnArea;
+import com.survivor.core.UIManager;
 import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.XPComponent;
-import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.entity.Player.PlayerAnimationComponent;
+import com.survivor.entity.Player.PlayerMovementComponent;
+import com.survivor.main.EntityType;
+import com.survivor.ui.HUD;
+import com.survivor.ui.upgrades.UpgradeOption;
+import com.survivor.ui.upgrades.UpgradePanel;
+import com.survivor.ui.upgrades.UpgradeRepository;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
-import com.survivor.main.EntityType;
-import com.survivor.ui.HUD;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 import java.util.ArrayList;
 
 public class ResourceLoader implements EntityFactory {
+
     private static final List<SpawnArea> spawnAreas = new ArrayList<>();
+    private UpgradePanel currentUpgradePanel;
+
+    private final UIManager uiManager;   // ✅ 不再用 FXGL.geto
+    private final GameSceneManager gsm;
+
+    public ResourceLoader(GameSceneManager gsm) {
+        this.gsm = gsm;
+        this.uiManager = gsm.getUiManager();
+    }
 
     @Spawns("spawnArea")
     public Entity newSpawnArea(SpawnData data) {
@@ -35,7 +49,6 @@ public class ResourceLoader implements EntityFactory {
 
         spawnAreas.add(new SpawnArea(x, y, w, h));
 
-        // 返回空实体即可
         return FXGL.entityBuilder(data)
                 .type(EntityType.SPAWN_AREA)
                 .build();
@@ -47,7 +60,6 @@ public class ResourceLoader implements EntityFactory {
 
     @Spawns("player")
     public Entity newPlayer(SpawnData data) {
-        // 创建物理组件并设置为动态
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.DYNAMIC);
 
@@ -56,27 +68,53 @@ public class ResourceLoader implements EntityFactory {
 
         Entity player = FXGL.entityBuilder(data)
                 .type(EntityType.PLAYER)
-                .with(physics) // 使用动态物理组件
-                .with(new PlayerMovementComponent()) // 移动组件
-                .with(health) // 生命值组件
-                .with(xp) // 经验值组件
-                .with(new PlayerAnimationComponent()) // 动画组件
+                .with(physics)
+                .with(new PlayerMovementComponent())
+                .with(health)
+                .with(xp)
+                .with(new PlayerAnimationComponent())
                 .collidable()
                 .scale(0.5, 0.5)
                 .build();
 
-        // 设置回调
-        xp.setOnXPChange((currentXP, maxXP) -> {
-            updateXPUI(currentXP, maxXP);
-        });
+        // 綁定 XP -> HUD
+        xp.setOnXPChange(this::updateXPUI);
 
         xp.setOnLevelUp(level -> {
-            updateLevelUI(level);
+            Platform.runLater(() -> {
+                updateLevelUI(level);
+                FXGL.getGameController().pauseEngine();
+
+                List<UpgradeOption> options;
+                try {
+                    options = UpgradeRepository.getRandomOptions();
+                    if (options.isEmpty()) {
+                        System.err.println("No upgrade options available");
+                        FXGL.getGameController().resumeEngine();
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    FXGL.getGameController().resumeEngine();
+                    return;
+                }
+
+                currentUpgradePanel = new UpgradePanel(options, chosen -> {
+                    applyUpgrade(chosen);
+                    if (currentUpgradePanel != null) {
+                        uiManager.removeOverlay(currentUpgradePanel);
+                    }
+                    FXGL.getGameController().resumeEngine();
+                });
+
+                currentUpgradePanel.setPrefSize(1280, 720);
+                uiManager.addOverlay(currentUpgradePanel);  // ✅ 用傳進來的 uiManager
+                currentUpgradePanel.playIn();
+            });
         });
 
-        health.setOnHealthChange((hp, maxHp) -> {
-            updateHealthUI(hp, maxHp);
-        });
+        // 綁定 HP -> HUD
+        health.setOnHealthChange(this::updateHealthUI);
 
         return player;
     }
@@ -89,18 +127,15 @@ public class ResourceLoader implements EntityFactory {
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.STATIC);
 
-        // 返回带有物理碰撞组件的实体
         return FXGL.entityBuilder(data)
                 .type(EntityType.WALL)
-                .bbox(new HitBox(new Point2D(0, 0), BoundingShape.box(w, h)))  // 设置碰撞盒子
+                .bbox(new HitBox(new Point2D(0, 0), BoundingShape.box(w, h)))
                 .with(physics)
-                //.view(new Rectangle(w, h, Color.GRAY))  // 设置视图，灰色矩形作为墙体
-                .collidable()  // 确保墙壁是可碰撞的
+                .collidable()
                 .build();
     }
 
     private void updateXPUI(int currentXP, int xpToNextLevel) {
-        // 通知 HUD 更新经验条
         FXGL.getGameScene().getUINodes().forEach(node -> {
             if (node instanceof HUD hud) {
                 hud.setMaxExp(xpToNextLevel);
@@ -110,21 +145,32 @@ public class ResourceLoader implements EntityFactory {
     }
 
     private void updateLevelUI(int level) {
-        // 通知 HUD 更新等级
         FXGL.getGameScene().getUINodes().forEach(node -> {
             if (node instanceof HUD hud) {
-                hud.setLevel(level); // 假设 HUD 有 setLevel 方法
+                hud.setLevel(level);
             }
         });
     }
 
     private void updateHealthUI(int hp, int maxHp) {
-        // 通知 HUD 更新血量
         FXGL.getGameScene().getUINodes().forEach(node -> {
             if (node instanceof HUD hud) {
                 hud.setMaxHealth(maxHp);
                 hud.setHealth(hp);
             }
         });
+    }
+
+    private static void applyUpgrade(UpgradeOption chosen) {
+        System.out.println("Applying upgrade: " + chosen.getTitle());
+        Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
+        if (player != null) {
+            String upgradeId = chosen.getId();
+            if ("health_boost".equals(upgradeId)) {
+                player.getComponent(HealthComponent.class).increaseMaxHP(50);
+            } else if ("speed_boost".equals(upgradeId)) {
+                player.getComponent(PlayerMovementComponent.class).setSpeed(1.2);
+            }
+        }
     }
 }

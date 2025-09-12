@@ -1,6 +1,10 @@
 package com.survivor.ui;
 
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.survivor.core.GameSceneManager;
+import com.survivor.entity.Player.XPComponent;
+import com.survivor.main.EntityType;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,6 +19,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.net.URL;
+import java.util.function.Consumer;
+import java.util.Optional;
 
 public class HUD extends StackPane {
 
@@ -27,7 +33,32 @@ public class HUD extends StackPane {
 
     // 等级更新回调
     private java.util.function.Consumer<Integer> onLevelUp;
-    public void setOnLevelUp(java.util.function.Consumer<Integer> cb) { this.onLevelUp = cb; }
+
+     // 新增导入（如果 IDE 未自动加）
+
+    public void setOnLevelUp(Consumer<Integer> callback) {
+        Optional<Entity> playerOpt = FXGL.getGameWorld()
+                .getEntitiesByType(EntityType.PLAYER)  // 返回 List<Entity>
+                .stream()
+                .findFirst();  // 返回 Optional<Entity>，获取第一个
+
+        if (playerOpt.isPresent()) {
+            Entity player = playerOpt.get();
+            XPComponent xp = player.getComponent(XPComponent.class);
+            if (xp != null) {
+                xp.setOnLevelUp(level -> {
+                    setLevel(level);  // 更新 UI（可选链式）
+                    if (callback != null) {
+                        callback.accept(level);  // 转发到 showUpgradeChoices
+                    }
+                });
+            } else {
+                System.err.println("XPComponent not found on player!");
+            }
+        } else {
+            System.err.println("No player entity found in world!");
+        }
+    }
 
     public HUD(double width, double height, double maxExp, double maxHealth, GameSceneManager gameSceneManager) {
         this.gameSceneManager = gameSceneManager;

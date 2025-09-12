@@ -15,9 +15,7 @@ import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.entity.Player.XPComponent;
 import com.survivor.system.ResourceLoader;
-import com.survivor.core.GameLoop;
 import com.survivor.core.GameSceneManager;
-import com.survivor.ui.HUD;
 import javafx.scene.input.KeyCode;
 import javafx.util.Duration;
 
@@ -29,8 +27,7 @@ public class GameApp extends GameApplication {
     final int MAP_HEIGHT = 5600;
     private GameSceneManager sceneManager;
 
-    static public Entity player;
-
+    public static Entity player;
 
     @Override
     protected void initSettings(GameSettings settings) {
@@ -53,9 +50,11 @@ public class GameApp extends GameApplication {
         // 关闭重力（顶视角）
         FXGL.getPhysicsWorld().setGravity(0, 0);
     }
+
     @Override
     protected void initInput() {
         FXGL.getInput().clearAll();
+
         // W
         FXGL.getInput().addAction(new UserAction("Move Up") {
             @Override
@@ -139,35 +138,36 @@ public class GameApp extends GameApplication {
 
     @Override
     protected void initGame() {
+        // 创建场景管理器
         sceneManager = new GameSceneManager(this);
         sceneManager.showMenu();
 
-        getGameWorld().addEntityFactory(new ResourceLoader());
+        // 注册实体工厂（必须传入 sceneManager）
+        getGameWorld().addEntityFactory(new ResourceLoader(sceneManager));
 
+        // 加载地图
         URL url = getClass().getResource("/assets/levels/Bigdongeonmap.tmx");
         Level baseLevel = new TMXLevelLoader().load(url, FXGL.getGameWorld());
-
         FXGL.getGameWorld().setLevel(baseLevel);
 
         // 生成玩家
         player = FXGL.spawn("player", 6000, 3000);
 
-        FXGL.run(() -> {
-            player.getComponentOptional(com.survivor.entity.Player.XPComponent.class)
-                    .ifPresent(xp -> xp.gainXP(30));
-        }, Duration.seconds(1));
+//        FXGL.run(() -> {
+//            player.getComponentOptional(XPComponent.class)
+//                    .ifPresent(xp -> xp.gainXP(20));
+//        }, Duration.seconds(1));
 
+//        FXGL.run(() -> {
+//            player.getComponentOptional(HealthComponent.class)
+//                    .ifPresent(hp -> hp.setHp(hp.getHP() - 30));
+//        }, Duration.seconds(2));
 
-        FXGL.run(() -> {
-            player.getComponentOptional(com.survivor.entity.Player.HealthComponent.class)
-                    .ifPresent(hp -> hp.setHp(hp.getHP() - 10));
-        }, Duration.seconds(1));
-
-
-
-        FXGL.getGameScene().getViewport().bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
+        // 绑定摄像机
+        FXGL.getGameScene().getViewport().bindToEntity(player,
+                FXGL.getAppWidth() / 2,
+                FXGL.getAppHeight() / 2);
     }
-
 
     @Override
     protected void onUpdate(double tpf) {
@@ -177,13 +177,12 @@ public class GameApp extends GameApplication {
         }
         System.out.println("Elapsed time: " + sceneManager.getGameLoop().getElapsedTime());
         DebugHelper.printPlayerHealth();
-
     }
-
 
     public GameSceneManager getSceneManager() {
         return sceneManager;
     }
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -204,15 +203,11 @@ public class GameApp extends GameApplication {
         // 4. 重新生成玩家
         player = FXGL.spawn("player", 6000, 3000);
 
-        // 5. 重置玩家血量和经验
-        player.getComponentOptional(HealthComponent.class)
-                .ifPresent(hp -> hp.setHp(hp.getMaxHp()));
-
-        player.getComponentOptional(XPComponent.class)
-                .ifPresent(XPComponent::reset);
 
         // 6. 绑定摄像机
-        FXGL.getGameScene().getViewport().bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
+        FXGL.getGameScene().getViewport().bindToEntity(player,
+                FXGL.getAppWidth() / 2,
+                FXGL.getAppHeight() / 2);
 
         // 7. 启动游戏循环
         sceneManager.getGameLoop().start();
@@ -221,5 +216,4 @@ public class GameApp extends GameApplication {
         URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
         if (resource != null) sceneManager.getAudioManager().playMusic(resource.toExternalForm());
     }
-
 }
