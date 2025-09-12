@@ -19,7 +19,7 @@ import com.survivor.entity.Bullet;
 import javafx.scene.transform.Rotate;
 
 public class ProjectileFactory implements EntityFactory {
-
+/*
     @Spawns("bullet")
     public Entity newBullet(SpawnData data) {
         Point2D startPos = data.get("startPos");
@@ -51,6 +51,6 @@ public class ProjectileFactory implements EntityFactory {
                 .with(new fire(startPos,speed,damage,center,hitRadius,hitCenter)) // 添加自定义逻辑
                 .collidable() // 标记为可碰撞
                 .build();
-    }
+    }*/
 }
 

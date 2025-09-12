@@ -33,7 +33,7 @@ public class GameApp extends GameApplication {
         settings.setTitle("Survivor Game");
         settings.setVersion("1.0");
         settings.setAppIcon("icon.png");
-        settings.setTicksPerSecond(120);
+        settings.setTicksPerSecond(60);
     }
 
     @Override

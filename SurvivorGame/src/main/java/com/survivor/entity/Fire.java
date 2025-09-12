@@ -1,63 +1,42 @@
 package com.survivor.entity;
 
-import com.almasb.fxgl.core.math.FXGLMath;
-import com.almasb.fxgl.entity.component.Component;
+
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.EntityFactory;
-import com.almasb.fxgl.entity.SpawnData;
-import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimationChannel;
-import com.survivor.entity.Projectile;
 import javafx.geometry.Point2D;
-import javafx.scene.shape.Circle;
-import javafx.scene.paint.Color;
-import com.survivor.entity.interfaces.Renderable;
-import javafx.scene.canvas.GraphicsContext;
-import com.almasb.fxgl.core.math.Vec2;
-import com.survivor.util.*;
-import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.texture.AnimatedTexture;
-import com.almasb.fxgl.texture.AnimationChannel;
 import javafx.util.Duration;
+import com.survivor.util.getMoveDirection;
 
-public class fire extends Projectile {
+public class Fire extends Projectile {
 
-    private float damage;
     private Point2D center;
-    boolean canMove = true;
-    Point2D startPos;
-    Vec2 direction;
-    float speed;
 
-    public fire(Point2D startPos, float speed, float damage, Point2D center,float hitRadius,Point2D hitCenter) {
-        super(startPos, speed, damage,hitRadius,hitCenter);
-        this.startPos = startPos;
-        this.speed = speed;
-        this.damage = damage;
+    public Fire(Point2D startPos, float speed, float damage, Point2D center, float hitRadius, Point2D hitCenter, Point2D offsetPos) {
+        super(speed, damage,hitRadius,hitCenter,offsetPos);
         this.center = center;
     }
     @Override
     protected void getNextMove() {
-
-        direction =  getMoveDirection.getCircularMoveDir(center, startPos, true);
-
+        direction = getMoveDirection.getCentripetalMoveDir(center,entity.getPosition(),true,true,0.9999f);
     }
-
-
+    @Override
+    public void onAdded() {
+        super.onAdded();
+    }
 
     @Override
     public void setAnimChannel() {
         flyAnim = new AnimationChannel(
-                FXGL.image("projectiles/FireBall.png"),
+                FXGL.image("FireBall.png"),
                 1,   // 帧数
                 80, 112, // 单帧大小
                 Duration.seconds(0.5), // 一轮动画时长
                 0, 0
         );
         explodeAnim = new AnimationChannel(
-                FXGL.image("projectiles/FireBall.png"),
+                FXGL.image("FireBall.png"),
                 4,   // 帧数
                 80, 112, // 单帧大小
                 Duration.seconds(0.5), // 一轮动画时长

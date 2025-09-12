@@ -1,5 +1,5 @@
 package com.survivor.entity.Player;
-
+import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.input.UserAction;
@@ -35,6 +35,16 @@ public class PlayerMovementComponent extends Component {
 
     private double dashCooldownMax = 2.0; // 冲刺冷却 2 秒
     private double dashCooldownTimer = 0; // 冷却计时器
+
+
+    private double attackInterval = 0.6;  // 攻击冷却
+    private double attackTimer = 0;
+
+    private double dashOrbTimer = 0;
+    private double dashOrbInterval = 0.03;
+
+    private double attackSlowTimer = 0;   // 攻击减速剩余时间
+    private double attackSlowDuration = 0.6; // 攻击动画时长（秒）
 
     // 新增暂停标志
     private boolean paused = false;
@@ -75,22 +85,22 @@ public class PlayerMovementComponent extends Component {
         FXGL.getInput().addAction(new UserAction("AttackLeft") {
             @Override protected void onActionBegin() {
                 if (!paused) attackingLeft = true;
-                FXGL.getNotificationService().pushNotification("攻击开始！");
+                //FXGL.getNotificationService().pushNotification("攻击开始！");
             }
             @Override protected void onActionEnd() {
                 attackingLeft= false;
-                FXGL.getNotificationService().pushNotification("攻击结束！");
+                //FXGL.getNotificationService().pushNotification("攻击结束！");
             }
         }, KeyCode.J);
 
         FXGL.getInput().addAction(new UserAction("AttackRight") {
             @Override protected void onActionBegin() {
                 if (!paused) attackingRight = true;
-                FXGL.getNotificationService().pushNotification("攻击开始！");
+                //FXGL.getNotificationService().pushNotification("攻击开始！");
             }
             @Override protected void onActionEnd() {
                 attackingRight= false;
-                FXGL.getNotificationService().pushNotification("攻击结束！");
+                //FXGL.getNotificationService().pushNotification("攻击结束！");
             }
         }, KeyCode.K);
 
@@ -127,14 +137,22 @@ public class PlayerMovementComponent extends Component {
         Point2D velocity = new Point2D(dx, dy);
 
         if (dashing) {
-            velocity = velocity.normalize().multiply(speed+1000).multiply(0.01/tpf*1.0);
+            velocity = velocity.normalize().multiply(speed+1000);
             dashTimer -= tpf;
             if (dashTimer <= 0) {
                 dashing = false; // 冲刺结束
             }
+            dashOrbTimer -= tpf;
+            if (dashOrbTimer <= 0) {
+                FXGL.spawn("xpOrb", new SpawnData(entity.getCenter()).put("xpAmount", 1));
+                dashOrbTimer = dashOrbInterval; // 重置间隔
+            }
+        } else if (attackSlowTimer > 0) {
+            velocity = velocity.normalize().multiply(speed * 0.75);
+            attackSlowTimer -= tpf;
         }
         else {
-            velocity = velocity.normalize().multiply(speed).multiply(0.01 / tpf * 1.0);
+            velocity = velocity.normalize().multiply(speed);
         }
         physics.setVelocityX(velocity.getX());
         physics.setVelocityY(velocity.getY());
@@ -198,5 +216,8 @@ public class PlayerMovementComponent extends Component {
     public void resetAttack() {
         attackingLeft = false;
         attackingRight = false;
+    }
+    public void triggerAttackSlow(double duration) {
+        attackSlowTimer = duration;
     }
 }

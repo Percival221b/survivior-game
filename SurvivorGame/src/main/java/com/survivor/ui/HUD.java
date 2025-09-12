@@ -144,8 +144,8 @@ public class HUD extends StackPane {
         private double currentValue = 0;
 
         private ImageView healthView;
-        private double fullWidth = 292;   // healthbar.png 原始宽度
-        private double barHeight = 46;   // 图片高度
+        private double fullWidth = 350;   // healthbar.png 原始宽度
+        private double barHeight = 39;   // 图片高度
         private final boolean showFraction;
 
 

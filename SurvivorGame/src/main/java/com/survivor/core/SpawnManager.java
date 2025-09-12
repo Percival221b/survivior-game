@@ -25,7 +25,7 @@ public class SpawnManager {
 
         // 随时间逐渐增加难度
         // 随着时间增长，spawnInterval 逐渐减小
-        double difficultyFactor = Math.min(elapsedTime / 60.0, 1.0); // 0~1，60秒达到最高难度
+        double difficultyFactor = Math.min(elapsedTime / 120.0, 1.0); // 0~1，120秒达到最高难度
         spawnInterval = 0.8 - 0.6 * difficultyFactor; // 最终达到 0.2 秒
 
         if (spawnTimer >= spawnInterval) {
@@ -84,11 +84,7 @@ public class SpawnManager {
 
             // 判定是否在允许距离范围之外
             if (distance >= minDist && distance <= maxDist) {
-                FXGL.entityBuilder()
-                        .type(EntityType.ENEMY)
-                        .at(x, y)
-                        .viewWithBBox("enemy.png")
-                        .buildAndAttach();
+                FXGL.spawn("enemy", x, y);
 
                 System.out.println("Spawned enemy at (" + x + ", " + y + "), distance=" + distance);
                 return;
