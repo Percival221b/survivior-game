@@ -94,6 +94,27 @@ public class EnemyComponent extends Component  {
     public AnimationChannel getAnimHit() {
         return animHit;
     }
+    // ========== 添加 setter ==========
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public void setDamage(int damage) {
+        this.damage = damage;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public void setAttackRange(double attackRange) {
+        this.attackRange = attackRange;
+    }
+
+    public void setExpValue(int expValue) {
+        this.expValue = expValue;
+    }
+
 }
  /*   @Override
     public void onUpdate(double tpf) {

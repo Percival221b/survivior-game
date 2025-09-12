@@ -99,17 +99,18 @@ public class BossComponent extends Component {
     public void onAdded() {
         entity.getViewComponent().addChild(texture);
 
-        // 使用FXGL的碰撞检测系统设置碰撞体积
-        // 注意：Entity没有setWidth/setHeight方法，使用BoundingBoxComponent
+        //让纹理居中渲染
+        texture.setTranslateX(-125); // 250 像素宽 / 2
+        texture.setTranslateY(-125); // 250 像素高 / 2
+
         BoundingBoxComponent bbox = entity.getBoundingBoxComponent();
         if (bbox == null) {
             entity.addComponent(new BoundingBoxComponent());
             bbox = entity.getBoundingBoxComponent();
         }
-
         bbox.addHitBox(new HitBox(BoundingShape.box(SIZE, SIZE)));
     }
-    // 在BossComponent类中添加这些方法
+
 
     public void setPhase(int phase) {
         this.phase = phase;
