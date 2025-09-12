@@ -1,28 +1,19 @@
 package com.survivor.entity;
 
 import com.almasb.fxgl.core.math.Vec2;
-import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.component.Component;
-import com.almasb.fxgl.entity.components.BoundingBoxComponent;
 import com.almasb.fxgl.entity.components.TransformComponent;
-import com.almasb.fxgl.physics.*;
-import com.almasb.fxgl.physics.box2d.collision.shapes.CircleShape;
-import com.almasb.fxgl.physics.box2d.collision.shapes.Shape;
+import com.almasb.fxgl.physics.BoundingShape;
+import com.almasb.fxgl.physics.HitBox;
+import com.almasb.fxgl.physics.PhysicsComponent;
+import com.almasb.fxgl.physics.SensorCollisionHandler;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.survivor.entity.interfaces.Renderable;
 import com.survivor.main.EntityType;
-import com.survivor.util.getMoveDirection;
 import javafx.geometry.Point2D;
-import javafx.scene.paint.Color;
-import org.jetbrains.annotations.NotNull;
-import com.almasb.fxgl.app.*;
-import com.almasb.fxgl.scene.*;
-import javafx.scene.shape.Circle;
-import javafx.scene.paint.Color;
-import java.util.logging.Handler;
 
 public abstract class Projectile extends Component implements Renderable {
     protected  float damage;

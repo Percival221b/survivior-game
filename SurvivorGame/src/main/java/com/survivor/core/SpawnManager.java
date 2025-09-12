@@ -2,19 +2,8 @@ package com.survivor.core;
 
 import com.almasb.fxgl.core.math.FXGLMath;
 import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.Entity;
-import com.survivor.entity.MapWall;
-import com.survivor.main.EntityType;
-import com.survivor.system.ResourceLoader;
-import javafx.geometry.Point2D;
-import javafx.geometry.Rectangle2D;
-
 import com.survivor.system.ResourceLoader;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 import java.util.Random;
 
 public class SpawnManager {
@@ -22,7 +11,6 @@ public class SpawnManager {
     private double spawnInterval = 0.8; // 初始刷怪间隔（秒）
     private double minSpawnInterval = 0.2; // 最小间隔
     private Random random = new Random();
-    private List<MapWall> walls;
 
     // 难度随时间增加
     private double elapsedTime = 0; // 游戏运行总时间
@@ -105,7 +93,7 @@ public class SpawnManager {
     public void reset() {
         spawnTimer = 0;
     }
-    public void spawnWalls() {
+    /*public void spawnWalls() {
         try {
             Files.lines(Paths.get("walls.txt"))
                     .map(line -> line.trim().split("\\s+"))
@@ -127,13 +115,13 @@ public class SpawnManager {
             e.printStackTrace();
             System.err.println("读取文件失败，请检查文件路径和权限：");
         }
-    }
+    }*/
 
-    public void removeWalls() {
+    /*public void removeWalls() {
         for (var wall : walls) {
             wall.remove();
         }
         walls.clear();
-    }
+    }*/
 }
 

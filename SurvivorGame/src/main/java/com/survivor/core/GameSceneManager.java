@@ -1,17 +1,15 @@
 package com.survivor.core;
 
 import com.almasb.fxgl.app.GameApplication;
-import com.survivor.ui.MenuUI;
 import com.survivor.ui.HUD;
+import com.survivor.ui.MenuUI;
 import com.survivor.ui.upgrades.UpgradeOption;
 import com.survivor.ui.upgrades.UpgradePanel;
 import com.survivor.ui.upgrades.UpgradeRepository;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
-import static com.almasb.fxgl.dsl.FXGL.*;
-import javafx.scene.input.KeyCode;
+
 import java.net.URL;
-import java.util.List;
 
 public class GameSceneManager {
 
