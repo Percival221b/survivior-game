@@ -15,7 +15,7 @@ import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.entity.Player.XPComponent;
 import com.survivor.entity.Enemy.EnemyAIComponent;
 import com.survivor.entity.Player.*;
-import com.survivor.entity.Fire;
+import com.survivor.entity.weapon.Fire;
 import com.survivor.main.EntityType;
 import com.survivor.ui.HUD;
 import javafx.geometry.Point2D;
@@ -29,6 +29,7 @@ import com.survivor.entity.ExperienceOrb;
 import com.survivor.entity.HealthPotionComponent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class ResourceLoader implements EntityFactory {
@@ -65,14 +66,25 @@ public class ResourceLoader implements EntityFactory {
                 .type(EntityType.WALL)
                 .bbox(new HitBox(new Point2D(0, 0), BoundingShape.box(w, h)))
                 .with(physics)
+                //.view(new Rectangle(w, h, Color.color(1, 0, 0, 0.3))) // 红色半透明矩形
                 .build();
     }
+
 
     @Spawns("player")
     public Entity newPlayer(SpawnData data) {
         // 创建物理组件并设置为动态
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.DYNAMIC);
+
+        float hitBoxW = 35f;
+        float hitBoxH = 50f;
+        float hitBoxX = 48f;
+        float hitBoxY = 48f;
+        Rectangle rectView = new Rectangle(hitBoxW, hitBoxH, Color.GREEN);
+        rectView.setTranslateX(hitBoxX);
+        rectView.setTranslateY(hitBoxY);
+        HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
 
         HealthComponent health = new HealthComponent(data);
         XPComponent xp = new XPComponent();
@@ -85,8 +97,9 @@ public class ResourceLoader implements EntityFactory {
                 .with(xp) // 经验值组件
                 .with(new PlayerAnimationComponent())
                 .with(new PlayerSoundComponent())
-                .bbox(new HitBox(BoundingShape.box(20, 20)))
                 .collidable()
+                .bbox(hitBox)
+                //.view(rectView)
                 .scale(0.5, 0.5)
                 .build();
 
@@ -131,7 +144,7 @@ public class ResourceLoader implements EntityFactory {
         float speed = data.get("speed");
         float damage = data.get("damage");
         return FXGL.entityBuilder(data)
-                .type(com.survivor.util.EntityType.PROJECTILE)
+                .type(com.survivor.main.EntityType.PROJECTILE)
                 .at(startPos)
                 //.view() TODO设置子弹外观
                 .with(new PhysicsComponent()) // 添加物理组件用于碰撞
@@ -149,7 +162,7 @@ public class ResourceLoader implements EntityFactory {
         float hitRadius = data.get("hitRadius");
         Point2D offsetPos = data.get("startPos");
         return FXGL.entityBuilder(data)
-                .type(com.survivor.util.EntityType.PROJECTILE)
+                .type(com.survivor.main.EntityType.PROJECTILE)
                 .at(startPos)
                 //.view() TODO设置子弹外观
                 .with(new PhysicsComponent()) // 添加物理组件用于碰撞
@@ -164,19 +177,29 @@ public class ResourceLoader implements EntityFactory {
 
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.DYNAMIC);
+
+        float hitBoxW = 22f;
+        float hitBoxH = 15f;
+        float hitBoxX = 42f;
+        float hitBoxY = 42f;
+        Rectangle rectView = new Rectangle(hitBoxW, hitBoxH, Color.GREEN);
+        rectView.setTranslateX(hitBoxX);
+        rectView.setTranslateY(hitBoxY);
+        HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
+
+        EnemyComponent enemyComp = new EnemyComponent(player);
+
         return FXGL.entityBuilder(data)
                 .type(EntityType.ENEMY)
-                .bbox(new HitBox(BoundingShape.box(20, 20)))  // 根据精灵大小调整碰撞盒
                 .with(physics)
-                .with(new EnemyComponent(player))
+                .with(enemyComp)
                 .with(new EnemyAIComponent())
+                .bbox(hitBox)
+                //.view(rectView)
+                .scale(1.6, 1.6)
                 .collidable()
-                .scale(1.7, 1.7)
                 .build();
     }
-
-
-
     @Spawns("xpOrb")
     public Entity newXPOrb(SpawnData data) {
         int xpAmount = data.get("xpAmount");

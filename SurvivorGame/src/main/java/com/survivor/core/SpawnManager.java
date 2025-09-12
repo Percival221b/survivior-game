@@ -3,11 +3,18 @@ package com.survivor.core;
 import com.almasb.fxgl.core.math.FXGLMath;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
+import com.survivor.entity.MapWall;
 import com.survivor.main.EntityType;
 import com.survivor.system.ResourceLoader;
+import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 
 import com.survivor.system.ResourceLoader;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Random;
 
 public class SpawnManager {
@@ -15,6 +22,7 @@ public class SpawnManager {
     private double spawnInterval = 0.8; // 初始刷怪间隔（秒）
     private double minSpawnInterval = 0.2; // 最小间隔
     private Random random = new Random();
+    private List<MapWall> walls;
 
     // 难度随时间增加
     private double elapsedTime = 0; // 游戏运行总时间
@@ -30,7 +38,7 @@ public class SpawnManager {
 
         if (spawnTimer >= spawnInterval) {
             // 每次刷怪的数量也随难度增加
-            int numEnemies = 1 + (int)(3 * difficultyFactor); // 1~4 个
+            int numEnemies = 1 + (int)(2 * difficultyFactor); // 1~4 个
             for (int i = 0; i < numEnemies; i++) {
                 spawnEnemy();
             }
@@ -94,12 +102,38 @@ public class SpawnManager {
         System.out.println("⚠ 无法在允许范围内找到合适刷怪点");
     }
 
-
-
-
-
     public void reset() {
         spawnTimer = 0;
+    }
+    public void spawnWalls() {
+        try {
+            Files.lines(Paths.get("walls.txt"))
+                    .map(line -> line.trim().split("\\s+"))
+                    .filter(parts -> parts.length == 4)
+                    .forEach(parts -> {
+                        int w = Integer.parseInt(parts[0]);
+                        int h = Integer.parseInt(parts[1]);
+                        int x = Integer.parseInt(parts[2]);
+                        int y = Integer.parseInt(parts[3]);
+
+                        MapWall mapWall = new MapWall(w, h, new Point2D(x, y));
+                        mapWall.spawn();
+                        walls.add(mapWall);
+
+                        System.out.printf("成功生成实体: w=%d, h=%d, x=%d, y=%d%n", w, h, x, y);
+                    });
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("读取文件失败，请检查文件路径和权限：");
+        }
+    }
+
+    public void removeWalls() {
+        for (var wall : walls) {
+            wall.remove();
+        }
+        walls.clear();
     }
 }
 

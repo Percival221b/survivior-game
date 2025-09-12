@@ -34,6 +34,8 @@ public class GameApp extends GameApplication {
         settings.setVersion("1.0");
         settings.setAppIcon("icon.png");
         settings.setTicksPerSecond(60);
+
+
     }
 
     @Override
@@ -80,8 +82,12 @@ public class GameApp extends GameApplication {
     @Override
     protected void onUpdate(double tpf) {
         sceneManager.getGameLoop().update(tpf);
-        if(!sceneManager.getGameLoop().isRunning()){player.getComponent(PlayerMovementComponent.class).setPaused(true);}
-        else {player.getComponent(PlayerMovementComponent.class).setPaused(false);}
+        if(!sceneManager.getGameLoop().isRunning()){
+            player.getComponent(PlayerMovementComponent.class).setPaused(true);
+        }
+        else {
+            player.getComponent(PlayerMovementComponent.class).setPaused(false);
+        }
         System.out.println("Elapsed time: " + sceneManager.getGameLoop().getElapsedTime());
     }
 

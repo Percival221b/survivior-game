@@ -1,22 +1,6 @@
 package com.survivor.entity;
 
-import com.almasb.fxgl.core.math.Vec2;
-import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.entity.EntityFactory;
-import com.almasb.fxgl.entity.SpawnData;
-import com.almasb.fxgl.entity.Spawns;
-import com.almasb.fxgl.entity.components.TransformComponent;
-import com.almasb.fxgl.physics.PhysicsComponent;
-import com.almasb.fxgl.texture.AnimationChannel;
-import javafx.geometry.Point2D;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.paint.Color;
-
-import com.survivor.entity.*;
-import com.survivor.util.EntityType;
-import com.survivor.entity.Bullet;
-import javafx.scene.transform.Rotate;
 
 public class ProjectileFactory implements EntityFactory {
 /*

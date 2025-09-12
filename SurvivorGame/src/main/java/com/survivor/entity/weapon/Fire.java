@@ -1,9 +1,10 @@
-package com.survivor.entity;
+package com.survivor.entity.weapon;
 
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.texture.AnimationChannel;
+import com.survivor.entity.Projectile;
 import javafx.geometry.Point2D;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import javafx.util.Duration;
@@ -13,8 +14,8 @@ public class Fire extends Projectile {
 
     private Point2D center;
 
-    public Fire(Point2D startPos, float speed, float damage, Point2D center, float hitRadius, Point2D hitCenter, Point2D offsetPos) {
-        super(speed, damage,hitRadius,hitCenter,offsetPos);
+    public Fire(Point2D startPos, float speed, float damage, Point2D center,float hitRadius,Point2D hitCenter,Point2D offsetPos) {
+        super(speed, damage,hitRadius,hitCenter,offsetPos,false);
         this.center = center;
     }
     @Override
