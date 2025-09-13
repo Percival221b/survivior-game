@@ -8,6 +8,8 @@ import com.almasb.fxgl.entity.components.BoundingBoxComponent;
 import com.almasb.fxgl.physics.BoundingShape;
 import com.almasb.fxgl.physics.HitBox;
 import javafx.util.Duration;
+import javafx.geometry.Point2D;
+
 
 /**
  * Boss实体组件 - 专注于攻击动作和动画表现
@@ -30,6 +32,7 @@ public class BossComponent extends Component {
     public static final double BASE_SPEED = 150;       // 基础移动速度（像素/秒）
     public static final double PHASE2_SPEED_BOOST = 1.5; // 第二阶段速度加成
     public static final double SIZE = 60;              // 实体碰撞体积大小
+    private static final double ATTACK_RANGE = 60; // 攻击范围
 
     // ===== 动画系统 =====
     // 第一阶段（远程形态）动画通道
@@ -55,6 +58,8 @@ public class BossComponent extends Component {
     private boolean isAlive = true;     // 存活状态
     private long lastAttackTime = 0;    // 上次攻击时间戳（毫秒）
     private int attackCooldown = 2000;  // 攻击冷却时间（毫秒）
+    private Point2D target = new Point2D(400, 300);
+    private boolean isAttacking = false;
 
     /**
      * 构造函数 - 初始化动画通道
@@ -109,6 +114,44 @@ public class BossComponent extends Component {
             bbox = entity.getBoundingBoxComponent();
         }
         bbox.addHitBox(new HitBox(BoundingShape.box(SIZE, SIZE)));
+        texture.loopAnimationChannel(idleAnimPhase1);
+    }
+
+    @Override
+    public void onUpdate(double tpf) {
+        if (!isAlive || isAttacking) return;
+
+        double distance = entity.getCenter().distance(target);
+
+        if (distance > ATTACK_RANGE) {
+            // 追逐目标
+            double speed = BASE_SPEED * (phase == 2 ? PHASE2_SPEED_BOOST : 1.0);
+            Point2D dir = target.subtract(entity.getCenter()).normalize();
+            entity.translate(dir.multiply(speed * tpf));
+
+            // 翻转朝向
+            texture.setScaleX(dir.getX() < 0 ? -1 : 1);
+
+            if (phase == 1) {
+                if (texture.getAnimationChannel() != moveAnimPhase1) {
+                    texture.loopAnimationChannel(moveAnimPhase1);
+                }
+            } else {
+                if (texture.getAnimationChannel() != moveAnimPhase2) {
+                    texture.loopAnimationChannel(moveAnimPhase2);
+                }
+            }
+        } else {
+            // 攻击冷却
+            long now = System.currentTimeMillis();
+            if (now - lastAttackTime >= attackCooldown) {
+                lastAttackTime = now;
+                playAttackAnimation();
+            }
+        }
+    }
+    public void updateTarget(Point2D newTarget) {
+        this.target = newTarget;
     }
 
 

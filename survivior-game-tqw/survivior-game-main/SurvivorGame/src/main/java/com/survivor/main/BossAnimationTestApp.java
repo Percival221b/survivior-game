@@ -1,3 +1,4 @@
+ /********------------------版本1----------------------****
 package com.survivor.main;
 
 import com.almasb.fxgl.app.GameApplication;
@@ -225,4 +226,59 @@ public class BossAnimationTestApp extends GameApplication {
     public static void main(String[] args) {
         launch(args);
     }
+}*****/
+ package com.survivor.main;
+import com.almasb.fxgl.app.GameApplication;
+import com.almasb.fxgl.app.GameSettings;
+import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.entity.SpawnData;
+import com.almasb.fxgl.entity.Spawns;
+import javafx.geometry.Point2D;
+import javafx.scene.input.MouseEvent;
+import com.survivor.entity.BossComponent;
+import com.survivor.entity.BossFactory;
+
+import static com.almasb.fxgl.dsl.FXGL.*;
+
+public class BossAnimationTestApp extends GameApplication{
+
+    private Entity boss;
+    private Point2D mouseTarget = new Point2D(400, 300); // 初始目标点
+
+    @Override
+    protected void initSettings(GameSettings settings) {
+        settings.setWidth(800);
+        settings.setHeight(600);
+        settings.setTitle("Boss Mouse Chase Test");
+    }
+
+    @Override
+    protected void initGame() {
+        getGameWorld().addEntityFactory(new BossFactory());
+
+        boss = spawn("boss", 400, 300);
+
+        // 监听鼠标移动，实时更新 Boss 的目标点
+        getGameScene().getInput().addEventHandler(MouseEvent.MOUSE_MOVED, e -> {
+            mouseTarget = new Point2D(e.getX(), e.getY());
+        });
+    }
+
+    @Override
+    protected void onUpdate(double tpf) {
+        BossComponent bossComp = boss.getComponent(BossComponent.class);
+        bossComp.updateTarget(mouseTarget);
+    }
+
+    @Spawns("boss")
+    public Entity newBoss(SpawnData data) {
+        return entityBuilder(data)
+                .with(new BossComponent())
+                .build();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
+
