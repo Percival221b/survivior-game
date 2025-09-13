@@ -34,8 +34,18 @@ public class PlayerAnimationComponent extends Component {
     private boolean attackInProgress = false;   // 正在播放攻击（期间禁止其它动画切换）
     private boolean prevAttackInput  = false;   // 上一帧是否按着 J/K（用来捕捉“刚按下”）
 
+    public void decreaseAttackInterval(double n) {
+        this.newattackInterval2 *= (1-n);
+    }
+
     double newattackInterval2=0.6;
     double speedrate=1;
+
+    public void increaseAttackRadius(double n) {
+        this.attackRadius *= (1+n);
+    }
+
+    float attackRadius = 45f;
 
 
     @Override
@@ -65,11 +75,6 @@ public class PlayerAnimationComponent extends Component {
         double x = entity.getPosition().getX()+50;
         double y = entity.getPosition().getY()+36;
 
-        /*Entity debugCircle = FXGL.entityBuilder()
-                .at(x, y) // 直接放在这个位置
-                .view(new javafx.scene.shape.Circle(5, javafx.scene.paint.Color.BLUE))
-                .buildAndAttach();
-        */
         movement = entity.getComponent(PlayerMovementComponent.class);
     }
 
@@ -160,22 +165,27 @@ public class PlayerAnimationComponent extends Component {
 
         FXGL.runOnce(() -> {
             if (leftAttack) {
-                //if (movement.isAttackingLeft()) {
-
                 FXGL.spawn("blade", new SpawnData( entity.getCenter())
                         .put("startPos",  entity.getCenter())
                         .put("damage", 10f)
-                        .put("hitCenter",(new Point2D(0f,0f)))
-                        .put("hitRadius", 39f)
+                        .put("hitCenter",(new Point2D(-50f,-30f)))
+                        .put("hitRadius", attackRadius)
                         .put("offsetPos",new Point2D(0f,0f))
                         .put("duration",0.1f));
 
                 entity.getComponent(PlayerSoundComponent.class).playAttack();
 
-                //  );
             } else if (rightAttack) {
+                FXGL.spawn("blade", new SpawnData( entity.getCenter())
+                        .put("startPos",  entity.getCenter())
+                        .put("damage", 10f)
+                        .put("hitCenter",(new Point2D(10f,-30f)))
+                        .put("hitRadius", attackRadius)
+                        .put("offsetPos",new Point2D(0f,0f))
+                        .put("duration",0.1f));
+
                 entity.getComponent(PlayerSoundComponent.class).playAttack();
-                FXGL.spawn("xpOrb", new SpawnData(entity.getCenter()).put("xpAmount", 10));
+                entity.getComponent(PlayerSoundComponent.class).playAttack();
             }
         }, Duration.seconds(newattackInterval2*0.6)); // 动画一半时出招
 

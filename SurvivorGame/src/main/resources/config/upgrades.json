@@ -8,7 +8,7 @@
   {
     "id": "spd_up",
     "title": "疾风步",
-    "description": "移动速度 +10%，冲刺冷却 -0.5s。",
+    "description": "移动速度 +10%，冲刺冷却 -20%。",
     "icon": "ui/upgrades/dash.png"
   },
   {
@@ -50,7 +50,7 @@
   {
     "id": "cooldown_up",
     "title": "魔力流转",
-    "description": "魔法技能冷却时间缩短 25%。",
+    "description": "普通攻击冷却时间缩短 20%。",
     "icon": "ui/upgrades/fire.png"
   },
   {

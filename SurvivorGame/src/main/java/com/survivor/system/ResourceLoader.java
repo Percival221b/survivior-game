@@ -336,7 +336,7 @@ public class ResourceLoader implements EntityFactory {
                 player.getComponent(HealthComponent.class).increaseRegenHP(10);
             }
             case "aoe_up" ->{
-
+                player.getComponent(PlayerAnimationComponent.class).increaseAttackRadius(0.2);
             }
             case "tool_up" ->{
 
@@ -345,7 +345,7 @@ public class ResourceLoader implements EntityFactory {
                 player.getComponent(HealthComponent.class).increaseShield(3);
             }
             case "cooldown_up" ->{
-
+                player.getComponent(PlayerAnimationComponent.class).decreaseAttackInterval(0.2);
             }
             case "xp_up"->{
 

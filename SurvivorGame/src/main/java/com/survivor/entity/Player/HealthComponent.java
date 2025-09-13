@@ -84,7 +84,11 @@ public class HealthComponent extends Component {
         if (shield > 0) {
             shield--;
             notifyHealthChange();
+            FXGL.getNotificationService().pushNotification("格挡");
             return;
+        }
+        if (shield == 0) {
+            FXGL.getNotificationService().pushNotification("护盾被击破！");
         }
         hp -= dmg;
         if (hp <= 0) {

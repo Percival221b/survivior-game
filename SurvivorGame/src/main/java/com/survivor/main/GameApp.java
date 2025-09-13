@@ -57,7 +57,7 @@ public class GameApp extends GameApplication {
 
         getGameWorld().addEntityFactory(new ResourceLoader(sceneManager));
 
-        URL url = getClass().getResource("/assets/levels/Bigdongeonmap.tmx");
+        URL url = getClass().getResource("/assets/levels/Testdongeonmap.tmx");
         Level baseLevel = new TMXLevelLoader().load(url, FXGL.getGameWorld());
 
         FXGL.getGameWorld().setLevel(baseLevel);
@@ -70,10 +70,10 @@ public class GameApp extends GameApplication {
                     .ifPresent(xp -> xp.gainXP(10));
         }, Duration.seconds(1));
 //
-        //FXGL.run(() -> {
-        //    player.getComponentOptional(com.survivor.entity.Player.HealthComponent.class)
-        //            .ifPresent(hp -> hp.takeDamage(1));
-        //}, Duration.seconds(1));
+        FXGL.run(() -> {
+            player.getComponentOptional(com.survivor.entity.Player.HealthComponent.class)
+                    .ifPresent(hp -> hp.takeDamage(10));
+        }, Duration.seconds(5));
 
         FXGL.getGameScene().getViewport().bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
     }
@@ -187,7 +187,7 @@ public class GameApp extends GameApplication {
         FXGL.set("timeSurvived", 0.0);
 
         // 3. 重新加载关卡
-        URL url = getClass().getResource("/assets/levels/Bigdongeonmap.tmx");
+        URL url = getClass().getResource("/assets/levels/Testdongeonmap.tmx");
         Level baseLevel = new TMXLevelLoader().load(url, FXGL.getGameWorld());
         FXGL.getGameWorld().setLevel(baseLevel);
 

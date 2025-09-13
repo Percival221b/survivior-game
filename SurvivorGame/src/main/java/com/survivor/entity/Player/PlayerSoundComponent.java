@@ -37,4 +37,5 @@ public class PlayerSoundComponent extends Component {
             FXGL.getAudioPlayer().playSound(dieSfx);
         }
     }
+
 }
