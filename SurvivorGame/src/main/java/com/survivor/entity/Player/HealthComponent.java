@@ -102,10 +102,9 @@ public class HealthComponent extends Component {
     public void increaseMaxHP(int amount) {
         // 增加最大生命值
         this.maxHp += amount;
-
         this.hp += amount;
         notifyHealthChange();
-        FXGL.getNotificationService().pushNotification("最大生命值增加 " + amount + " 点！");
+        //FXGL.getNotificationService().pushNotification("最大生命值增加 " + amount + " 点！");
     }
 
     public void increaseRegenHP(int amount) {

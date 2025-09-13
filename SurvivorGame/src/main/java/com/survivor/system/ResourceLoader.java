@@ -7,7 +7,9 @@ import com.almasb.fxgl.entity.Spawns;
 import com.almasb.fxgl.entity.EntityFactory;
 import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.BoundingShape;
+import com.survivor.core.GameSceneManager;
 import com.survivor.core.SpawnArea;
+import com.survivor.core.UIManager;
 import com.survivor.entity.Enemy.EnemyComponent;
 import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.PlayerAnimationComponent;
@@ -18,6 +20,10 @@ import com.survivor.entity.Player.*;
 import com.survivor.entity.weapon.Fire;
 import com.survivor.main.EntityType;
 import com.survivor.ui.HUD;
+import com.survivor.ui.upgrades.UpgradeOption;
+import com.survivor.ui.upgrades.UpgradePanel;
+import com.survivor.ui.upgrades.UpgradeRepository;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
@@ -34,6 +40,14 @@ import javafx.util.Duration;
 
 public class ResourceLoader implements EntityFactory {
     private static final List<SpawnArea> spawnAreas = new ArrayList<>();
+    private UpgradePanel currentUpgradePanel;
+    private final UIManager uiManager;   // ✅ 不再用 FXGL.geto
+    private final GameSceneManager gsm;
+
+    public ResourceLoader(GameSceneManager gsm) {
+        this.gsm = gsm;
+        this.uiManager = gsm.getUiManager();
+    }
 
     @Spawns("spawnArea")
     public Entity newSpawnArea(SpawnData data) {
@@ -86,7 +100,7 @@ public class ResourceLoader implements EntityFactory {
         rectView.setTranslateY(hitBoxY);
         HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
 
-        HealthComponent health = new HealthComponent(data);
+        HealthComponent health = new HealthComponent(100);
         XPComponent xp = new XPComponent();
 
         Entity player =  FXGL.entityBuilder(data)
@@ -117,23 +131,40 @@ public class ResourceLoader implements EntityFactory {
             });
         }, Duration.seconds(0.1));  // 等待 UI 初始化完成后执行
 
-        health.setOnHealthChange((hp, maxHp) -> {
-            FXGL.getGameScene().getUINodes().forEach(node -> {
-                if (node instanceof HUD hud) {
-                    hud.setMaxHealth(maxHp);
-                    hud.setHealth(hp);
-                }
-            });
-        });
+        health.setOnHealthChange(this::updateHealthUI);
 
-        xp.setOnXPChange((currentXP, maxXP) -> {
-            FXGL.getGameScene().getUINodes().forEach(node -> {
-                if (node instanceof HUD hud) {
-                    hud.setMaxExp(maxXP);
-                    hud.setExp(currentXP);
+        xp.setOnXPChange(this::updateXPUI);
+
+        xp.setOnLevelUp(level -> {
+            Platform.runLater(() -> {
+                updateLevelUI(level);
+                FXGL.getGameController().pauseEngine();
+
+                List<UpgradeOption> options;
+                try {
+                    options = UpgradeRepository.getRandomOptions();
+                    if (options.isEmpty()) {
+                        System.err.println("No upgrade options available");
+                        FXGL.getGameController().resumeEngine();
+                        return;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    FXGL.getGameController().resumeEngine();
+                    return;
                 }
+                currentUpgradePanel = new UpgradePanel(options, chosen -> {
+                    applyUpgrade(chosen);
+                    if (currentUpgradePanel != null) {
+                        uiManager.removeOverlay(currentUpgradePanel);
+                    }
+                    FXGL.getGameController().resumeEngine();
+                });
+                currentUpgradePanel.setPrefSize(1280, 720);
+                uiManager.addOverlay(currentUpgradePanel);  // ✅ 用傳進來的 uiManager
+                currentUpgradePanel.playIn();
+                });
             });
-        });
         return player;
     }
 
@@ -229,4 +260,71 @@ public class ResourceLoader implements EntityFactory {
                 .collidable()
                 .build();
     }
+
+    private void updateLevelUI(int level) {
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setLevel(level);
+            }
+        });
+    }
+
+    private void updateHealthUI(int hp, int maxHp) {
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setMaxHealth(maxHp);
+                hud.setHealth(hp);
+            }
+        });
+    }
+
+    private void updateXPUI(int currentXP, int xpToNextLevel) {
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setMaxExp(xpToNextLevel);
+                hud.setExp(currentXP);
+            }
+        });
+    }
+
+    private void applyUpgrade(UpgradeOption opt) {
+        Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
+        if (player == null) return;
+        switch (opt.getId()) {
+            case "atk_up" -> {
+                player.getComponent(PlayerMovementComponent.class).increaseAttack(0.2);
+            }
+            case "spd_up" -> {
+                player.getComponent(PlayerMovementComponent.class).increaseSpeed(0.1);
+                player.getComponent(PlayerMovementComponent.class).decreaseDashCooldown(0.2);
+            }
+            case "hp_up" -> {
+                player.getComponent(HealthComponent.class).increaseMaxHP(20);
+                player.getComponent(HealthComponent.class).heal(50);
+            }
+            case "crit_up" -> {
+
+            }
+            case "regen_up" ->{
+                player.getComponent(HealthComponent.class).increaseRegenHP(10);
+            }
+            case "aoe_up" ->{
+
+            }
+            case "tool_up" ->{
+
+            }
+            case "shield_up"->{
+                player.getComponent(HealthComponent.class).increaseShield(3);
+            }
+            case "cooldown_up" ->{
+
+            }
+            case "xp_up"->{
+
+            }
+        }
+        System.out.println("Applied upgrade: " + opt.getId());
+    }
+
 }

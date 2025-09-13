@@ -33,7 +33,7 @@ public class UIManager {
     }
 
     // 销毁 UI
-    private void clearUI(String name) {
+    public void clearUI(String name) {
         Parent uiContent = uiMap.get(name);
         if (uiContent != null) {
             FXGL.getGameScene().removeUINode(uiContent);

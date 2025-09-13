@@ -2,17 +2,13 @@ package com.survivor.core;
 
 import com.almasb.fxgl.app.GameApplication;
 import com.almasb.fxgl.dsl.FXGL;
-import com.almasb.fxgl.entity.Entity;
 import com.survivor.entity.Player.HealthComponent;
-import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.main.EntityType;
+import com.survivor.main.GameApp;
+import com.survivor.system.ResourceLoader;
+import com.survivor.ui.GameOverUI;
 import com.survivor.ui.HUD;
 import com.survivor.ui.MenuUI;
-import com.survivor.ui.upgrades.UpgradeOption;
-import com.survivor.ui.upgrades.UpgradePanel;
-import com.survivor.ui.upgrades.UpgradeRepository;
-import javafx.scene.image.Image;
-import javafx.scene.image.WritableImage;
 
 import java.net.URL;
 
@@ -24,22 +20,22 @@ public class GameSceneManager {
     private final UIManager uiManager;
     private final AudioManager audioManager;
     private GameLoop gameLoop;
-
-    private UpgradePanel currentUpgradePanel;
+    private ResourceLoader resourceLoader;
+    private boolean gameOverShown = false;
 
     public GameSceneManager(GameApplication app) {
         this.app = app;
-        uiManager = new UIManager();
-        gameLoop = new GameLoop();
-        audioManager = new AudioManager();
+        this.uiManager = new UIManager();
+        this.gameLoop = new GameLoop();
+        this.audioManager = new AudioManager();
+        this.resourceLoader = new ResourceLoader(this);
 
         // 主菜单
         MenuUI menuUI = new MenuUI(this);
         uiManager.registerUI("menu", menuUI.createContent());
 
         // HUD
-        this.hud = new HUD(1280, 720, 100, 50, this);
-        this.hud.setOnLevelUp(this::showUpgradeChoices);
+        this.hud = new HUD(1280, 720, 100, 100, this);
         uiManager.registerUI("hud", this.hud.createContent());
     }
 
@@ -48,6 +44,13 @@ public class GameSceneManager {
         gameLoop.stop();
         URL resource = getClass().getResource("/sounds/Perennial_Respite_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
+        // 重置状态
+        gameOverShown = false;
+        gameLoop.stop();
+
+        FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
+                .forEach(player -> player.getComponentOptional(HealthComponent.class)
+                        .ifPresent(hp -> hp.setHp(hp.getMaxHp())));
     }
 
     public void startGame() {
@@ -55,84 +58,57 @@ public class GameSceneManager {
 
         URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
+        // 初始化一局
+        hud.setHealth(100);
+        hud.setExp(0);
         gameLoop.start();
+        gameOverShown = false;
     }
 
+    // 重新开始游戏
+    public void restartGame() {
+        if (app instanceof GameApp ga) {
+            hud.setHealth(100);
+            hud.setExp(0);
+            hud.setLevel(1);
+            ga.restartGame();
+        }
+
+        gameOverShown = false;
+        gameLoop.start();
+        uiManager.showUI("hud");
+
+        URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
+        if (resource != null) audioManager.playMusic(resource.toExternalForm());
+    }
+
+    // 每帧更新
+    public void update(double tpf) {
+        gameLoop.update(tpf);
+        if (!gameLoop.isRunning() || gameOverShown) return;
+        if (gameLoop.getElapsedTime() >= 60) {
+            showEndScreen(true); // 胜利
+        } else if (hud != null && hud.getHealth() <= 0) {
+            showEndScreen(false); // 失败
+        }
+    }
+
+    private void showEndScreen(boolean isVictory) {
+        if (gameOverShown) return;
+        gameOverShown = true;
+        gameLoop.stop();
+        // 动态创建 GameOverUI，传递胜利/失败状态
+        GameOverUI overUI = new GameOverUI(this, isVictory);
+        uiManager.registerUI("end", overUI.createContent());
+        uiManager.showUI("end");
+        audioManager.stopMusic();
+    }
+
+
+    // Getter
     public GameLoop getGameLoop() { return gameLoop; }
     public AudioManager getAudioManager() { return audioManager; }
-
-    // —— 升级面板 —— //
-    private void showUpgradeChoices(int level) {
-        getGameLoop().pause();
-
-        var options = UpgradeRepository.getRandomOptions();
-
-        currentUpgradePanel = new UpgradePanel(options, chosen -> {
-            applyUpgrade(chosen);
-            uiManager.removeOverlay(currentUpgradePanel);
-            getGameLoop().resume();
-        });
-
-        currentUpgradePanel.setPrefSize(1280, 720); // 覆盖全屏
-        uiManager.addOverlay(currentUpgradePanel);
-        currentUpgradePanel.playIn();
-    }
-
-    private Image img(String path) {
-        try {
-            Image im = new Image(path, false);     // 试 1：直接用字符串路径
-            if (!im.isError()) return im;
-        } catch (Exception ignored) {}
-
-        try {                                      // 试 2：用 getResource 找 URL
-            String p = path.startsWith("/") ? path : ("/" + path);
-            URL url = getClass().getResource(p);
-            if (url != null) return new Image(url.toExternalForm());
-        } catch (Exception ignored) {}
-
-        return new WritableImage(1, 1);            // 兜底：1×1 透明像素，避免 NPE
-    }
-
-
-
-    /** 实际应用升级（按你的数据结构改） */
-    private void applyUpgrade(UpgradeOption opt) {
-        Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
-        if (player == null) return;
-        switch (opt.getId()) {
-            case "atk_up" -> {
-                player.getComponent(PlayerMovementComponent.class).increaseAttack(0.2);
-            }
-            case "spd_up" -> {
-                player.getComponent(PlayerMovementComponent.class).increaseSpeed(0.1);
-                player.getComponent(PlayerMovementComponent.class).decreaseDashCooldown(0.2);
-            }
-            case "hp_up" -> {
-                player.getComponent(HealthComponent.class).increaseMaxHP(20);
-                player.getComponent(HealthComponent.class).heal(50);
-            }
-            case "crit_up" -> {
-
-            }
-            case "regen_up" ->{
-                player.getComponent(HealthComponent.class).increaseRegenHP(10);
-            }
-            case "aoe_up" ->{
-
-            }
-            case "tool_up" ->{
-
-            }
-            case "shield_up"->{
-                player.getComponent(HealthComponent.class).increaseShield(3);
-            }
-            case "cooldown_up" ->{
-
-            }
-            case "xp_up"->{
-
-            }
-        }
-        System.out.println("Applied upgrade: " + opt.getId());
-    }
+    public HUD getHud() { return hud; }
+    public UIManager getUiManager() { return uiManager; }
+    public ResourceLoader getResourceLoader() { return resourceLoader; }
 }

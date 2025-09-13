@@ -1,6 +1,10 @@
 package com.survivor.ui;
 
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.survivor.core.GameSceneManager;
+import com.survivor.entity.Player.XPComponent;
+import com.survivor.main.EntityType;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -15,6 +19,10 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 import java.net.URL;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import static com.sun.media.jfxmedia.logging.Logger.setLevel;
 
 public class HUD extends StackPane {
 
@@ -27,7 +35,30 @@ public class HUD extends StackPane {
 
     // ==== 新增：升级事件回调 ====
     private java.util.function.Consumer<Integer> onLevelUp;
-    public void setOnLevelUp(java.util.function.Consumer<Integer> cb) { this.onLevelUp = cb; }
+    public void setOnLevelUp(Consumer<Integer> callback) {
+        Optional<Entity> playerOpt = FXGL.getGameWorld()
+                .getEntitiesByType(EntityType.PLAYER)  // 返回 List<Entity>
+                .stream()
+                .findFirst();  // 返回 Optional<Entity>，获取第一个
+
+        if (playerOpt.isPresent()) {
+            Entity player = playerOpt.get();
+            XPComponent xp = player.getComponent(XPComponent.class);
+            if (xp != null) {
+                xp.setOnLevelUp(level -> {
+                    setLevel(level);  // 更新 UI（可选链式）
+                    if (callback != null) {
+                        callback.accept(level);  // 转发到 showUpgradeChoices
+                    }
+                });
+            } else {
+                System.err.println("XPComponent not found on player!");
+            }
+        } else {
+            System.err.println("No player entity found in world!");
+        }
+    }
+
 
     public HUD(double width, double height, double maxExp, double maxHealth, GameSceneManager gameSceneManager) {
         this.gameSceneManager = gameSceneManager;
@@ -102,10 +133,10 @@ public class HUD extends StackPane {
         root.getChildren().add(pauseMenu);
 
         getChildren().add(root);
-        // ====== NEW: 初始化数值（血量满、经验空）======
+
         healthBar.setValue(maxHealth); // 血条满
         setExp(0);                     // 经验条清零（不用直接改 expBar，走统一接口）
-        // ============================================
+
     }
 
     public StackPane createContent() {
@@ -193,7 +224,9 @@ public class HUD extends StackPane {
             this.currentValue = value;
             updateUI();
         }
-
+        public double getValue() {
+            return currentValue;
+        }
         public void addValue(double value) {
             setValue(this.currentValue + value);
         }
@@ -269,7 +302,25 @@ public class HUD extends StackPane {
         }
         expBar.setValue(value);
     }
+    public void setLevel(int level) {
+        levelLabel.setText("等级: " + level);
+    }
 
+    public void reset() {
+        level = 1;
+        levelLabel.setText("等级: 1");
+
+        setExp(0);
+    }
+    // 获取当前血量
+    public double getHealth() {
+        return healthBar.getValue();
+    }
+
+    // 获取当前经验
+    public double getExp() {
+        return expBar.getValue();
+    }
     public void addExp(double value) { setExp(expBar.currentValue + value); }
     public void setMaxExp(double value) { expBar.setMaxValue(value); }
     public void setHealth(double value) { healthBar.setValue(value); }
