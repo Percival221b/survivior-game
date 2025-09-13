@@ -12,7 +12,7 @@ import javafx.geometry.Point2D;
 public class EnemyAIComponent extends Component {
 
     private PhysicsComponent physics;
-    private double speed = 50;  // 怪物移动速度
+    private double speed = 70;  // 怪物移动速度
     // 新增暂停标志
     private boolean paused = false;
 

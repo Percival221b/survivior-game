@@ -13,10 +13,11 @@ import com.survivor.util.getMoveDirection;
 public class Fire extends Projectile {
 
     private Point2D center;
-
-    public Fire(Point2D startPos, float speed, float damage, Point2D center,float hitRadius,Point2D hitCenter,Point2D offsetPos) {
+    private float duration;
+    public Fire(float speed, float damage, Point2D center,float hitRadius,Point2D hitCenter,Point2D offsetPos,float duration) {
         super(speed, damage,hitRadius,hitCenter,offsetPos,false);
         this.center = center;
+        this.duration = duration;
     }
     @Override
     protected void getNextMove() {
@@ -25,6 +26,14 @@ public class Fire extends Projectile {
     @Override
     public void onAdded() {
         super.onAdded();
+    }
+
+    protected void setAutoRemove()
+    {
+        FXGL.getGameTimer().runOnceAfter(() -> {
+            if(currentState ==State.FLY)
+                explode();
+        }, Duration.seconds(duration));
     }
 
     @Override

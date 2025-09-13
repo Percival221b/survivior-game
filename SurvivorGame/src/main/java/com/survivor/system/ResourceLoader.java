@@ -10,6 +10,7 @@ import com.almasb.fxgl.physics.BoundingShape;
 import com.survivor.core.GameSceneManager;
 import com.survivor.core.SpawnArea;
 import com.survivor.core.UIManager;
+import com.survivor.entity.weapon.Blade;
 import com.survivor.entity.Enemy.EnemyComponent;
 import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.PlayerAnimationComponent;
@@ -41,8 +42,35 @@ import javafx.util.Duration;
 public class ResourceLoader implements EntityFactory {
     private static final List<SpawnArea> spawnAreas = new ArrayList<>();
     private UpgradePanel currentUpgradePanel;
-    private final UIManager uiManager;   // ✅ 不再用 FXGL.geto
+
+    private final UIManager uiManager;
     private final GameSceneManager gsm;
+
+    private void updateLevelUI(int level) {
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setLevel(level);
+            }
+        });
+    }
+
+    private void updateHealthUI(int hp, int maxHp) {
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setMaxHealth(maxHp);
+                hud.setHealth(hp);
+            }
+        });
+    }
+
+    private void updateXPUI(int currentXP, int xpToNextLevel) {
+        FXGL.getGameScene().getUINodes().forEach(node -> {
+            if (node instanceof HUD hud) {
+                hud.setMaxExp(xpToNextLevel);
+                hud.setExp(currentXP);
+            }
+        });
+    }
 
     public ResourceLoader(GameSceneManager gsm) {
         this.gsm = gsm;
@@ -87,7 +115,6 @@ public class ResourceLoader implements EntityFactory {
 
     @Spawns("player")
     public Entity newPlayer(SpawnData data) {
-        // 创建物理组件并设置为动态
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.DYNAMIC);
 
@@ -113,33 +140,17 @@ public class ResourceLoader implements EntityFactory {
                 .with(new PlayerSoundComponent())
                 .collidable()
                 .bbox(hitBox)
-                //.view(rectView)
+                .view(rectView)
                 .scale(0.5, 0.5)
                 .build();
 
-        // ---- 绑定到 UI ----
-        FXGL.runOnce(() -> {
-            // 设置初始血条
-            FXGL.getGameScene().getUINodes().forEach(node -> {
-                if (node instanceof HUD hud) {
-                    hud.setMaxHealth(100);
-                    hud.setHealth(health.getHP());
-
-                    hud.setMaxExp(xp.getXpToNextLevel());
-                    hud.setExp(xp.getCurrentXP());
-                }
-            });
-        }, Duration.seconds(0.1));  // 等待 UI 初始化完成后执行
-
-        health.setOnHealthChange(this::updateHealthUI);
-
+        // 綁定 XP -> HUD
         xp.setOnXPChange(this::updateXPUI);
 
         xp.setOnLevelUp(level -> {
             Platform.runLater(() -> {
                 updateLevelUI(level);
                 FXGL.getGameController().pauseEngine();
-
                 List<UpgradeOption> options;
                 try {
                     options = UpgradeRepository.getRandomOptions();
@@ -153,6 +164,7 @@ public class ResourceLoader implements EntityFactory {
                     FXGL.getGameController().resumeEngine();
                     return;
                 }
+
                 currentUpgradePanel = new UpgradePanel(options, chosen -> {
                     applyUpgrade(chosen);
                     if (currentUpgradePanel != null) {
@@ -160,14 +172,48 @@ public class ResourceLoader implements EntityFactory {
                     }
                     FXGL.getGameController().resumeEngine();
                 });
+
                 currentUpgradePanel.setPrefSize(1280, 720);
-                uiManager.addOverlay(currentUpgradePanel);  // ✅ 用傳進來的 uiManager
+                uiManager.addOverlay(currentUpgradePanel);  //  用傳進來的 uiManager
                 currentUpgradePanel.playIn();
-                });
             });
+        });
+
+        // 綁定 HP -> HUD
+        health.setOnHealthChange(this::updateHealthUI);
+
         return player;
     }
 
+    @Spawns("xpOrb")
+    public Entity newXPOrb(SpawnData data) {
+        int xpAmount = data.get("xpAmount");
+
+        PhysicsComponent physics = new PhysicsComponent();
+        physics.setBodyType(BodyType.DYNAMIC);
+
+        return FXGL.entityBuilder(data)
+                .type(EntityType.XP_ORB)
+                .with(new ExperienceOrb(xpAmount))
+                .with(physics) // 经验球也用动态，方便碰撞检测
+                .view(new Circle(5, Color.LIMEGREEN))
+                .collidable()
+                .build();
+    }
+
+    @Spawns("healthPotion")
+    public Entity newHealthPotion(SpawnData data) {
+        PhysicsComponent physics = new PhysicsComponent();
+        physics.setBodyType(BodyType.DYNAMIC);
+
+        return FXGL.entityBuilder(data)
+                .type(EntityType.HEALTH_POTION)
+                .with(new HealthPotionComponent())   // 回复 10% 最大血量
+                .with(physics)
+                .view(new Circle(7, Color.RED))      // 临时红球作为血瓶
+                .collidable()
+                .build();
+    }
     @Spawns("bullet")
     public Entity newBullet(SpawnData data) {
         Point2D startPos = data.get("startPos");
@@ -180,24 +226,6 @@ public class ResourceLoader implements EntityFactory {
                 //.view() TODO设置子弹外观
                 .with(new PhysicsComponent()) // 添加物理组件用于碰撞
 
-                .collidable() // 标记为可碰撞
-                .build();
-    }
-    @Spawns("fireX")
-    public Entity newFire(SpawnData data) {
-        Point2D startPos = data.get("startPos");
-        float speed = data.get("speed");
-        float damage = data.get("damage");
-        Point2D center = data.get("center");
-        Point2D hitCenter = data.get("hitCenter");
-        float hitRadius = data.get("hitRadius");
-        Point2D offsetPos = data.get("startPos");
-        return FXGL.entityBuilder(data)
-                .type(com.survivor.main.EntityType.PROJECTILE)
-                .at(startPos)
-                //.view() TODO设置子弹外观
-                .with(new PhysicsComponent()) // 添加物理组件用于碰撞
-                .with(new Fire(startPos,speed,damage,center,hitRadius,hitCenter,offsetPos)) // 添加自定义逻辑
                 .collidable() // 标记为可碰撞
                 .build();
     }
@@ -231,60 +259,59 @@ public class ResourceLoader implements EntityFactory {
                 .collidable()
                 .build();
     }
-    @Spawns("xpOrb")
-    public Entity newXPOrb(SpawnData data) {
-        int xpAmount = data.get("xpAmount");
 
+    @Spawns("fireEnemy")
+    public Entity newfireEnemy(SpawnData data) {
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.DYNAMIC);
 
+        Point2D startPos = data.get("startPos");
+        float speed = data.get("speed");
+        float damage = data.get("damage");
+        Point2D center = data.get("center");
+        Point2D hitCenter = data.get("hitCenter");
+        Point2D offsetPos = data.get("offsetPos");
+        float hitRadius = data.get("hitRadius");
+        float duration = data.get("duration");
+        Circle circleView = new Circle(hitRadius, Color.BLUE);
+        circleView.setTranslateX(hitCenter.subtract(startPos).getX()); // 视图在实体x轴上向右偏移10像素
+        circleView.setTranslateY(hitCenter.subtract(startPos).getY());
         return FXGL.entityBuilder(data)
-                .type(EntityType.XP_ORB)
-                .with(new ExperienceOrb(xpAmount))
-                .with(physics) // 经验球也用动态，方便碰撞检测
-                .view(new Circle(5, Color.LIMEGREEN))
-                .collidable()
+                .type(com.survivor.main.EntityType.PROJECTILEENEMY)
+                .at(startPos)
+                .view(circleView)
+                .with(physics) // 添加物理组件用于碰撞
+                .with(new Fire(speed, damage, center, hitRadius, hitCenter, offsetPos, duration)) // 添加自定义逻辑
+                .collidable() // 标记为可碰撞
                 .build();
     }
 
-    @Spawns("healthPotion")
-    public Entity newHealthPotion(SpawnData data) {
+
+    @Spawns("blade")
+    public Entity newBlade(SpawnData data) {
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.DYNAMIC);
 
+        float hitRadius = data.get("hitRadius");
+        Point2D startPos = data.get("startPos");
+        Point2D hitCenter = data.get("hitCenter");
+        Circle circleView = new Circle(hitRadius, Color.RED);
+        circleView.setTranslateX(hitCenter.getX()); // 视图在实体x轴上向右偏移10像素
+        circleView.setTranslateY(hitCenter.getY());
         return FXGL.entityBuilder(data)
-                .type(EntityType.HEALTH_POTION)
-                .with(new HealthPotionComponent())   // 回复 10% 最大血量
+                .type(com.survivor.main.EntityType.PROJECTILE)
+                .at(startPos)
+                .view(circleView)
+                //  不要 collidable，传感器不需要
                 .with(physics)
-                .view(new Circle(7, Color.RED))      // 临时红球作为血瓶
-                .collidable()
+                .with(new Blade(
+                        data.get("damage"),
+                        hitRadius,
+                        data.get("hitCenter"),
+                        data.get("offsetPos"),
+                        data.get("duration")
+                ))
                 .build();
-    }
-
-    private void updateLevelUI(int level) {
-        FXGL.getGameScene().getUINodes().forEach(node -> {
-            if (node instanceof HUD hud) {
-                hud.setLevel(level);
-            }
-        });
-    }
-
-    private void updateHealthUI(int hp, int maxHp) {
-        FXGL.getGameScene().getUINodes().forEach(node -> {
-            if (node instanceof HUD hud) {
-                hud.setMaxHealth(maxHp);
-                hud.setHealth(hp);
-            }
-        });
-    }
-
-    private void updateXPUI(int currentXP, int xpToNextLevel) {
-        FXGL.getGameScene().getUINodes().forEach(node -> {
-            if (node instanceof HUD hud) {
-                hud.setMaxExp(xpToNextLevel);
-                hud.setExp(currentXP);
-            }
-        });
     }
 
     private void applyUpgrade(UpgradeOption opt) {

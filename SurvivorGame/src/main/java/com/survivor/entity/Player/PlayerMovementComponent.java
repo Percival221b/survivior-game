@@ -9,6 +9,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import com.almasb.fxgl.core.math.Vec2;
 
+import java.util.function.Consumer;
+
 /**
  * 玩家移动组件
  * 专为 FXGL 框架设计，处理WASD或方向键控制下的角色移动。
@@ -37,6 +39,7 @@ public class PlayerMovementComponent extends Component {
 
     private double dashCooldownMax = 2.0; // 冲刺冷却 2 秒
     private double dashCooldownTimer = 0; // 冷却计时器
+    private boolean dashSoundPlayed = false;  // 新增字段
 
 
     private double attackInterval = 0.6;  // 攻击冷却
@@ -50,76 +53,12 @@ public class PlayerMovementComponent extends Component {
 
     // 新增暂停标志
     private boolean paused = false;
-
+    private Consumer<Double> attackIntervalonChange;
+    private Consumer<Double> onSpeedChange;
     @Override
     public void onAdded() {
         this.physics = entity.getComponent(PhysicsComponent.class);
-        // 注册输入绑定（WASD）
-        //FXGL.getInput().addAction(new UserAction("Move Up") {
-        //    @Override
-        //    protected void onAction() { if (!paused) movingUp = true; }
-        //    @Override
-        //    protected void onActionEnd() {  if (!paused) movingUp = false; }
-        //}, KeyCode.W);
-//
-        //FXGL.getInput().addAction(new UserAction("Move Down") {
-        //    @Override
-        //    protected void onAction() {  if (!paused) movingDown = true; }
-        //    @Override
-        //    protected void onActionEnd() {  if (!paused) movingDown = false; }
-        //}, KeyCode.S);
-//
-        //FXGL.getInput().addAction(new UserAction("Move Left") {
-        //    @Override
-        //    protected void onAction() {  if (!paused) movingLeft = true; }
-        //    @Override
-        //    protected void onActionEnd() {  if (!paused) movingLeft = false; }
-        //}, KeyCode.A);
-//
-        //FXGL.getInput().addAction(new UserAction("Move Right") {
-        //    @Override
-        //    protected void onAction() {  if (!paused) movingRight = true; }
-        //    @Override
-        //    protected void onActionEnd() {  if (!paused) movingRight = false; }
-        //}, KeyCode.D);
-//
-        //FXGL.getInput().addAction(new UserAction("AttackLeft") {
-        //    @Override protected void onActionBegin() {
-        //        if (!paused) attackingLeft = true;
-        //        //FXGL.getNotificationService().pushNotification("攻击开始！");
-        //    }
-        //    @Override protected void onActionEnd() {
-        //        attackingLeft= false;
-        //        //FXGL.getNotificationService().pushNotification("攻击结束！");
-        //    }
-        //}, KeyCode.J);
-//
-        //FXGL.getInput().addAction(new UserAction("AttackRight") {
-        //    @Override protected void onActionBegin() {
-        //        if (!paused) attackingRight = true;
-        //        //FXGL.getNotificationService().pushNotification("攻击开始！");
-        //    }
-        //    @Override protected void onActionEnd() {
-        //        attackingRight= false;
-        //        //FXGL.getNotificationService().pushNotification("攻击结束！");
-        //    }
-        //}, KeyCode.K);
-//
-        //FXGL.getInput().addAction(new UserAction("Dash") {
-        //    @Override
-        //    protected void onActionBegin() {
-        //        if (!paused && !dashing && dashCooldownTimer <= 0) { // 冷却完成才能冲刺
-        //            dashing = true;
-        //            dashTimer = dashDuration;
-        //            dashCooldownTimer = dashCooldownMax; // 开始进入冷却
-        //            FXGL.getNotificationService().pushNotification("冲刺！");
-        //        }
-        //    }
-        //}, KeyCode.L);
-
     }
-
-
     @Override
     public void onUpdate(double tpf) {
         if (paused) {
@@ -140,6 +79,10 @@ public class PlayerMovementComponent extends Component {
         if (dashing) {
             velocity = velocity.normalize().multiply(speed+1000);
             dashTimer -= tpf;
+            if (!dashSoundPlayed) {
+                entity.getComponent(PlayerSoundComponent.class).playDash();
+                dashSoundPlayed = true; // 只放一次
+            }
             if (dashTimer <= 0) {
                 dashing = false; // 冲刺结束
             }
@@ -177,32 +120,27 @@ public class PlayerMovementComponent extends Component {
 
     // --- 公共方法供动画或其他组件调用 ---
 
-    public boolean isMoving() {
-        return movingUp || movingDown || movingLeft || movingRight;
-    }
-
+    public boolean isMoving() {return movingUp || movingDown || movingLeft || movingRight;}
     public boolean isMovingLeft() { return movingLeft; }
     public boolean isMovingRight() { return movingRight; }
-
-    public double getSpeed() { return speed; }
     public boolean isMovingUp() {return movingUp;}
     public boolean isMovingDown() {return movingDown;}
-    public PlayerState getState() {
-        return state;
-    }
-    public boolean isAttackingLeft() {
-        return attackingLeft;
-    }
-    public boolean isAttackingRight() {
-        return attackingRight;
-    }
-    public boolean isDashing() {
-        return dashing;
-    }
 
+    public double getSpeed() { return speed; }
+    public PlayerState getState() {return state;}
+    public boolean isAttackingLeft() {return attackingLeft;}
+    public boolean isAttackingRight() {return attackingRight;}
+    public boolean isDashing() {return dashing;}
+    public double getAttackInterval() {return attackInterval;}
 
     public void increaseAttack(double percent) {
         attack *= (1 + percent);
+    }
+    public void setAttackInterval(double newattackInterval) {
+        this.attackInterval = newattackInterval;
+        if (attackIntervalonChange != null) {
+            attackIntervalonChange.accept(newattackInterval);
+        }
     }
 
     public void increaseSpeed(double percent) {
@@ -251,5 +189,12 @@ public class PlayerMovementComponent extends Component {
             dashCooldownTimer = dashCooldownMax;
             FXGL.getNotificationService().pushNotification("冲刺！");
         }
+    }
+    //回调
+    public void setattackIntervalOnChange(Consumer<Double> callback) {
+        this.attackIntervalonChange = callback;
+    }
+    public void setOnSpeedChange(Consumer<Double> callback) {
+        this.onSpeedChange = callback;
     }
 }

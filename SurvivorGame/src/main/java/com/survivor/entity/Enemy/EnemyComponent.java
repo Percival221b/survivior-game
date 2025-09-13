@@ -66,6 +66,38 @@ public class EnemyComponent extends Component  {
         // 初始播放空闲动画
         texture.loopAnimationChannel(animIdle);
     }
+    // 受伤
+    public void takeDamage(int amount) {
+        if (isDead) return;
+
+        health -= amount;
+
+        if (health > 0) {
+            // 播放受击动画
+            texture.playAnimationChannel(animHit);
+
+            // 动画结束后回到 Idle
+            FXGL.runOnce(() -> {
+                if (!isDead) {
+                    texture.loopAnimationChannel(animIdle);
+                }
+            }, Duration.seconds(1.0));
+        } else {
+            // 触发死亡
+            isDead = true;
+            playDeathAnimation();
+        }
+    }
+
+    // 死亡
+    private void playDeathAnimation() {
+        texture.playAnimationChannel(animDeath);
+
+        // 动画结束后移除实体
+        FXGL.runOnce(() -> {
+            entity.removeFromWorld();
+        }, Duration.seconds(1.0));
+    }
     public AnimatedTexture getTexture() {
         return texture;
     }

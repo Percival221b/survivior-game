@@ -43,27 +43,24 @@ public abstract class Projectile extends Component implements Renderable {
     }
 
     public void onAdded() {
-
-//        entity = getEntity();
         physics = entity.getComponent(PhysicsComponent.class);
         transform = entity.getTransformComponent();
         physics.setBodyType(BodyType.DYNAMIC);
-        SensorCollisionHandler handler = new SensorCollisionHandler() {
+
+        HitBox hitBox = new HitBox(hitCenter.subtract(new Point2D(hitRadius,hitRadius)), BoundingShape.circle(hitRadius));
+        physics.addSensor(hitBox, new SensorCollisionHandler() {
             @Override
             protected void onCollisionBegin(Entity other) {
-//                super.onCollisionBegin(other);
-                if(other.getType().equals(EntityType.PLAYER)&&entity.getType().equals(EntityType.PROJECTILEX))
-                    handleHeroCollision(other);
-                else if(other.getType().equals(EntityType.ENEMY)&&entity.getType().equals(EntityType.PROJECTILE))
+                if (other.isType(EntityType.ENEMY)) {
                     handleMonsterCollision(other);
+                }
             }
-        };
-        HitBox hitBox = new HitBox(hitCenter, BoundingShape.circle(hitRadius)) ;
+        });
 
-        physics.addSensor(hitBox,handler);
-        if(!isTransparent)
+        if (!isTransparent) {
             setAnimChannel();
-
+        }
+        setAutoRemove();
     }
 
     public void move() {
@@ -106,7 +103,6 @@ public abstract class Projectile extends Component implements Renderable {
         getNextMove();
         move();
 //        System.out.println(physics.getLinearVelocity().distance(0,0));
-
     }
-
+    protected abstract void setAutoRemove();
 }
