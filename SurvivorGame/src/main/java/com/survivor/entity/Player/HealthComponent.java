@@ -2,11 +2,14 @@ package com.survivor.entity.Player;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
+import javafx.util.Duration;
+
 import java.util.function.BiConsumer;
 
 public class HealthComponent extends Component {
     private int hp;
     private int maxHp;
+    private boolean isnotifydie=false;
 
     private BiConsumer<Integer, Integer> onHealthChange;
 
@@ -49,8 +52,17 @@ public class HealthComponent extends Component {
     public int getMaxHp() { return maxHp; }
 
     public void setHp(int hp) {
+        if(hp<=0&&isnotifydie==false){
+            isnotifydie=true;
+            entity.getComponent(PlayerSoundComponent.class).playDie();
+            FXGL.getGameTimer().runOnceAfter(() -> {
+                this.hp = hp;
+                notifyHealthChange();
+            }, Duration.seconds(2));
+        }else if(isnotifydie==false){
         this.hp = hp;
         notifyHealthChange();
+    }
     }
     public void setMaxHp(int maxHp) {
         this.maxHp = maxHp;
@@ -60,6 +72,7 @@ public class HealthComponent extends Component {
     public void takeDamage(int dmg) {
         hp -= dmg;
         if (hp <= 0) {
+
             hp = 0;
             FXGL.getNotificationService().pushNotification("玩家死亡！");
         }

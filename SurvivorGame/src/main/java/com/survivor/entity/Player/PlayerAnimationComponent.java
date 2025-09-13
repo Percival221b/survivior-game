@@ -32,8 +32,15 @@ public class PlayerAnimationComponent extends Component {
     private boolean attackInProgress = false;   // 正在播放攻击（期间禁止其它动画切换）
     private boolean prevAttackInput  = false;   // 上一帧是否按着 J/K（用来捕捉“刚按下”）
 
+    double newattackInterval2=0.6;
+    double speedrate=1;
+
+
     @Override
     public void onAdded() {
+
+        movement = entity.getComponent(PlayerMovementComponent.class);
+
         idle = new AnimationChannel(
                 FXGL.image("Idle.png"), 10, 135, 135, Duration.seconds(0.5), 0, 9
         );
@@ -63,15 +70,32 @@ public class PlayerAnimationComponent extends Component {
                 .at(x, y) // 直接放在这个位置
                 .view(new javafx.scene.shape.Circle(5, javafx.scene.paint.Color.BLUE))
                 .buildAndAttach();
-
 // 生成一个蓝色圆，放在 entity.getPosition() 的坐标点
-        movement = entity.getComponent(PlayerMovementComponent.class);
     }
 
     @Override
     public void onUpdate(double tpf) {
-        // 朝向：优先用攻击方向，其次移动方向
 
+
+        movement.setattackIntervalOnChange(newattackInterval -> {
+            newattackInterval2= Math.max(newattackInterval, 0.08);
+            attack = new AnimationChannel(
+                    FXGL.image("Attack2.png"), 5, 135, 135, Duration.seconds(newattackInterval2), 0, 4
+            );
+        });
+        movement.setOnSpeedChange(newSpeed -> {
+            speedrate= Math.max(400/newSpeed, 0.1);
+            walk = new AnimationChannel(
+                    FXGL.image("Run.png"), 6, 135, 135, Duration.seconds(0.7*speedrate), 0, 5
+            );
+        });
+
+        // 朝向：优先用攻击方向，其次移动方向
+        if (movement.isAttackingLeft()) {
+            texture.setScaleX(-2.5);
+        } else if (movement.isAttackingRight()) {
+            texture.setScaleX(2.5);
+        }
 
 
         // 攻击进行中：完全锁住，禁止任何其它动画打断
@@ -100,6 +124,7 @@ public class PlayerAnimationComponent extends Component {
 
         // 冲刺（只有在不攻击时才允许切换）
         if (movement.isDashing()) {
+
             if (state != State.DASH) {
                 state = State.DASH;
                 texture.playAnimationChannel(dash);
@@ -134,19 +159,21 @@ public class PlayerAnimationComponent extends Component {
 
         texture.playAnimationChannel(attack);
 
+
+
         // 关键：在攻击动画的关键帧触发攻击逻辑
         FXGL.runOnce(() -> {
             if (leftAttack) {
                 //if (movement.isAttackingLeft()) {
-                FXGL.spawn("fireX", new SpawnData( entity.getCenter())
+
+                FXGL.spawn("blade", new SpawnData( entity.getCenter())
                         .put("startPos",  entity.getCenter())
-                        .put("speed", 150f)
                         .put("damage", 10f)
-                        .put("center", new Point2D(entity.getPosition().getX()+50,entity.getPosition().getY()+67))
-                        .put("hitCenter",entity.getCenter())
-                        .put("hitRadius", 40f)
+                        .put("hitCenter",(new Point2D(0f,0f)))
+                        .put("hitRadius", 39f)
                         .put("offsetPos",new Point2D(0f,0f))
-                );
+                        .put("duration",0.1f));
+
                 entity.getComponent(PlayerSoundComponent.class).playAttack();
 
                 //  );
@@ -155,7 +182,7 @@ public class PlayerAnimationComponent extends Component {
                 //  } else if (movement.isAttackingRight()) {
                 FXGL.spawn("xpOrb", new SpawnData(entity.getCenter()).put("xpAmount", 10));
             }
-        }, Duration.seconds(0.6*0.6)); // 动画一半时出招
+        }, Duration.seconds(newattackInterval2*0.6)); // 动画一半时出招
 
         texture.setOnCycleFinished(() -> {
             boolean stillHolding = movement.isAttackingLeft() || movement.isAttackingRight();

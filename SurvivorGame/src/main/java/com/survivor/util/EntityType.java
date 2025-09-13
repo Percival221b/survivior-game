@@ -3,7 +3,7 @@ package com.survivor.util;
 public enum EntityType {
     BOSS,
     PROJECTILE,
-    PROJECTILEX,
+    PROJECTILEENEMY,
     EXPERIENCEORB,
     HERO,
     ITEM,

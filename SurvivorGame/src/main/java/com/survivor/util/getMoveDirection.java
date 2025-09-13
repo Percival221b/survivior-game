@@ -50,6 +50,8 @@ public class getMoveDirection {
         }
 
         // 4. 返回归一化后的切线向量
+//        System.out.println(direction.normalize()
+//        System.out.println(direction.normalize());
         return direction.normalize();
     }
 

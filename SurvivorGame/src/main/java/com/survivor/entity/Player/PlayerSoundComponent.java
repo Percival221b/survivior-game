@@ -8,11 +8,15 @@ import com.almasb.fxgl.entity.component.Component;
 public class PlayerSoundComponent extends Component {
 
     private Sound attackSfx;
+    private Sound dashSfx;
+    private Sound dieSfx;
 
     @Override
     public void onAdded() {
         // 从 assets/sounds 目录加载音效文件
-        attackSfx = FXGL.getAssetLoader().loadSound("sword-clashhit-393837.mp3");
+        attackSfx = FXGL.getAssetLoader().loadSound("sword-slash-315218.mp3");
+        dashSfx = FXGL.getAssetLoader().loadSound("split-[AudioTrimmer.com].mp3");
+        dieSfx = FXGL.getAssetLoader().loadSound("die_knight.wav");
     }
 
     /**
@@ -21,6 +25,16 @@ public class PlayerSoundComponent extends Component {
     public void playAttack() {
         if (attackSfx != null) {
             FXGL.getAudioPlayer().playSound(attackSfx);
+        }
+    }
+    public void playDash() {
+        if (dashSfx != null) {
+            FXGL.getAudioPlayer().playSound(dashSfx);
+        }
+    }
+    public void playDie() {
+        if (dieSfx != null) {
+            FXGL.getAudioPlayer().playSound(dieSfx);
         }
     }
 }
