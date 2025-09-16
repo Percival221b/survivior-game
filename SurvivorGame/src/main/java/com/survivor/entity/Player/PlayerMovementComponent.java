@@ -2,9 +2,13 @@ package com.survivor.entity.Player;
 import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
+import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.input.Input;
 import com.almasb.fxgl.input.UserAction;
+import com.almasb.fxgl.physics.BoundingShape;
+import com.almasb.fxgl.physics.HitBox;
 import com.almasb.fxgl.physics.PhysicsComponent;
+import com.almasb.fxgl.physics.box2d.dynamics.FixtureDef;
 import javafx.geometry.Point2D;
 import javafx.scene.input.KeyCode;
 import com.almasb.fxgl.core.math.Vec2;
@@ -21,7 +25,7 @@ public class PlayerMovementComponent extends Component {
     public PlayerState state = PlayerState.IDLE;
 
     private double speed = 400; // 单位：像素/秒
-    private double attack = 10;       // 基础攻击
+    public static double attack = 3000;       // 基础攻击
 
     // 移动方向状态
     private boolean movingUp = false;
@@ -32,24 +36,32 @@ public class PlayerMovementComponent extends Component {
     private boolean attackingLeft = false;
     private boolean attackingRight = false;
 
-    private boolean dashing = false;
-    // 冲刺速度，可以自己调
+    public static boolean dashing = false;// 冲刺速度，可以自己调
     private double dashDuration = 0.1; // 持续时间（秒）
     private double dashTimer = 0;      // 冲刺剩余时间
+    private double dashOrbTimer = 0;
+    private double dashOrbInterval = 0.03;
 
-    private double dashCooldownMax = 2.0; // 冲刺冷却 2 秒
+    private double dashCooldownMax = 0.5; // 冲刺冷却 2 秒
     private double dashCooldownTimer = 0; // 冷却计时器
     private boolean dashSoundPlayed = false;  // 新增字段
-
 
     private double attackInterval = 0.6;  // 攻击冷却
     private double attackTimer = 0;
 
-    private double dashOrbTimer = 0;
-    private double dashOrbInterval = 0.03;
-
     private double attackSlowTimer = 0;   // 攻击减速剩余时间
     private double attackSlowDuration = 0.6; // 攻击动画时长（秒）
+
+    private double scaleX = 0.5;//角色飞行物大小
+    private double scaleY = 0.5;
+    private float scaleSpeed = 800.0f;
+    private double numbers=3;
+
+    private boolean hadBloodCircle=false;//环绕物
+    private double scaleBloodCircleX=1.0;
+    private double scaleBloodCircleY=1.0;
+    private double timeBloodCircle=1.0;
+    private double timerBloodCircle = 0.0;
 
     // 新增暂停标志
     private boolean paused = false;
@@ -58,6 +70,10 @@ public class PlayerMovementComponent extends Component {
     @Override
     public void onAdded() {
         this.physics = entity.getComponent(PhysicsComponent.class);
+        physics.setOnPhysicsInitialized(() -> {
+            physics.getBody().setFixedRotation(true);
+
+        });
     }
     @Override
     public void onUpdate(double tpf) {
@@ -66,6 +82,22 @@ public class PlayerMovementComponent extends Component {
             physics.setVelocityX(0);
             physics.setVelocityY(0);
             return;
+        }
+        if(hadBloodCircle) {
+            timerBloodCircle += tpf;  // tpf = time per frame, 秒为单位
+
+            if (timerBloodCircle >= timeBloodCircle) {  // 每满 1 秒
+                timerBloodCircle = 0.0;    // 归零
+                FXGL.spawn("bloodCircle", new SpawnData(entity.getPosition())
+                        .put("startPos", entity.getPosition().add(new Point2D(40f, 60f)))
+                        .put("damage", 10f)
+                        .put("hitCenter", new Point2D(0f, 0f))
+                        .put("hitRadius", 50f)
+                        .put("offsetPos", new Point2D(0f, 0f))
+                        .put("scaleX", this.getScaleBloodCircleX())
+                        .put("scaleY", this.getScaleBloodCircleY()));
+            }
+
         }
         double dx = 0, dy = 0;
 
@@ -77,14 +109,24 @@ public class PlayerMovementComponent extends Component {
         Point2D velocity = new Point2D(dx, dy);
 
         if (dashing) {
-            velocity = velocity.normalize().multiply(speed+1000);
-            dashTimer -= tpf;
+           // entity.getBoundingBoxComponent().clearHitBoxes();
+           velocity = velocity.normalize().multiply(speed+1000);
+           dashTimer -= tpf;
+//            Point2D dir = new Point2D(
+//                    (movingRight ? 1 : 0) - (movingLeft ? 1 : 0),
+//                    (movingDown ? 1 : 0) - (movingUp ? 1 : 0)
+//            ).normalize();
+
+//            entity.translate(dir.multiply((speed + 1000) * tpf)); // 手动位移
             if (!dashSoundPlayed) {
                 entity.getComponent(PlayerSoundComponent.class).playDash();
                 dashSoundPlayed = true; // 只放一次
             }
             if (dashTimer <= 0) {
                 dashing = false; // 冲刺结束
+               // entity.getBoundingBoxComponent().addHitBox(new HitBox(new Point2D(35f,50f),BoundingShape.box(48,48))
+               // );
+
             }
             dashOrbTimer -= tpf;
             if (dashOrbTimer <= 0) {
@@ -115,6 +157,8 @@ public class PlayerMovementComponent extends Component {
         if (dashCooldownTimer > 0) {
             dashCooldownTimer -= tpf;
         }
+
+
     }
 
 
@@ -187,6 +231,11 @@ public class PlayerMovementComponent extends Component {
             dashing = true;
             dashTimer = dashDuration;
             dashCooldownTimer = dashCooldownMax;
+            dashSoundPlayed = false;
+
+            // 🚀 冲刺时关闭碰撞
+
+
             FXGL.getNotificationService().pushNotification("冲刺！");
         }
     }
@@ -196,5 +245,70 @@ public class PlayerMovementComponent extends Component {
     }
     public void setOnSpeedChange(Consumer<Double> callback) {
         this.onSpeedChange = callback;
+    }
+
+    public double getScaleX() {
+        return scaleX;
+    }
+
+    public void setScaleX(double scaleX) {
+        this.scaleX = scaleX;
+        System.out.println("move"+this.getScaleX());
+    }
+
+    public double getScaleY() {
+        return scaleY;
+    }
+
+    public void setScaleY(double scaleY) {
+        this.scaleY = scaleY;
+    }
+
+    public float getScaleSpeed() {
+        return scaleSpeed;
+    }
+
+    public void setScaleSpeed(float scaleSpeed) {
+        this.scaleSpeed = scaleSpeed;
+    }
+
+    public double getScaleBloodCircleY() {
+        return scaleBloodCircleY;
+    }
+
+    public void setScaleBloodCircleY(double scaleBloodCircleY) {
+        this.scaleBloodCircleY = scaleBloodCircleY;
+    }
+
+    public double getScaleBloodCircleX() {
+        return scaleBloodCircleX;
+    }
+
+    public void setScaleBloodCircleX(double scaleBloodCircleX) {
+        this.scaleBloodCircleX = scaleBloodCircleX;
+    }
+
+    public double getTimeBloodCircle() {
+        return timeBloodCircle;
+    }
+
+    public void setTimeBloodCircle(double timeBloodCircleRadius) {
+        this.timeBloodCircle = Math.max(timeBloodCircleRadius,0.3);
+    }
+
+    public boolean isHadBloodCircle() {
+        return hadBloodCircle;
+    }
+
+    public void setHadBloodCircle(boolean hadBloodCircle) {
+        this.hadBloodCircle = hadBloodCircle;
+    }
+
+    public double getNumbers() {
+        return numbers;
+    }
+
+    public void setNumbers(double numbers) {
+        this.numbers = numbers;
     }
 }

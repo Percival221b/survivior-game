@@ -3,6 +3,7 @@ package com.survivor.main;
 public enum EntityType {
     PLAYER,
     ENEMY,
+    AIENEMY,
     WALL,
     BULLET,
     SPAWN_AREA,

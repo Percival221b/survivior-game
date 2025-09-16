@@ -15,6 +15,8 @@ import com.survivor.entity.interfaces.Renderable;
 import com.survivor.main.EntityType;
 import javafx.geometry.Point2D;
 
+import javax.print.attribute.standard.MediaSize;
+
 public abstract class Projectile extends Component implements Renderable {
     protected  float damage;
     //    protected Entity entity;
@@ -51,8 +53,11 @@ public abstract class Projectile extends Component implements Renderable {
         physics.addSensor(hitBox, new SensorCollisionHandler() {
             @Override
             protected void onCollisionBegin(Entity other) {
-                if (other.isType(EntityType.ENEMY)) {
+                if ((other.isType(EntityType.ENEMY) || other.isType(EntityType.AIENEMY)) && entity.isType(EntityType.PROJECTILE)) {
                     handleMonsterCollision(other);
+                }
+                if (other.isType(EntityType.PLAYER)&&entity.isType(EntityType.PROJECTILEENEMY)) {
+                    handleHeroCollision(other);
                 }
             }
         });
@@ -65,6 +70,7 @@ public abstract class Projectile extends Component implements Renderable {
 
     public void move() {
 //        System.out.println(direction);
+        direction = direction.normalize();
         physics.setVelocityX(direction.x * speed);
         physics.setVelocityY(direction.y * speed);
         transform.rotateToVector(direction.toPoint2D().add(offsetPos));
@@ -86,16 +92,21 @@ public abstract class Projectile extends Component implements Renderable {
 
     protected abstract void handleMonsterCollision(Entity monster);
     protected void explode() {
-        if(isTransparent) {
-            remove();
-            return;
-        }
-        texture.playAnimationChannel(explodeAnim);
-        texture.setOnCycleFinished(() -> {
-            remove();
-        });
+        if (entity != null) {
+            if (isTransparent) {
 
+                remove();
+                return;
+            }
+            texture.playAnimationChannel(explodeAnim);
+            texture.setOnCycleFinished(() -> {
+                if (entity != null) {
+                    remove();
+                }
+            });
+        }
     }
+
 
     @Override
     public void onUpdate(double tpf) {

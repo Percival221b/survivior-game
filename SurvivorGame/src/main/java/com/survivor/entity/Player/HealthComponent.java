@@ -34,7 +34,7 @@ public class HealthComponent extends Component {
     }
 
     public HealthComponent(SpawnData data) {
-        Object healthValue = data.hasKey("health") ? data.get("health") : 100;
+        Object healthValue = data.hasKey("health") ? data.get("health") : 10000;
 
         // 检查值是否为 null，以防 SpawnData 中没有 "health" 键
         if (healthValue != null) {
@@ -42,7 +42,7 @@ public class HealthComponent extends Component {
             this.maxHp = ((Number) healthValue).intValue();
         } else {
             // 如果 SpawnData 中未提供生命值，则使用默认值
-            this.maxHp = 100;
+            this.maxHp = 10000;
         }
 
         this.hp = maxHp;
@@ -81,17 +81,20 @@ public class HealthComponent extends Component {
     }
 
     public void takeDamage(int dmg) {
-        if (shield > 0) {
-            shield--;
-            notifyHealthChange();
-            FXGL.getNotificationService().pushNotification("格挡");
-            return;
-        }
-        if (shield == 0) {
-            FXGL.getNotificationService().pushNotification("护盾被击破！");
-        }
+        if(PlayerMovementComponent.dashing)return;
+
         hp -= dmg;
         if (hp <= 0) {
+            if (shield > 0) {
+                shield--;
+                notifyHealthChange();
+                FXGL.getNotificationService().pushNotification("格挡");
+                if (shield == 0) {
+                    FXGL.getNotificationService().pushNotification("护盾被击破！");
+                }
+                hp = (int) (maxHp*0.3);
+                return;
+            }
             hp = 0;
             FXGL.getNotificationService().pushNotification("玩家死亡！");
         }

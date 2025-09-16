@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.Map;
 
 import com.almasb.fxgl.input.UserAction;
+import com.survivor.entity.Enemy.test.NeutralMonsterAIManager;
 import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.system.ResourceLoader;
 import com.survivor.core.GameLoop;
@@ -30,12 +31,12 @@ public class GameApp extends GameApplication {
 
     @Override
     protected void initSettings(GameSettings settings) {
-        settings.setWidth(1280);
-        settings.setHeight(720);
+        settings.setWidth(2560);
+        settings.setHeight(1280);
         settings.setTitle("Survivor Game");
         settings.setVersion("1.0");
         settings.setAppIcon("icon.png");
-        settings.setTicksPerSecond(60);
+        settings.setTicksPerSecond(120);
     }
 
     @Override
@@ -57,6 +58,7 @@ public class GameApp extends GameApplication {
 
         getGameWorld().addEntityFactory(new ResourceLoader(sceneManager));
 
+
         URL url = getClass().getResource("/assets/levels/Testdongeonmap.tmx");
         Level baseLevel = new TMXLevelLoader().load(url, FXGL.getGameWorld());
 
@@ -64,16 +66,33 @@ public class GameApp extends GameApplication {
 
         // 生成玩家
         player = FXGL.spawn("player", 6000, 3000);
+        FXGL.spawn("AIEnemy", 6050, 3000);
+        FXGL.spawn("AIEnemy", 6040, 3000);
+        FXGL.spawn("AIEnemy", 6060, 3000);
+        FXGL.spawn("AIEnemy", 6070, 3000);
+        FXGL.spawn("AIEnemy", 6080, 3000);
 
         FXGL.run(() -> {
             player.getComponentOptional(com.survivor.entity.Player.XPComponent.class)
-                    .ifPresent(xp -> xp.gainXP(10));
+                    .ifPresent(xp -> xp.gainXP(0));
         }, Duration.seconds(1));
 //
         FXGL.run(() -> {
             player.getComponentOptional(com.survivor.entity.Player.HealthComponent.class)
                     .ifPresent(hp -> hp.takeDamage(10));
         }, Duration.seconds(5));
+//        FXGL.run(() -> {
+//        player.getComponentOptional(com.survivor.entity.Player.PlayerMovementComponent.class).
+//                ifPresent(xp -> xp.setAttackInterval(0.1));
+//        }, Duration.seconds(1));
+//        FXGL.run(() -> {
+//            player.getComponentOptional(com.survivor.entity.Player.PlayerMovementComponent.class).
+//                    ifPresent(xp -> xp.setScaleX(xp.getScaleX()+0.4));
+//        }, Duration.seconds(1));
+//        FXGL.run(() -> {
+//            player.getComponentOptional(com.survivor.entity.Player.PlayerMovementComponent.class).
+//                    ifPresent(xp -> xp.setScaleY(xp.getScaleY()+0.4));
+//        }, Duration.seconds(1));
 
         FXGL.getGameScene().getViewport().bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
     }
@@ -166,6 +185,7 @@ public class GameApp extends GameApplication {
     @Override
     protected void onUpdate(double tpf) {
         //sceneManager.getGameLoop().update(tpf);
+        NeutralMonsterAIManager.getInstance().onUpdate(tpf);
         if (sceneManager != null) {
             sceneManager.update(tpf);
         }
@@ -175,7 +195,7 @@ public class GameApp extends GameApplication {
         else {
             player.getComponent(PlayerMovementComponent.class).setPaused(false);
         }
-        System.out.println("Elapsed time: " + sceneManager.getGameLoop().getElapsedTime());
+//        System.out.println("Elapsed time: " + sceneManager.getGameLoop().getElapsedTime());
     }
 
     public void restartGame() {

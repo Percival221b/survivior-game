@@ -6,6 +6,8 @@ import com.survivor.system.ResourceLoader;
 
 import java.util.Random;
 
+import static com.almasb.fxgl.core.math.FXGLMath.getRandom;
+
 public class SpawnManager {
     private double spawnTimer = 0;
     private double spawnInterval = 0.8; // 初始刷怪间隔（秒）
@@ -14,6 +16,8 @@ public class SpawnManager {
 
     // 难度随时间增加
     private double elapsedTime = 0; // 游戏运行总时间
+    private double specialSpawnTime = 1; // 1分钟后生成一排怪物
+    private double time1=5;
 
     public void update(double tpf) {
         elapsedTime += tpf;
@@ -33,6 +37,14 @@ public class SpawnManager {
 
             spawnTimer = 0;
         }
+
+//        if (elapsedTime >= specialSpawnTime) {
+//
+//            spawnZigzagEnemies(); // 召唤一排怪物
+//            specialSpawnTime += time1;
+//            if(time1>1) {time1 -=1;}
+//
+//        }
     }
 
 
@@ -80,9 +92,23 @@ public class SpawnManager {
 
             // 判定是否在允许距离范围之外
             if (distance >= minDist && distance <= maxDist) {
-                FXGL.spawn("enemy", x, y);
 
-                System.out.println("Spawned enemy at (" + x + ", " + y + "), distance=" + distance);
+                int roll = getRandom().nextInt(100); // 0-99
+
+                if (roll < 40) {
+                    FXGL.spawn("bat", x, y);
+                } else if (roll < 70) {
+                    FXGL.spawn("enemy", x, y);
+                } else if (roll < 80) {
+                    FXGL.spawn("ExplodedEnemy", x, y);
+                } else if (roll < 98) {
+                    FXGL.spawn("splitenemy", x, y);
+                } else {
+                    this. spawnZigzagEnemies();
+                }
+
+
+                //System.out.println("Spawned enemy at (" + x + ", " + y + "), distance=" + distance);
                 return;
             }
         }
@@ -90,38 +116,66 @@ public class SpawnManager {
         System.out.println("⚠ 无法在允许范围内找到合适刷怪点");
     }
 
+    private void spawnZigzagEnemies() {
+        // 获取屏幕的宽度和高度
+        double camW = FXGL.getAppWidth();
+        double camH = FXGL.getAppHeight();
+        var viewport = FXGL.getGameScene().getViewport();
+        double camX = viewport.getX();
+        double camY = viewport.getY();
+
+        Random rand = new Random();
+        Random rand0 = new Random();
+        int edgeChoice = rand.nextInt(2);// 0: 左, 1: 右, 2: 上, 3: 下
+        int enemyNum = rand.nextInt(5)+2;
+
+        for (int i = 0; i < enemyNum; i++) {
+            // 随机选择一个边缘来生成怪物
+            double spawnX = 0;
+            double spawnY = 0;
+
+            double offsetX = i * (camW * 0.6 / enemyNum);
+            double offsetY = i * (camH * 0.6 / enemyNum);
+
+            // 根据边缘选择生成怪物的位置
+            switch (edgeChoice) {
+//                case 0: // 上边缘
+//                    spawnX = camX + camW*0.2 + offsetX;
+//                    spawnY = camY;
+//                    break;
+//                case 1: // 下边缘
+//                    spawnX = camX + camW*0.2 + offsetX;
+//                    spawnY = camY+ camH;
+//                    break;
+                case 0: // 左边缘
+                    spawnX = camX;
+                    spawnY = camY + camH * 0.2 + offsetY;
+                    break;
+                case 1: // 右边缘
+                    spawnX = camX + camW ;
+                    spawnY = camY + camH * 0.2 + offsetY;
+                    break;
+            }
+
+
+
+            // 在边缘生成怪物并设置偏移
+            FXGL.spawn("Armyenemy", spawnX, spawnY+300);
+
+//            System.out.println("Spawned enemy at edge: (" + spawnX + ", " + spawnY + ")");
+        }
+    }
+
+
+
+
+
     public void reset() {
         spawnTimer = 0;
     }
-    /*public void spawnWalls() {
-        try {
-            Files.lines(Paths.get("walls.txt"))
-                    .map(line -> line.trim().split("\\s+"))
-                    .filter(parts -> parts.length == 4)
-                    .forEach(parts -> {
-                        int w = Integer.parseInt(parts[0]);
-                        int h = Integer.parseInt(parts[1]);
-                        int x = Integer.parseInt(parts[2]);
-                        int y = Integer.parseInt(parts[3]);
 
-                        MapWall mapWall = new MapWall(w, h, new Point2D(x, y));
-                        mapWall.spawn();
-                        walls.add(mapWall);
 
-                        System.out.printf("成功生成实体: w=%d, h=%d, x=%d, y=%d%n", w, h, x, y);
-                    });
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("读取文件失败，请检查文件路径和权限：");
-        }
-    }*/
 
-    /*public void removeWalls() {
-        for (var wall : walls) {
-            wall.remove();
-        }
-        walls.clear();
-    }*/
 }
 

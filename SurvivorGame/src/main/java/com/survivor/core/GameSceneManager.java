@@ -22,7 +22,7 @@ public class GameSceneManager {
     private GameLoop gameLoop;
     private ResourceLoader resourceLoader;
     private boolean gameOverShown = false;
-
+    private CollisionSystem collisionSystem = new CollisionSystem();
     public GameSceneManager(GameApplication app) {
         this.app = app;
         this.uiManager = new UIManager();
@@ -35,7 +35,7 @@ public class GameSceneManager {
         uiManager.registerUI("menu", menuUI.createContent());
 
         // HUD
-        this.hud = new HUD(1280, 720, 100, 100, this);
+        this.hud = new HUD(1280, 720, 100, 10000, this);
         uiManager.registerUI("hud", this.hud.createContent());
     }
 
@@ -59,16 +59,17 @@ public class GameSceneManager {
         URL resource = getClass().getResource("/sounds/Decimation_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
         // 初始化一局
-        hud.setHealth(100);
+        hud.setHealth(10000);
         hud.setExp(0);
         gameLoop.start();
         gameOverShown = false;
+        collisionSystem.registerCollisionHandlers();
     }
 
     // 重新开始游戏
     public void restartGame() {
         if (app instanceof GameApp ga) {
-            hud.setHealth(100);
+            hud.setHealth(10000);
             hud.setExp(0);
             hud.setLevel(1);
             ga.restartGame();
@@ -86,7 +87,7 @@ public class GameSceneManager {
     public void update(double tpf) {
         gameLoop.update(tpf);
         if (!gameLoop.isRunning() || gameOverShown) return;
-        if (gameLoop.getElapsedTime() >= 60) {
+        if (gameLoop.getElapsedTime() >= 6000) {
             showEndScreen(true); // 胜利
         } else if (hud != null && hud.getHealth() <= 0) {
             showEndScreen(false); // 失败

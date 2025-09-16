@@ -3,11 +3,12 @@ package com.survivor.entity.weapon;
 import com.almasb.fxgl.core.math.Vec2;
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.texture.AnimatedTexture;
-import com.almasb.fxgl.texture.AnimationChannel;
-import com.survivor.entity.Enemy.EnemyComponent;
+import com.survivor.entity.Enemy.*;
+import com.survivor.entity.Enemy.test.SmartEnemyAI;
+import com.survivor.entity.Player.HealthComponent;
+import com.survivor.entity.Player.PlayerMovementComponent;
+import com.survivor.entity.Player.PlayerSoundComponent;
 import com.survivor.entity.Projectile;
-import com.survivor.util.getMoveDirection;
 import javafx.geometry.Point2D;
 import javafx.util.Duration;
 
@@ -43,13 +44,28 @@ public class Blade extends Projectile {
 
     @Override
     protected void handleHeroCollision(Entity hero) {
-
-
+        hero.getComponent(HealthComponent.class).takeDamage(4000);
     }
 
     @Override
     protected void handleMonsterCollision(Entity monster) {
-        monster.getComponent(EnemyComponent.class).takeDamage(4000);
+        if(monster.hasComponent(SprintEnemyCompontBat.class)) {
+            monster.getComponent(SprintEnemyCompontBat.class).takeDamage(PlayerMovementComponent.attack);
+        }else if (monster.hasComponent(SplitEnemyComponent.class)){
+            monster.getComponent(SplitEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
+        }else if (monster.hasComponent(zhiEnemyComponent.class)){
+            monster.getComponent(zhiEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
+        }else if(monster.hasComponent(SmallSplitEnemyComponent.class)) {
+            monster.getComponent(SmallSplitEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
+        }else if (monster.hasComponent(RangedEnemyComponent.class)) {
+            monster.getComponent(RangedEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
+        }
+        else if (monster.hasComponent(SelfExplodingEnemyComponent.class)) {
+            monster.getComponent(SelfExplodingEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
+        }
+        else if(monster.hasComponent(SmartEnemyAI.class)) {
+            monster.getComponent(SmartEnemyAI.class).takeDamage((int) PlayerMovementComponent.attack);
+        }
     }
 }
 

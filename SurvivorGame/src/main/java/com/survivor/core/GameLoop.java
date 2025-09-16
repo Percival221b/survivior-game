@@ -26,30 +26,30 @@ public class GameLoop {
         FXGL.set("timeSurvived", elapsedTime);
         spawnManager.reset();
         isRunning = false;
-        System.out.println("GameLoop reset.");
+//        System.out.println("GameLoop reset.");
     }
 
     /** 启动循环（进入游戏时） */
     public void start() {
         reset();            // 每次开始都清空数据
         isRunning = true;
-        System.out.println("GameLoop started.");
+//        System.out.println("GameLoop started.");
     }
 
     /** 停止循环（返回菜单时） */
     public void stop() {
         isRunning = false;
-        System.out.println("GameLoop stopped.");
+//        System.out.println("GameLoop stopped.");
     }
 
     public void pause() {
         isRunning = false;
-        System.out.println("GameLoop paused.");
+//        System.out.println("GameLoop paused.");
     }
 
     public void resume() {
         isRunning = true;
-        System.out.println("GameLoop resumed.");
+//        System.out.println("GameLoop resumed.");
     }
 
     public double getElapsedTime() {
