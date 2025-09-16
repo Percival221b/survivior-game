@@ -194,6 +194,9 @@ public class UpgradePanel extends StackPane {
         st.setAutoReverse(true);
         st.setCycleCount(2);
         st.setOnFinished(e -> {
+            if (opt.unique) {
+                UpgradeRepository.chooseUpgrade(opt);
+            }
             if (onChosen != null) onChosen.accept(opt);
             close(null);
         });

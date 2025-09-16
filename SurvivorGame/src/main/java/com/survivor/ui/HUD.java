@@ -16,7 +16,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+
 
 import java.net.URL;
 import java.util.Optional;
@@ -32,7 +36,11 @@ public class HUD extends StackPane {
     private final GameSceneManager gameSceneManager;
     private int level = 1;  // 初始等级
     private Label levelLabel;  // 等级显示标签
-
+    private Text countdownText;
+    private boolean countdownVisible = false;
+    private double countdownTime = 0;
+    Font customFont = Font.loadFont(getClass().getResourceAsStream("/assets/fonts/antiquity-print.ttf"), 100);
+    AnchorPane root = new AnchorPane();
     // ==== 新增：升级事件回调 ====
     private java.util.function.Consumer<Integer> onLevelUp;
     public void setOnLevelUp(Consumer<Integer> callback) {
@@ -63,19 +71,19 @@ public class HUD extends StackPane {
     public HUD(double width, double height, double maxExp, double maxHealth, GameSceneManager gameSceneManager) {
         this.gameSceneManager = gameSceneManager;
 
-        AnchorPane root = new AnchorPane();
+
         root.setPrefSize(width, height);
 
         // 血条（左下角）
-        double healthWidth = width * 0.2;
-        healthBar = new ExpBar(healthWidth, 20, maxHealth, Color.RED, true);
+        double healthWidth = width * 0.5;
+        healthBar = new ExpBar(healthWidth, 40, maxHealth, Color.RED, true);
         AnchorPane.setBottomAnchor(healthBar, 60.0);
         AnchorPane.setLeftAnchor(healthBar, 10.0 + width * 0.094);
         root.getChildren().add(healthBar);
 
         // 经验条（左下角，血条下面）
         double expWidth = width * 0.8;
-        expBar = new ExpBar(expWidth, 20, maxExp, Color.GOLDENROD, false);
+        expBar = new ExpBar(expWidth, 60, maxExp, Color.GOLDENROD, false);
         AnchorPane.setBottomAnchor(expBar, 30.0);
         AnchorPane.setLeftAnchor(expBar, (width - expWidth) / 2);
         root.getChildren().add(expBar);
@@ -90,8 +98,8 @@ public class HUD extends StackPane {
         // 暂停按钮（右上角）
         Image pauseImage = new Image("images/table.png");
         ImageView pauseIcon = new ImageView(pauseImage);
-        pauseIcon.setFitWidth(70);
-        pauseIcon.setFitHeight(70);
+        pauseIcon.setFitWidth(140);
+        pauseIcon.setFitHeight(140);
         pauseIcon.setPreserveRatio(true);
 
         Button pauseButton = new Button();
@@ -108,8 +116,8 @@ public class HUD extends StackPane {
         ImageView musicIcon = new ImageView(
                 gameSceneManager.getAudioManager().isMusicEnabled() ? musicOnImg : musicOffImg
         );
-        musicIcon.setFitWidth(70);
-        musicIcon.setFitHeight(70);
+        musicIcon.setFitWidth(140);
+        musicIcon.setFitHeight(140);
 
         Button musicButton = new Button();
         musicButton.setGraphic(musicIcon);
@@ -124,7 +132,7 @@ public class HUD extends StackPane {
             }
         });
         AnchorPane.setTopAnchor(musicButton, 25.0);
-        AnchorPane.setRightAnchor(musicButton, 100.0);
+        AnchorPane.setRightAnchor(musicButton, 200.0);
         root.getChildren().add(musicButton);
 
         // 暂停菜单（初始隐藏）
@@ -175,8 +183,8 @@ public class HUD extends StackPane {
         private double currentValue = 0;
 
         private ImageView healthView;
-        private double fullWidth = 350;   // healthbar.png 原始宽度
-        private double barHeight = 39;   // 图片高度
+        private double fullWidth = 1400;   // healthbar.png 原始宽度
+        private double barHeight = 150;   // 图片高度
         private final boolean showFraction;
 
 
@@ -266,8 +274,8 @@ public class HUD extends StackPane {
     private StackPane createCustomButton(String text, String imagePath, Runnable onClick) {
         StackPane button = new StackPane();
         ImageView bg = new ImageView(new Image(imagePath));
-        bg.setFitWidth(338);
-        bg.setFitHeight(80);
+        bg.setFitWidth(507);
+        bg.setFitHeight(120);
 
         Label label = new Label(text);
         label.setStyle("-fx-font-family: 'Press Start 2P'; -fx-font-size: 20; -fx-text-fill: #FFD700;");
@@ -312,6 +320,44 @@ public class HUD extends StackPane {
 
         setExp(0);
     }
+    public void startCountdown(double seconds) {
+        if (countdownText == null) {
+            countdownText = new Text();
+            countdownText.setFill(Color.RED);
+            countdownText.setFont(customFont);;
+            // 固定上方
+            AnchorPane.setTopAnchor(countdownText,0.0);
+            countdownText.setLayoutX(root.getPrefWidth() / 2 - 30);
+            root.getChildren().add(countdownText);
+        }
+        countdownVisible = true;
+        countdownTime = seconds;
+        updateCountdown((int) countdownTime);
+    }
+
+    public void hideCountdown() {
+        if (countdownText != null) {
+            countdownText.setVisible(false);   // 隱藏
+            countdownVisible = false;
+        }
+    }
+
+
+    public void updateCountdown(int secondsLeft) {
+        if (countdownText != null) {
+            countdownText.setText(String.valueOf(secondsLeft));
+        }
+    }
+
+    // 每幀更新（GameLoop 調用）
+    public void onUpdate(double tpf) {
+        if (countdownVisible && countdownTime > 0) {
+            countdownTime -= tpf;
+            if (countdownTime < 0) countdownTime = 0;
+            updateCountdown((int) countdownTime);
+        }
+    }
+
     // 获取当前血量
     public double getHealth() {
         return healthBar.getValue();

@@ -3,67 +3,79 @@
     "id": "atk_up",
     "title": "体魄强化",
     "description": "基础攻击力 +40%。",
-    "icon": "ui/upgrades/blade.png"
+    "icon": "ui/upgrades/blade.png",
+    "unique": false
+
   },
   {
     "id": "spd_up",
     "title": "疾风步",
     "description": "移动速度 +40%，冲刺冷却 -20%。",
-    "icon": "ui/upgrades/dash.png"
+    "icon": "ui/upgrades/dash.png",
+    "unique": false
   },
   {
     "id": "hp_up",
     "title": "不屈之心",
-    "description": "最大生命 +50，并立即回复 %50 生命。",
-    "icon": "ui/upgrades/heart.png"
+    "description": "最大生命 +50%，并立即回复 %50 生命。",
+    "icon": "ui/upgrades/heart.png",
+    "unique": false
   },
   {
     "id": "attcktime_up",
     "title": "迅捷之刃",
     "description": "攻速加+20%",
-    "icon": "ui/upgrades/smash.png"
+    "icon": "ui/upgrades/smash.png",
+    "unique": false
   },
   {
     "id": "regen_up",
     "title": "坚毅体魄",
     "description": "增加每 5 秒恢复 20% 点生命值。",
-    "icon": "ui/upgrades/muscle.png"
+    "icon": "ui/upgrades/muscle.png",
+    "unique": false
   },
   {
     "id": "aoe_up",
     "title": "剑气扩散",
     "description": "攻击范围扩大 30%，更容易同时命中多个敌人。",
-    "icon": "ui/upgrades/wave.png"
+    "icon": "ui/upgrades/wave.png",
+    "unique": false
   },
   {
     "id": "tool_up",
     "title": "多重打击",
-    "description": "增加发射子弹数量",
-    "icon": "ui/upgrades/rich.png"
-  },
+    "description": "增加发射剑气数量",
+    "icon": "ui/upgrades/bounce.png",
+    "unique": false  },
   {
     "id": "blood-increase",
     "title": "魔力增强",
     "description": "提高法阵的速度与攻击力",
-    "icon": "ui/upgrades/fire.png"
+    "icon": "ui/upgrades/fire.png",
+    "unique": false
   },
   {
     "id": "blood_up",
     "title": "魔力流转",
-    "description": "强化魔法能力",
-    "icon": "ui/upgrades/fire.png"
+    "description": "开启魔法阵",
+    "icon": "ui/upgrades/fire.png",
+    "unique": true
   },
   {
     "id": "waterwindspeed_up",
     "title": "飞驰之矢",
     "description": "剑气速度增加",
-    "icon": "ui/upgrades/smart.png"
+    "icon": "ui/upgrades/more.png",
+    "unique": false
   },
   {
-    "id": "speacil",
-    "title": "相位攻击",
-    "description": "剑气会移动位置多次攻击",
-    "icon": "ui/upgrades/rich.png"
+    "id": "bloodbiger",
+    "title": "魔力修炼",
+    "description": "增大法阵范围",
+    "icon": "ui/upgrades/circle.png",
+    "unique": false
   }
+
 
 ]

@@ -2,8 +2,32 @@ package com.survivor.core;
 
 import com.almasb.fxgl.core.math.FXGLMath;
 import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.entity.Entity;
 import com.survivor.main.EntityType;
 import com.survivor.system.ResourceLoader;
+import javafx.animation.FadeTransition;
+import javafx.scene.effect.BlendMode;
+import javafx.util.Duration;
+import com.almasb.fxgl.animation.Interpolators;
+import com.almasb.fxgl.dsl.FXGL;
+import com.almasb.fxgl.core.math.FXGLMath;
+import com.almasb.fxgl.entity.Entity;
+import com.almasb.fxgl.input.UserAction;
+import com.survivor.main.EntityType;
+import com.survivor.system.ResourceLoader;
+//import com.survivor.ui.BossAttackEffect;
+import javafx.animation.FadeTransition;
+import javafx.geometry.Point2D;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.input.KeyCode;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
+
 
 import java.util.Random;
 
@@ -20,20 +44,29 @@ public class SpawnManager {
     private double specialSpawnTime = 1; // 1分钟后生成一排怪物
     private double time1=5;
 
+    private boolean spawned = false;   // 保證只生成一次
+
     public void update(double tpf) {
+        if (elapsedTime >= 320) {
+            if (spawned) return;
+            spawnBossNearPlayer();
+            spawned = true;
+        }
+
         elapsedTime += tpf;
         spawnTimer += tpf;
 
         // 随时间逐渐增加难度
         // 随着时间增长，spawnInterval 逐渐减小
-        double difficultyFactor = Math.min(elapsedTime / 180.0, 1.0); // 0~1，120秒达到最高难度
+        double difficultyFactor = Math.min(elapsedTime / 200.0, 1.0); // 0~1，120秒达到最高难度
         spawnInterval = 0.8 - 0.6 * difficultyFactor; // 最终达到 0.2 秒
-    // 计算当前分钟数（向下取整）
+
         int minutes = (int)(elapsedTime / 60);
         if (minutes < 1) minutes = 1; // 至少 1 分钟，避免刚开始 0 * 5 = 0 不刷怪
 
         // 统计 AI 敌人的数量
         int aiEnemyCount = FXGL.getGameWorld().getEntitiesByType(EntityType.AIENEMY).size();
+
 
         if (spawnTimer >= spawnInterval) {
             // 每次刷怪的数量也随难度增加
@@ -46,15 +79,6 @@ public class SpawnManager {
             }
             spawnTimer = 0;
         }
-
-
-//        if (elapsedTime >= specialSpawnTime) {
-//
-//            spawnZigzagEnemies(); // 召唤一排怪物
-//            specialSpawnTime += time1;
-//            if(time1>1) {time1 -=1;}
-//
-//        }
     }
 
 
@@ -102,8 +126,8 @@ public class SpawnManager {
 
             // 判定是否在允许距离范围之外
             if (distance >= minDist && distance <= maxDist) {
-                if(FXGL.getGameWorld().getEntities().size()<=1000) {
-                     if(elapsedTime<=15)FXGL.spawn("bat", x, y);
+                 if(FXGL.getGameWorld().getEntities().size()<=1000) {
+                     if(elapsedTime<=12)FXGL.spawn("slime_enemy", x, y);
                      else if (elapsedTime<=30) {
                          FXGL.spawn("bat", x, y);
                          FXGL.spawn("enemy", x, y);
@@ -121,9 +145,9 @@ public class SpawnManager {
                          this.spawnZigzagEnemies();
                      }
                      }else if (elapsedTime<=120) {int roll = getRandom().nextInt(100); // 0-99
-                     if (roll <30 ) {
+                     if (roll <0 ) {
                          FXGL.spawn("bat", x, y);
-                     } else if (roll < 60) {
+                     } else if (roll < 40) {
                          FXGL.spawn("enemy", x, y);
                      } else if (roll < 80) {
                          FXGL.spawn("ExplodedEnemy", x, y);
@@ -160,11 +184,11 @@ public class SpawnManager {
                          }
                      } else if (elapsedTime<=240) {
                          int roll = getRandom().nextInt(100); // 0-99
-                         if (roll <10 ) {
+                         if (roll <5 ) {
                              FXGL.spawn("bat", x, y);
-                         } else if (roll < 20) {
+                         } else if (roll <50 ) {
                              FXGL.spawn("enemy", x, y);
-                         } else if (roll < 50) {
+                         } else if (roll < 70) {
                              FXGL.spawn("ExplodedEnemy", x, y);
                          } else if (roll < 85) {
                              FXGL.spawn("splitenemy", x, y);
@@ -174,11 +198,11 @@ public class SpawnManager {
                      }
                      else{
                          int roll = getRandom().nextInt(100); // 0-99
-                         if (roll <10 ) {
+                         if (roll <20 ) {
                              FXGL.spawn("bat", x, y);
-                         } else if (roll < 20) {
+                         } else if (roll < 40) {
                              FXGL.spawn("enemy", x, y);
-                         } else if (roll < 30) {
+                         } else if (roll < 55) {
                              FXGL.spawn("ExplodedEnemy", x, y);
                          } else if (roll < 85) {
                              FXGL.spawn("splitenemy", x, y);
@@ -203,13 +227,14 @@ public class SpawnManager {
 
                  }
 
-                //System.out.println("Spawned enemy at (" + x + ", " + y + "), distance=" + distance);
+                System.out.println("Spawned enemy at (" + x + ", " + y + "), distance=" + distance);
                 return;
             }
         }
 
         System.out.println("⚠ 无法在允许范围内找到合适刷怪点");
     }
+
     private void spawnAIEnemy() {
         var areas = ResourceLoader.getSpawnAreas();
         if (areas.isEmpty()) {
@@ -303,13 +328,71 @@ public class SpawnManager {
         }
     }
 
-
-
-
-
     public void reset() {
         spawnTimer = 0;
     }
+    private void spawnBossNearPlayer() {
+        var playerOpt = FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
+                .stream().findFirst();
+
+        if (playerOpt.isPresent()) {
+            var player = playerOpt.get();
+            var playerPos = player.getCenter();
+
+            double offsetX = -100;
+            double offsetY = -200;
+
+            double bossX = playerPos.getX() + offsetX;
+            double bossY = playerPos.getY() + offsetY;
+
+            // 刷 Boss
+            Entity boss = FXGL.spawn("boss", bossX, bossY);
+
+            // 播出場演出 / 特效（不要再呼叫 spawnBossNearPlayer 自己了！）
+            playSpawnEffectAt(bossX, bossY);
+
+            // 如果你還有自訂過場（含對話/可跳過），可在這裡再調用：
+            // playSpawnCinematicNearPlayer(boss, bossX, bossY);
+        }
+
+    }
+    private void playSpawnEffectAt(double x, double y) {
+        var viewport = FXGL.getGameScene().getViewport();
+
+        // 保存原來的鏡頭位置和縮放
+        double oldX = viewport.getX();
+        double oldY = viewport.getY();
+        double oldZoom = viewport.getZoom();
+
+        // 1) 鏡頭聚焦並拉近
+        viewport.focusOn(new Point2D(x, y));
+        viewport.setZoom(1.5);
+
+        // 2) 2 秒後恢復
+        FXGL.runOnce(() -> {
+            viewport.setZoom(oldZoom);
+            viewport.setX(oldX);
+            viewport.setY(oldY);
+        }, Duration.seconds(2));
+
+        // 3) 閃光（ADD 混合）
+        var flash = new Rectangle(FXGL.getAppWidth(), FXGL.getAppHeight(), Color.WHITE);
+        flash.setOpacity(0);
+        flash.setBlendMode(BlendMode.ADD);
+        FXGL.getGameScene().addUINode(flash);
+
+        var ft = new FadeTransition(Duration.seconds(0.4), flash);
+        ft.setFromValue(0);
+        ft.setToValue(0.8);
+        ft.setCycleCount(2);
+        ft.setAutoReverse(true);
+        ft.setOnFinished(e -> FXGL.getGameScene().removeUINode(flash));
+        ft.play();
+
+        // 4) 鏡頭震動
+        viewport.shakeTranslational(100);
+    }
+
 
 
 

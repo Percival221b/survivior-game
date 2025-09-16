@@ -51,7 +51,7 @@ public abstract class Projectile extends Component implements Renderable {
         physics.addSensor(hitBox, new SensorCollisionHandler() {
             @Override
             protected void onCollisionBegin(Entity other) {
-                if ((other.isType(EntityType.ENEMY)||other.isType(EntityType.AIENEMY))&&entity.isType(EntityType.PROJECTILE)) {
+                if (other.isType(EntityType.ENEMY)&&entity.isType(EntityType.PROJECTILE)) {
                     handleMonsterCollision(other);
                 }
                 if (other.isType(EntityType.PLAYER)&&entity.isType(EntityType.PROJECTILEENEMY)) {

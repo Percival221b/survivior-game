@@ -9,7 +9,6 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.SensorCollisionHandler;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
 import com.survivor.entity.Enemy.*;
-import com.survivor.entity.Enemy.test.SmartEnemyAI;
 import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.entity.Projectile;

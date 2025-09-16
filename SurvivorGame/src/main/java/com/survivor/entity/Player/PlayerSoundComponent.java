@@ -14,11 +14,10 @@ public class PlayerSoundComponent extends Component {
     @Override
     public void onAdded() {
         // 从 assets/sounds 目录加载音效文件
-        attackSfx = FXGL.getAssetLoader().loadSound("sword-slash-315218.mp3");
+        attackSfx = FXGL.getAssetLoader().loadSound("sword-slash-315218(3).mp3");
         dashSfx = FXGL.getAssetLoader().loadSound("split-[AudioTrimmer.com].mp3");
         dieSfx = FXGL.getAssetLoader().loadSound("die_knight.wav");
     }
-
     /**
      * 播放攻击音效
      */

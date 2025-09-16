@@ -59,12 +59,16 @@ public class SlimeEnemyComponent extends Component {
     private long lastAttackTime = 0;
     private long attackCooldown = 1500; // 毫秒
 
+
+
+
+
     @Override
     public void onAdded() {
-        float hitBoxW =  10f;
-        float hitBoxH = 16f;
-        float hitBoxX = -5f;
-        float hitBoxY = -8f;
+        float hitBoxW =  20f;
+        float hitBoxH = 15f;
+        float hitBoxX = -10f;
+        float hitBoxY = -3f;
 //        Rectangle rectView = new Rectangle(hitBoxW, hitBoxH, Color.GREEN);
 //        rectView.setTranslateX(hitBoxX);
 //        rectView.setTranslateY(hitBoxY);
@@ -94,10 +98,8 @@ public class SlimeEnemyComponent extends Component {
                 }
                 else if(other.isType(EntityType.PROJECTILE))
                 {
-
-
-                        takeDamage(4000);
-
+                    takeDamage(4000);
+//                    other.getComponent(Projectile.class).explode();
                 }
             }
 
@@ -106,21 +108,22 @@ public class SlimeEnemyComponent extends Component {
         physics.setOnPhysicsInitialized(() -> {
             physics.getBody().setFixedRotation(true);
         });
-        idleAnim = new AnimationChannel(FXGL.image("monster/normal/Orc_Idle.png"),
-                6, 100, 100, Duration.seconds(0.8), 0, 5);
-        moveAnim = new AnimationChannel(FXGL.image("monster/normal/Orc_Walk.png"),
-                8, 100, 100, Duration.seconds(0.8), 0, 7);
-        attackAnim = new AnimationChannel(FXGL.image("monster/normal/Orc_Attack.png"),
-                6, 100, 100, Duration.seconds(0.8), 0, 5);
-        deadAnim = new AnimationChannel(FXGL.image("monster/normal/Orc_Death.png"),
-                4, 100, 100, Duration.seconds(0.8), 0, 3);
+        idleAnim = new AnimationChannel(FXGL.image("slime_idle.png"),
+                7, 32, 32, Duration.seconds(2), 0, 6);
+        moveAnim = new AnimationChannel(FXGL.image("slime_run.png"),
+                23, 32, 32, Duration.seconds(2), 0, 22);
+        attackAnim = new AnimationChannel(FXGL.image("slime_run.png"),
+                23, 32, 32, Duration.seconds(2), 0, 22);
+        deadAnim = new AnimationChannel(FXGL.image("slime_run.png"),
+                4, 32, 32, Duration.seconds(2), 15, 18);
         texture = new AnimatedTexture(idleAnim);
-        texture.setTranslateX(-50f); // 让贴图居中
-        texture.setTranslateY(-50f);
+        texture.setTranslateX(-16f); // 让贴图居中
+        texture.setTranslateY(-16f);
 
         entity.getViewComponent().addChild(texture);
         texture.loopAnimationChannel(idleAnim);
     }
+
 
     @Override
     public void onUpdate(double tpf) {
@@ -192,7 +195,7 @@ public class SlimeEnemyComponent extends Component {
         if (health <= 0) {
             var playerOpt = FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
                     .stream().findFirst();
-            playerOpt.get().getComponent(XPComponent.class).gainXP(25);
+            playerOpt.get().getComponent(XPComponent.class).gainXP(15);
             dead = true;
             speed = 0;
             isAttacking = false;

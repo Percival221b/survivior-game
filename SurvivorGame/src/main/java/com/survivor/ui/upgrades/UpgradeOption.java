@@ -3,20 +3,22 @@ package com.survivor.ui.upgrades;
 import javafx.scene.image.Image;
 
 public class UpgradeOption {
-    private String id;
+    public String id;
     private String title;
     private String description;
     private String icon; // 从 JSON 读出来的路径，不直接存 Image
+    public boolean unique;
 
     public UpgradeOption() {
         // Jackson 需要无参构造函数
     }
 
-    public UpgradeOption(String id, String title, String description, String icon) {
+    public UpgradeOption(String id, String title, String description, String icon, boolean unique) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.icon = icon;
+        this.unique = unique;
     }
 
     // getter / setter

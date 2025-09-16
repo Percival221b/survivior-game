@@ -24,8 +24,8 @@ public class PlayerMovementComponent extends Component {
     private PhysicsComponent physics;
     public PlayerState state = PlayerState.IDLE;
 
-    private double speed = 400; // 单位：像素/秒
-    public static double attack = 50;       // 基础攻击
+    private double speed = 500; // 单位：像素/秒
+    public static double attack = 80;       // 基础攻击
 
     // 移动方向状态
     private boolean movingUp = false;
@@ -42,7 +42,7 @@ public class PlayerMovementComponent extends Component {
     private double dashOrbTimer = 0;
     private double dashOrbInterval = 0.03;
 
-    private double dashCooldownMax = 1.5; // 冲刺冷却 2 秒
+    private double dashCooldownMax = 1.3; // 冲刺冷却 2 秒
     private double dashCooldownTimer = 0; // 冷却计时器
     private boolean dashSoundPlayed = false;  // 新增字段
 
@@ -58,8 +58,8 @@ public class PlayerMovementComponent extends Component {
     private double numbers=0;
 
     private boolean hadBloodCircle=false;//环绕物
-    private double scaleBloodCircleX=1.0;
-    private double scaleBloodCircleY=1.0;
+    private double scaleBloodCircleX=1.5;
+    private double scaleBloodCircleY=1.5;
     private double timeBloodCircle=1.0;
     private double timerBloodCircle = 0.0;
 
@@ -257,6 +257,10 @@ public class PlayerMovementComponent extends Component {
         return scaleX;
     }
 
+    public static void setDashing(boolean dashing) {
+        PlayerMovementComponent.dashing = dashing;
+    }
+
     public void setScaleX(double scaleX) {
         this.scaleX = scaleX;
         System.out.println("move"+this.getScaleX());
@@ -319,8 +323,8 @@ public class PlayerMovementComponent extends Component {
     }
 
     public void increaseScale(double percent) {
-        this.scaleX *= 1+percent;
-        this.scaleY *= 1+percent;
+        this.scaleX =Math.min((1+percent)*scaleX,7);
+        this.scaleY =Math.min((1+percent)*scaleY,7);
     }
 
     public void increasenumbers(double number) {

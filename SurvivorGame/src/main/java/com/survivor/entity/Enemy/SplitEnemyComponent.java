@@ -144,8 +144,8 @@ public class SplitEnemyComponent extends Component {
         if (health <= 0) {
             var playerOpt= FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
                     .stream().findFirst();
-            playerOpt.get().getComponent(XPComponent.class).gainXP(100);
-            spawnSmallEnemies();
+            playerOpt.get().getComponent(XPComponent.class).gainXP(200);
+
             dead = true;
             speed = 0;
             isAttacking = false;
@@ -159,7 +159,8 @@ public class SplitEnemyComponent extends Component {
                     // 清空回调，避免死循环
                     texture.setOnCycleFinished(() -> {
                     });
-                    if (entity != null) {
+
+                    if (entity != null) {spawnSmallEnemies();
                         entity.removeFromWorld();
                     }
                 }

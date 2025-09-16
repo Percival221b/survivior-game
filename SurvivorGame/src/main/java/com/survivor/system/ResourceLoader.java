@@ -13,7 +13,7 @@ import com.survivor.core.SpawnArea;
 import com.survivor.core.UIManager;
 import com.survivor.core.spawnTile;
 import com.survivor.entity.Enemy.*;
-import com.survivor.entity.Enemy.test.SmartEnemyAI;
+import com.survivor.entity.Enemy.smart.SmartEnemyAI;
 import com.survivor.entity.weapon.*;
 import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.PlayerAnimationComponent;
@@ -29,17 +29,17 @@ import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.physics.box2d.dynamics.BodyType;
-import com.almasb.fxgl.core.math.Vec2;
+
 import java.util.ArrayList;
 import java.util.List;
-import com.survivor.util.aStarGrid;
 
 import com.survivor.entity.ExperienceOrb;
 import com.survivor.entity.HealthPotionComponent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.util.Duration;
+
+import static com.survivor.entity.Player.XPComponent.isup;
 
 public class ResourceLoader implements EntityFactory {
     private static final List<SpawnArea> spawnAreas = new ArrayList<>();
@@ -140,7 +140,7 @@ public class ResourceLoader implements EntityFactory {
         rectView.setTranslateY(hitBoxY);
         HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
 
-        HealthComponent health = new HealthComponent(1000000);
+        HealthComponent health = new HealthComponent(10000);
         XPComponent xp = new XPComponent();
 
         Entity player =  FXGL.entityBuilder(data)
@@ -154,7 +154,7 @@ public class ResourceLoader implements EntityFactory {
                 .collidable()
                 .bbox(hitBox)
                 .zIndex(150)
-                .view(rectView)
+                //.view(rectView)
                 .scale(0.5, 0.5)
                 .build();
 
@@ -210,7 +210,7 @@ public class ResourceLoader implements EntityFactory {
                 .type(EntityType.XP_ORB)
                 .with(new ExperienceOrb(xpAmount))
                 .with(physics) // 经验球也用动态，方便碰撞检测
-                .view(new Circle(5, Color.LIMEGREEN))
+                //.view(new Circle(5, Color.LIMEGREEN))
                 .collidable()
                 .build();
     }
@@ -257,7 +257,7 @@ public class ResourceLoader implements EntityFactory {
                 .with(new SlimeEnemyComponent())
 //                 .with(new EnemyAIComponent())
 //                .bbox(hitBox)
-                .view(rectView)
+                //.view(rectView)
                 .scale(1.6, 1.6)
                 .collidable()
                 .build();
@@ -294,6 +294,34 @@ public class ResourceLoader implements EntityFactory {
                 .build();
     }
 
+    @Spawns("AIEnemy")
+    public Entity newAIEnemy(SpawnData data) {
+        Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
+
+        PhysicsComponent physics = new PhysicsComponent();
+        physics.setBodyType(BodyType.DYNAMIC);
+
+        float hitBoxW = 25f;
+        float hitBoxH = 17f;
+        float hitBoxX = 30f;
+        float hitBoxY = 40f;
+        Rectangle rectView = new Rectangle(hitBoxW, hitBoxH, Color.GREEN);
+        rectView.setTranslateX(hitBoxX);
+        rectView.setTranslateY(hitBoxY);
+        HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
+
+
+        return FXGL.entityBuilder(data)
+                .type(EntityType.AIENEMY)
+                .with(physics)
+                .with(new SmartEnemyAI())
+                .bbox(hitBox)
+                //.view(rectView)
+                .scale(1.5, 1.5)
+                .collidable()
+                .build();
+    }
+
     @Spawns("bat")
     public Entity Bat(SpawnData data) {
         Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
@@ -325,34 +353,6 @@ public class ResourceLoader implements EntityFactory {
                 .build();
     }
 
-    @Spawns("AIEnemy")
-    public Entity newAIEnemy(SpawnData data) {
-        Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
-
-        PhysicsComponent physics = new PhysicsComponent();
-        physics.setBodyType(BodyType.DYNAMIC);
-
-        float hitBoxW = 25f;
-        float hitBoxH = 17f;
-        float hitBoxX = 30f;
-        float hitBoxY = 40f;
-        Rectangle rectView = new Rectangle(hitBoxW, hitBoxH, Color.GREEN);
-        rectView.setTranslateX(hitBoxX);
-        rectView.setTranslateY(hitBoxY);
-        HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
-
-
-        return FXGL.entityBuilder(data)
-                .type(EntityType.AIENEMY)
-                .with(physics)
-                .with(new SmartEnemyAI())
-                .bbox(hitBox)
-                //.view(rectView)
-                .scale(1.5, 1.5)
-                .collidable()
-                .build();
-    }
-
     @Spawns("splitenemy")
     public Entity newsplitEnemy(SpawnData data) {
         Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
@@ -372,6 +372,8 @@ public class ResourceLoader implements EntityFactory {
         rectView.setTranslateX(hitBoxX);
         rectView.setTranslateY(hitBoxY);
         HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
+
+
 
         return FXGL.entityBuilder(data)
                 .type(EntityType.ENEMY)
@@ -492,7 +494,6 @@ public class ResourceLoader implements EntityFactory {
     public Entity newBomb(SpawnData data) {
         PhysicsComponent physics = new PhysicsComponent();
         physics.setBodyType(BodyType.DYNAMIC);
-
         float hitRadius = data.get("hitRadius");
         Point2D startPos = data.get("startPos");
         Point2D hitCenter = data.get("hitCenter");
@@ -536,7 +537,7 @@ public class ResourceLoader implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .type(com.survivor.main.EntityType.PROJECTILEENEMY)
                 .at(startPos)
-                .view(circleView)
+                //.view(circleView)
                 .with(physics) // 添加物理组件用于碰撞
                 .with(new Fire(speed, damage, center, hitRadius, hitCenter, offsetPos, duration)) // 添加自定义逻辑
                 .collidable() // 标记为可碰撞
@@ -550,46 +551,55 @@ public class ResourceLoader implements EntityFactory {
         switch (opt.getId()) {
             case "atk_up" -> {
                 player.getComponent(PlayerMovementComponent.class).increaseAttack(0.5);
+                isup=false;
             }
             case "spd_up" -> {
-                player.getComponent(PlayerMovementComponent.class).increaseSpeed(0.2);
-                player.getComponent(PlayerMovementComponent.class).decreaseDashCooldown(0.2);
+                player.getComponent(PlayerMovementComponent.class).increaseSpeed(0.4);
+                player.getComponent(PlayerMovementComponent.class).decreaseDashCooldown(0.4);
+                isup=false;
             }
             case "hp_up" -> {//
                 player.getComponent(HealthComponent.class).increaseMaxHP((int)(player.getComponent(HealthComponent.class).getMaxHp()*0.5));
                 player.getComponent(HealthComponent.class).heal((int)(player.getComponent(HealthComponent.class).getMaxHp()*0.5));
+                isup=false;
             }
             case "attcktime_up" -> {
                 player.getComponent(PlayerMovementComponent.class).decreaseattackInterval(0.3);
+                isup=false;
             }
             case "regen_up" ->{//
-                player.getComponent(HealthComponent.class).increaseRegenHP(500);
+                player.getComponent(HealthComponent.class).increaseRegenHP((int)(player.getComponent(HealthComponent.class).getMaxHp()*0.2));
+                isup=false;
             }
             case "aoe_up" ->{
                 player.getComponent(PlayerAnimationComponent.class).increaseAttackRadius(0.2);
-                player.getComponent(PlayerMovementComponent.class).increaseScale(0.5);
+                player.getComponent(PlayerMovementComponent.class).increaseScale(0.4);
+                isup=false;
             }
             case "tool_up" ->{
                 player.getComponent(PlayerMovementComponent.class).increasenumbers(1);
+                isup=false;
             }
             case "waterwindspeed_up"->{
                 player.getComponent(PlayerMovementComponent.class).setScaleSpeed( player.getComponent(PlayerMovementComponent.class).getScaleSpeed()*1.4f);
+                isup=false;
             }
             case "blood_up" ->{
-                if(!player.getComponent(PlayerMovementComponent.class).isHadBloodCircle()){
                     player.getComponent(PlayerMovementComponent.class).setHadBloodCircle(true);
-                    return;
-                }
-                player.getComponent(PlayerMovementComponent.class).setScaleBloodCircleX(player.getComponent(PlayerMovementComponent.class).getScaleBloodCircleX()*1.5);
-                player.getComponent(PlayerMovementComponent.class).setScaleBloodCircleY(player.getComponent(PlayerMovementComponent.class).getScaleBloodCircleY()*1.5);
-
+                isup=false;
+//                player.getComponent(PlayerMovementComponent.class).setScaleBloodCircleX(player.getComponent(PlayerMovementComponent.class).getScaleBloodCircleX()*1.5);
+//                player.getComponent(PlayerMovementComponent.class).setScaleBloodCircleY(player.getComponent(PlayerMovementComponent.class).getScaleBloodCircleY()*1.5);
             }
             case "blood-increase"->{
                 player.getComponent(PlayerMovementComponent.class).setTimeBloodCircle( player.getComponent(PlayerMovementComponent.class).getTimeBloodCircle()*(0.8));
+                isup=false;
             }
-            case "speacil"->{
-                PlayerMovementComponent.speacil = true;
-            }
+             case"bloodbiger"->{
+                player.getComponent(PlayerMovementComponent.class).setScaleBloodCircleX(player.getComponent(PlayerMovementComponent.class).getScaleBloodCircleX()*1.5);
+               player.getComponent(PlayerMovementComponent.class).setScaleBloodCircleY(player.getComponent(PlayerMovementComponent.class).getScaleBloodCircleY()*1.5);
+               BloodCircle.bloodattack*=1.5;
+                 isup=false;
+             }
         }
         System.out.println("Applied upgrade: " + opt.getId());
     }
@@ -620,6 +630,7 @@ public class ResourceLoader implements EntityFactory {
                 ))
                 .build();
     }
+
     @Spawns("neutralBlade")
     public Entity newNeutralBlade(SpawnData data) {
         PhysicsComponent physics = new PhysicsComponent();
@@ -646,6 +657,7 @@ public class ResourceLoader implements EntityFactory {
                 ))
                 .build();
     }
+
     @Spawns("magicAttackEnemy")
     public Entity newMagicAttack(SpawnData data) {
         PhysicsComponent physics = new PhysicsComponent();
@@ -661,7 +673,7 @@ public class ResourceLoader implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .type(EntityType.PROJECTILEENEMY)
                 .at(startPos)
-                .view(circleView)
+                //.view(circleView)
                 .with(physics)
                 .with(new MagicAttack(damage, hitRadius, hitCenter, offsetPos)) // 添加自定义逻辑
                 .build();
@@ -685,7 +697,7 @@ public class ResourceLoader implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .type(com.survivor.main.EntityType.PROJECTILEENEMY)
                 .at(startPos)
-                .view(circleView)
+                //.view(circleView)
                 .with(physics)
                 .zIndex(110)
                 .with(new Bullet(speed, damage, hitRadius, hitCenter, offsetPos, duration, targetPos))
@@ -712,7 +724,7 @@ public class ResourceLoader implements EntityFactory {
         return FXGL.entityBuilder(data)
                 .type(com.survivor.main.EntityType.PROJECTILE)
                 .at(startPos)
-                .view(circleView)
+                //.view(circleView)
                 .with(physics)
                 .scale(scaleX,scaleY )
                 .zIndex(110)
@@ -742,7 +754,86 @@ public class ResourceLoader implements EntityFactory {
                 .with(physics)
                 .with(new BloodCircle(damage, hitRadius, hitCenter, offsetPos)) // 添加自定义逻辑
                 .build();
-
     }
+    @Spawns("boss")
+    public Entity newBoss(SpawnData data) {
+        Entity player = FXGL.getGameWorld().getSingleton(EntityType.PLAYER);
+
+        PhysicsComponent physics = new PhysicsComponent();
+        physics.setBodyType(BodyType.DYNAMIC);
+        physics.setFixtureDef(new FixtureDef()
+                .density(80.f)   // 密度越大，质量越大// 弹性
+                .restitution(0.0f)
+        );
+
+        float hitBoxW = 27f;
+        float hitBoxH = 30f;
+        float hitBoxX = -90f;
+        float hitBoxY = -95f;
+        Rectangle rectView = new Rectangle(hitBoxW, hitBoxH, Color.GREEN);
+        rectView.setTranslateX(hitBoxX);
+        rectView.setTranslateY(hitBoxY);
+        HitBox hitBox = new HitBox(new Point2D(hitBoxX,hitBoxY),BoundingShape.box(hitBoxW,hitBoxH));
+
+        return FXGL.entityBuilder(data)
+                .type(EntityType.ENEMY)
+                .with(physics)
+                .with(new BossComponent())
+                //.bbox(hitBox)
+                .scale(6, 6)
+                .collidable()
+                .build();
+    }
+    @Spawns("BossBullet")
+    public Entity newBossBullet(SpawnData data) {
+        PhysicsComponent physics = new PhysicsComponent();
+        physics.setBodyType(BodyType.DYNAMIC);
+
+        Point2D startPos = data.get("startPos");
+        float speed = data.get("speed");
+        float damage = data.get("damage");
+        Point2D center = data.get("center");
+        Point2D hitCenter = data.get("hitCenter");
+        Point2D offsetPos = data.get("offsetPos");
+        float hitRadius = data.get("hitRadius");
+        float duration = data.get("duration");
+        boolean isClockWise = data.get("isClockWise");
+        Circle circleView = new Circle(hitRadius, Color.BLUE);
+        circleView.setTranslateX(hitCenter.getX()); // 视图在实体x轴上向右偏移10像素
+        circleView.setTranslateY(hitCenter.getY());
+        return FXGL.entityBuilder(data)
+                .type(com.survivor.main.EntityType.PROJECTILEENEMY)
+                .at(startPos)
+                //.view(circleView)
+                .with(physics) // 添加物理组件用于碰撞
+                .with(new BossBullet(speed, damage, center, hitRadius, hitCenter, offsetPos, duration,isClockWise)) // 添加自定义逻辑
+                .collidable() // 标记为可碰撞
+                .scale(9,9)
+                .build();
+    }
+
+    @Spawns("BossMagic")
+    public Entity newBossMagic(SpawnData data) {
+        PhysicsComponent physics = new PhysicsComponent();
+        physics.setBodyType(BodyType.DYNAMIC);
+        Point2D startPos = data.get("startPos");
+        float damage = data.get("damage");
+        Point2D hitCenter = data.get("hitCenter");
+        Point2D offsetPos = data.get("offsetPos");
+        float hitRadius = data.get("hitRadius");
+        Circle circleView = new Circle(hitRadius, Color.BLUE);
+        circleView.setTranslateX(hitCenter.getX()); // 视图在实体x轴上向右偏移10像素
+        circleView.setTranslateY(hitCenter.getY());
+        return FXGL.entityBuilder(data)
+                .type(EntityType.PROJECTILEENEMY)
+                .at(startPos)
+                //.view(circleView)
+                .with(physics)
+                .with(new BossMagic(damage, hitRadius, hitCenter, offsetPos)) // 添加自定义逻辑
+                .scale(10,10)
+                .build();
+    }
+
+
 
 }

@@ -10,10 +10,9 @@ import java.net.URL;
 import java.util.Map;
 
 import com.almasb.fxgl.input.UserAction;
-import com.survivor.entity.Enemy.test.NeutralMonsterAIManager;
+import com.survivor.entity.Enemy.smart.NeutralMonsterAIManager;
 import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.system.ResourceLoader;
-import com.survivor.core.GameLoop;
 import com.survivor.core.GameSceneManager;
 import javafx.scene.input.KeyCode;
 import javafx.util.Duration;
@@ -185,13 +184,13 @@ public class GameApp extends GameApplication {
         //sceneManager.getGameLoop().update(tpf);
         if (sceneManager != null) {
             sceneManager.update(tpf);
-        }
-        if(!sceneManager.getGameLoop().isRunning()){
-            player.getComponent(PlayerMovementComponent.class).setPaused(true);
             NeutralMonsterAIManager.getInstance().onUpdate(tpf);
         }
+        if(!sceneManager.getGameLoop().isRunning()){
+            //player.getComponent(PlayerMovementComponent.class).setPaused(true);
+        }
         else {
-            player.getComponent(PlayerMovementComponent.class).setPaused(false);
+            //player.getComponent(PlayerMovementComponent.class).setPaused(false);
         }
 //        System.out.println("Elapsed time: " + sceneManager.getGameLoop().getElapsedTime());
     }

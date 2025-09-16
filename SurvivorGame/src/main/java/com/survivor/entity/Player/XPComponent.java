@@ -4,6 +4,8 @@ import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.component.Component;
 import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.PlayerMovementComponent;
+import javafx.util.Duration;
+
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -12,7 +14,7 @@ public class XPComponent extends Component {
     private int level = 1;
     private int currentXP = 0;
     private int xpToNextLevel = 100;
-
+    public static boolean isup=false;
     // 经验变化回调
     private BiConsumer<Integer, Integer> onXPChange;
     // 升级回调
@@ -49,13 +51,14 @@ public class XPComponent extends Component {
      * 检查当前经验值是否达到升级要求，并处理升级。
      */
     private void checkLevelUp() {
-        while (currentXP >= xpToNextLevel) {
+        if (currentXP >= xpToNextLevel&&isup==false) {
+             isup = true;
             // 升级玩家
             level++;
             currentXP -= xpToNextLevel; // 减去所需的经验值
 
             // 增加下一级所需的经验值（例如，指数增长）
-            xpToNextLevel = (int) (100 * Math.pow(1.2, level));
+            xpToNextLevel = (int) (100 * Math.pow(1.15, level));
             System.out.println("Level up triggered. Current Level: " + level);
             if (onLevelUp != null) {
                 System.out.println("Calling onLevelUp callback - Consumer class: " + onLevelUp.getClass().getName());  // 打印 Consumer 类型（应是 $$Lambda$... 或您的类）
@@ -69,7 +72,7 @@ public class XPComponent extends Component {
                 }
             }
             // 如果玩家一次性获得足够升多级的经验，则再次检查
-            checkLevelUp();
+            if(isup) checkLevelUp();
         }
     }
 

@@ -83,7 +83,7 @@ public class PlayerAnimationComponent extends Component {
         movement.setattackIntervalOnChange(newattackInterval -> {
             newattackInterval2= Math.max(newattackInterval, 0.08);
             attack = new AnimationChannel(
-                    FXGL.image("Attack2.png"), 5, 135, 135, Duration.seconds(newattackInterval2), 0, 4
+                    FXGL.image("Attack3.png"), 5, 135, 135, Duration.seconds(newattackInterval2), 0, 4
             );
         });
         movement.setOnSpeedChange(newSpeed -> {
@@ -181,7 +181,7 @@ public class PlayerAnimationComponent extends Component {
                         .put("startPos",entity.getPosition().add(new Point2D(-25f,40f)))
                         .put("damage", 10f)
                         .put("speed",movement.getScaleSpeed())
-                        .put("hitRadius", 5f)
+                        .put("hitRadius", 25f)
                         .put("hitCenter", new Point2D(0f, 0f))
                         .put("offsetPos", new Point2D(0f, 0f))
                         .put("duration",6f)

@@ -22,6 +22,12 @@ public class GameSceneManager {
     private GameLoop gameLoop;
     private ResourceLoader resourceLoader;
     private boolean gameOverShown = false;
+
+    private final double victoryTime = 420; // 例如 5 分鐘勝利，可自行修改
+    private final int countdownStart = 100;
+
+    private boolean countdownActive = false;
+
     private CollisionSystem collisionSystem = new CollisionSystem();
     public GameSceneManager(GameApplication app) {
         this.app = app;
@@ -35,18 +41,18 @@ public class GameSceneManager {
         uiManager.registerUI("menu", menuUI.createContent());
 
         // HUD
-        this.hud = new HUD(1280, 720, 100, 10000, this);
+        this.hud = new HUD(2560, 1280, 100, 10000, this);
         uiManager.registerUI("hud", this.hud.createContent());
     }
 
     public void showMenu() {
         uiManager.showUI("menu");
-        gameLoop.stop();
+       // gameLoop.stop();
         URL resource = getClass().getResource("/sounds/Perennial_Respite_Loop.wav");
         if (resource != null) audioManager.playMusic(resource.toExternalForm());
         // 重置状态
         gameOverShown = false;
-        gameLoop.stop();
+        //gameLoop.stop();
 
         FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
                 .forEach(player -> player.getComponentOptional(HealthComponent.class)
@@ -87,17 +93,38 @@ public class GameSceneManager {
     public void update(double tpf) {
         gameLoop.update(tpf);
         if (!gameLoop.isRunning() || gameOverShown) return;
-        if (gameLoop.getElapsedTime() >= 6000) {
-            showEndScreen(true); // 胜利
-        } else if (hud != null && hud.getHealth() <= 0) {
-            showEndScreen(false); // 失败
+
+        double elapsed = gameLoop.getElapsedTime();
+        double remaining = victoryTime - elapsed;
+
+        //  在最後 100 秒啟用倒計時
+        if (remaining <= countdownStart && !countdownActive) {
+            countdownActive = true;
+            hud.startCountdown((int) remaining);
+        }
+
+        //  更新倒計時
+        if (countdownActive) {
+            if (remaining > 0) {
+                hud.updateCountdown((int) remaining);
+            } else {
+                //  時間到 -> 勝利
+                showEndScreen(true);
+            }
+        }
+
+        //  玩家死亡 -> 失敗
+        if (hud != null && hud.getHealth() <= 0) {
+            //FXGL.getGameWorld().getEntitiesCopy().forEach(e -> e.removeFromWorld());
+            showEndScreen(false);
         }
     }
+
 
     private void showEndScreen(boolean isVictory) {
         if (gameOverShown) return;
         gameOverShown = true;
-        gameLoop.stop();
+       // gameLoop.stop();
         // 动态创建 GameOverUI，传递胜利/失败状态
         GameOverUI overUI = new GameOverUI(this, isVictory);
         uiManager.registerUI("end", overUI.createContent());

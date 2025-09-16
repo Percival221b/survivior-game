@@ -11,6 +11,7 @@ import javafx.geometry.Point2D;
 import javafx.util.Duration;
 
 public class BloodCircle extends Projectile {
+    public static double bloodattack=300;
     public BloodCircle(float damage,float hitRadius,Point2D hitCenter,Point2D offsetPos) {
         super(0, damage,hitRadius,hitCenter,offsetPos,false);
     }
@@ -75,18 +76,18 @@ public class BloodCircle extends Projectile {
     @Override
     protected void handleMonsterCollision(Entity monster) {
         if(monster.hasComponent(SprintEnemyCompontBat.class)) {
-            monster.getComponent(SprintEnemyCompontBat.class).takeDamage(300);
+            monster.getComponent(SprintEnemyCompontBat.class).takeDamage(BloodCircle.bloodattack);
         }else if (monster.hasComponent(SplitEnemyComponent.class)){
-            monster.getComponent(SplitEnemyComponent.class).takeDamage(300);
+            monster.getComponent(SplitEnemyComponent.class).takeDamage(BloodCircle.bloodattack);
         }else if (monster.hasComponent(zhiEnemyComponent.class)){
-            monster.getComponent(zhiEnemyComponent.class).takeDamage(300);
+            monster.getComponent(zhiEnemyComponent.class).takeDamage(BloodCircle.bloodattack);
         }else if(monster.hasComponent(SmallSplitEnemyComponent.class)) {
-            monster.getComponent(SmallSplitEnemyComponent.class).takeDamage(300);
+            monster.getComponent(SmallSplitEnemyComponent.class).takeDamage(BloodCircle.bloodattack);
         }else if (monster.hasComponent(RangedEnemyComponent.class)) {
-            monster.getComponent(RangedEnemyComponent.class).takeDamage(300);
+            monster.getComponent(RangedEnemyComponent.class).takeDamage(BloodCircle.bloodattack);
         }
         else if (monster.hasComponent(SelfExplodingEnemyComponent.class)) {
-            monster.getComponent(SelfExplodingEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
+            monster.getComponent(SelfExplodingEnemyComponent.class).takeDamage(BloodCircle.bloodattack);
         }
         else{
 

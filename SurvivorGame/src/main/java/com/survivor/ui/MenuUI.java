@@ -35,8 +35,8 @@ public class MenuUI {
 
     private void setBackground(String path) {
         background = new ImageView(new Image(path));
-        background.setFitWidth(1280);
-        background.setFitHeight(720);
+        background.setFitWidth(2560);
+        background.setFitHeight(1280);
         background.setOpacity(0.8);
     }
 
@@ -52,7 +52,7 @@ public class MenuUI {
         title.setStyle("-fx-fill: white;");
 
         // 按钮布局
-        VBox buttonLayout = new VBox(30, startButton, exitButton);
+        VBox buttonLayout = new VBox(100, startButton, exitButton);
         buttonLayout.setAlignment(Pos.CENTER);
 
         // 背景淡入动画
@@ -73,8 +73,8 @@ public class MenuUI {
         button.setMinSize(220, 80);
 
         ImageView bg = new ImageView(new Image(imagePath));
-        bg.setFitWidth(338);
-        bg.setFitHeight(80);
+        bg.setFitWidth(507);
+        bg.setFitHeight(120);
 
         Label label = new Label(text);
         label.setFont(Font.font("Press Start 2P", 24));

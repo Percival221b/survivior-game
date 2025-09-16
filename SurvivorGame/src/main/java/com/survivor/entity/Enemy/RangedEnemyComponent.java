@@ -164,7 +164,7 @@ public class RangedEnemyComponent extends Component {
         if (health <= 0) {
             var playerOpt= FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
                     .stream().findFirst();
-            playerOpt.get().getComponent(XPComponent.class).gainXP(20);
+            playerOpt.get().getComponent(XPComponent.class).gainXP(30);
 
           //      entity.removeFromWorld();
             dead = true;

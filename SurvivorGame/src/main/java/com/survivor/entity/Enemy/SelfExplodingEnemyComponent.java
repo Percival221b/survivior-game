@@ -7,6 +7,7 @@ import com.almasb.fxgl.entity.component.Required;
 import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
+import com.survivor.entity.Player.XPComponent;
 import com.survivor.main.EntityType;
 import javafx.animation.ScaleTransition;
 import javafx.geometry.Point2D;
@@ -144,6 +145,9 @@ public class SelfExplodingEnemyComponent extends Component {
         System.out.println("Enemy took " + damage + " damage. Remaining HP: " + health);
 
         if (health <= 0) {
+            var playerOpt= FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
+                    .stream().findFirst();
+            playerOpt.get().getComponent(XPComponent.class).gainXP(80);
 
             if(dead){
                 return;

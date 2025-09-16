@@ -39,7 +39,7 @@ public class zhiEnemyComponent extends Component {
 
     private boolean isAttacking = false;
 
-    private int attack  = 3000;
+    private int attack  = 1000;
     private double speed = 1200;
     private double attackRange = 250;
     private long lastAttackTime = 0;
@@ -51,9 +51,10 @@ public class zhiEnemyComponent extends Component {
         FXGL.getGameTimer().runOnceAfter(() -> {
             var playerOpt= FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
                     .stream().findFirst();
-            playerOpt.get().getComponent(XPComponent.class).gainXP(30);
-            entity.removeFromWorld();
-
+            playerOpt.get().getComponent(XPComponent.class).gainXP(60);
+            if (entity!=null) {
+                entity.removeFromWorld();
+            }
 
         }, Duration.seconds(3));
         float hitBoxW = 38f;

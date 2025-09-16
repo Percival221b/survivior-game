@@ -21,13 +21,13 @@ public class GameOverUI {
     public Parent createContent() {
         // 创建根容器StackPane，自动将子元素居中
         StackPane root = new StackPane();
-        root.setPrefSize(1280, 720);
+        root.setPrefSize(2560, 1280);
 
         // 动态选择背景图
         String bgImagePath = isVictory ? "images/Victory.png" : "images/Game Over.png";
         ImageView bg = new ImageView(new Image(bgImagePath));
-        bg.setFitWidth(700);
-        bg.setFitHeight(700);
+        bg.setFitWidth(1200);
+        bg.setFitHeight(1200);
         bg.setMouseTransparent(true);
 
         // 标题
@@ -57,8 +57,8 @@ public class GameOverUI {
         StackPane button = new StackPane();
 
         ImageView bg = new ImageView(new Image(imagePath));
-        bg.setFitWidth(250);
-        bg.setFitHeight(60);
+        bg.setFitWidth(509);
+        bg.setFitHeight(128);
         bg.setPickOnBounds(true); // 确保透明区域响应鼠标事件
 
         button.getChildren().add(bg);

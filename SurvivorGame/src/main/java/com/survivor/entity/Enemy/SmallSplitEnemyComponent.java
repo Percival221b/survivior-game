@@ -141,7 +141,7 @@ public class SmallSplitEnemyComponent extends Component {
         if (health <= 0) {
             var playerOpt= FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
                     .stream().findFirst();
-            playerOpt.get().getComponent(XPComponent.class).gainXP(25);
+            playerOpt.get().getComponent(XPComponent.class).gainXP(120);
             dead = true;
             speed = 0;
             isAttacking = false;
