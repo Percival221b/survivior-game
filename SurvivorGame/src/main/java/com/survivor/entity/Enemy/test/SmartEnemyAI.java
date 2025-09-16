@@ -2,7 +2,6 @@ package com.survivor.entity.Enemy.test;
 
 import com.almasb.fxgl.dsl.FXGL;
 import com.almasb.fxgl.entity.Entity;
-import com.almasb.fxgl.entity.SpawnData;
 import com.almasb.fxgl.entity.component.Component;
 import com.almasb.fxgl.entity.components.CollidableComponent;
 import com.almasb.fxgl.physics.PhysicsComponent;
@@ -10,7 +9,6 @@ import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.survivor.entity.Player.PlayerSoundComponent;
 import com.survivor.main.EntityType;
 import com.survivor.main.GameApp;
 import javafx.geometry.Point2D;
@@ -29,7 +27,7 @@ public class SmartEnemyAI extends Component {
 
     // ========== 小怪属性 ==========
     private int health = 1000;          // 生命值 (基础值，可根据小怪类型调整)
-    private int damage = 5000;          // 攻击伤害 (每次攻击造成的伤害)
+    private int damage = 500;          // 攻击伤害 (每次攻击造成的伤害)
     private double speed = 200;       // 移动速度 (像素/帧)
     private double attackRange = 50;  // 攻击范围 (像素)
     private int expValue = 5;         // 死亡时掉落的经验值
@@ -74,7 +72,7 @@ public class SmartEnemyAI extends Component {
         animWalk = new AnimationChannel(FXGL.image("ai_run.png"), 6, 80, 100, Duration.seconds(0.8), 0, 5);
         animAttack = new AnimationChannel(FXGL.image("ai_attack.png"), 12, 80, 100, Duration.seconds(1.0), 0, 11);
         animDeath = new AnimationChannel(FXGL.image("ai_die.png"), 23, 80, 80, Duration.seconds(1.5), 0, 22);
-        animHit=new AnimationChannel(FXGL.image("ai_hit.png"),5,80,100,Duration.seconds(1),0,4);
+        animHit=new AnimationChannel(FXGL.image("ai_hit.png"),5,80,100,Duration.seconds(0.5),0,4);
 
         texture = new AnimatedTexture(animIdle);
     }
@@ -119,7 +117,7 @@ public class SmartEnemyAI extends Component {
         double distance = myPos.distance(playerPos);
 
 
-
+        /*
         targetUpdateCooldown -= tpf;
         if (targetUpdateCooldown <= 0 || cachedTargetMonster == null || !cachedTargetMonster.isActive()) {
             cachedTargetMonster = getClosestMonsterToPlayer();
@@ -142,9 +140,9 @@ public class SmartEnemyAI extends Component {
         } else {
             performPatrol(tpf);
         }
-
-        // 决策逻辑
-        /*String action = NeutralMonsterAIManager.getInstance().getGlobalDecision();
+*/
+        // 决策逻辑（这里只改 attack_player）
+        String action = NeutralMonsterAIManager.getInstance().getGlobalDecision();
 
         switch (action) {
             case "attack_player":
@@ -180,7 +178,7 @@ public class SmartEnemyAI extends Component {
 
                 if (cachedTargetMonster != null) {
                     distance = myPos.distance(cachedTargetMonster.getPosition());
-                    if (distance > 50) {
+                    if (distance > targetUpdateCooldown) {
                         moveTowards(cachedTargetMonster.getCenter());
                     }
                     else {
@@ -199,7 +197,7 @@ public class SmartEnemyAI extends Component {
             default:
                 performPatrol(tpf);
                 break;
-        }*/
+        }
     }
 
     // 随机选取一个其他怪物
@@ -268,6 +266,7 @@ public class SmartEnemyAI extends Component {
             return action;
 
         } catch (Exception e) {
+            System.err.println("[SmartEnemyAI] 请求失败: " + e.getMessage());
             e.printStackTrace();
             return "patrol"; // 出错时默认巡逻
         }
@@ -307,16 +306,6 @@ public class SmartEnemyAI extends Component {
 
         // 播放一次攻击动画
         texture.playAnimationChannel(animAttack);
-
-        FXGL.runOnce(() -> {
-            FXGL.spawn("neutralBlade", new SpawnData( entity.getCenter())
-                    .put("startPos",  entity.getCenter())
-                    .put("damage", 1000f)
-                    .put("hitCenter",(new Point2D(0f,0f)))
-                    .put("hitRadius", 50f)
-                    .put("offsetPos",new Point2D(0f,0f))
-                    .put("duration",0.1f));
-        }, Duration.seconds(0.6)); // 动画一半时出招
 
         // 动画完成回调
         texture.setOnCycleFinished(() -> {

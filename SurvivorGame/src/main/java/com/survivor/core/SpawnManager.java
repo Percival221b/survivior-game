@@ -2,6 +2,7 @@ package com.survivor.core;
 
 import com.almasb.fxgl.core.math.FXGLMath;
 import com.almasb.fxgl.dsl.FXGL;
+import com.survivor.main.EntityType;
 import com.survivor.system.ResourceLoader;
 
 import java.util.Random;
@@ -25,8 +26,14 @@ public class SpawnManager {
 
         // 随时间逐渐增加难度
         // 随着时间增长，spawnInterval 逐渐减小
-        double difficultyFactor = Math.min(elapsedTime / 120.0, 1.0); // 0~1，120秒达到最高难度
+        double difficultyFactor = Math.min(elapsedTime / 180.0, 1.0); // 0~1，120秒达到最高难度
         spawnInterval = 0.8 - 0.6 * difficultyFactor; // 最终达到 0.2 秒
+    // 计算当前分钟数（向下取整）
+        int minutes = (int)(elapsedTime / 60);
+        if (minutes < 1) minutes = 1; // 至少 1 分钟，避免刚开始 0 * 5 = 0 不刷怪
+
+        // 统计 AI 敌人的数量
+        int aiEnemyCount = FXGL.getGameWorld().getEntitiesByType(EntityType.AIENEMY).size();
 
         if (spawnTimer >= spawnInterval) {
             // 每次刷怪的数量也随难度增加
@@ -34,9 +41,12 @@ public class SpawnManager {
             for (int i = 0; i < numEnemies; i++) {
                 spawnEnemy();
             }
-
+            if (aiEnemyCount<minutes*5) {
+                spawnAIEnemy();
+            }
             spawnTimer = 0;
         }
+
 
 //        if (elapsedTime >= specialSpawnTime) {
 //
@@ -92,21 +102,106 @@ public class SpawnManager {
 
             // 判定是否在允许距离范围之外
             if (distance >= minDist && distance <= maxDist) {
+                if(FXGL.getGameWorld().getEntities().size()<=1000) {
+                     if(elapsedTime<=15)FXGL.spawn("bat", x, y);
+                     else if (elapsedTime<=30) {
+                         FXGL.spawn("bat", x, y);
+                         FXGL.spawn("enemy", x, y);
+                         int roll = getRandom().nextInt(100);
+                         if(roll<5)this.spawnZigzagEnemies();
+                     } else if (elapsedTime<=60) {
+                         int roll = getRandom().nextInt(100); // 0-99
+                     if (roll < 40) {
+                         FXGL.spawn("bat", x, y);
+                     } else if (roll < 70) {
+                         FXGL.spawn("enemy", x, y);
+                     } else if (roll < 95) {
+                         FXGL.spawn("ExplodedEnemy", x, y);
+                     } else if (roll < 100) {
+                         this.spawnZigzagEnemies();
+                     }
+                     }else if (elapsedTime<=120) {int roll = getRandom().nextInt(100); // 0-99
+                     if (roll <30 ) {
+                         FXGL.spawn("bat", x, y);
+                     } else if (roll < 60) {
+                         FXGL.spawn("enemy", x, y);
+                     } else if (roll < 80) {
+                         FXGL.spawn("ExplodedEnemy", x, y);
+                     } else if (roll < 93) {
+                         FXGL.spawn("splitenemy", x, y);
+                     } else {
+                         this.spawnZigzagEnemies();
+                     }
+                     } else if (elapsedTime<=180) {
+                         int roll = getRandom().nextInt(100); // 0-99
+                         if (roll <20 ) {
+                             FXGL.spawn("bat", x, y);
+                         } else if (roll < 50) {
+                             FXGL.spawn("enemy", x, y);
+                         } else if (roll < 70) {
+                             FXGL.spawn("ExplodedEnemy", x, y);
+                         } else if (roll < 91) {
+                             FXGL.spawn("splitenemy", x, y);
+                         } else {
+                             this.spawnZigzagEnemies();
+                         }
+                     } else if (elapsedTime<=180) {
+                         int roll = getRandom().nextInt(100); // 0-99
+                         if (roll <20 ) {
+                             FXGL.spawn("bat", x, y);
+                         } else if (roll < 40) {
+                             FXGL.spawn("enemy", x, y);
+                         } else if (roll < 60) {
+                             FXGL.spawn("ExplodedEnemy", x, y);
+                         } else if (roll < 88) {
+                             FXGL.spawn("splitenemy", x, y);
+                         } else {
+                             this.spawnZigzagEnemies();
+                         }
+                     } else if (elapsedTime<=240) {
+                         int roll = getRandom().nextInt(100); // 0-99
+                         if (roll <10 ) {
+                             FXGL.spawn("bat", x, y);
+                         } else if (roll < 20) {
+                             FXGL.spawn("enemy", x, y);
+                         } else if (roll < 50) {
+                             FXGL.spawn("ExplodedEnemy", x, y);
+                         } else if (roll < 85) {
+                             FXGL.spawn("splitenemy", x, y);
+                         } else {
+                             this.spawnZigzagEnemies();
+                         }
+                     }
+                     else{
+                         int roll = getRandom().nextInt(100); // 0-99
+                         if (roll <10 ) {
+                             FXGL.spawn("bat", x, y);
+                         } else if (roll < 20) {
+                             FXGL.spawn("enemy", x, y);
+                         } else if (roll < 30) {
+                             FXGL.spawn("ExplodedEnemy", x, y);
+                         } else if (roll < 85) {
+                             FXGL.spawn("splitenemy", x, y);
+                         } else {
+                             this.spawnZigzagEnemies();
+                         }
+                     }
 
-                int roll = getRandom().nextInt(100); // 0-99
+//                     int roll = getRandom().nextInt(100); // 0-99
+//
+//                     if (roll < 100) {
+//                         FXGL.spawn("bat", x, y);
+//                     } else if (roll < 70) {
+//                         FXGL.spawn("enemy", x, y);
+//                     } else if (roll < 80) {
+//                         FXGL.spawn("ExplodedEnemy", x, y);
+//                     } else if (roll < 98) {
+//                         FXGL.spawn("splitenemy", x, y);
+//                     } else {
+//                         this.spawnZigzagEnemies();
+//                     }
 
-                if (roll < 40) {
-                    FXGL.spawn("bat", x, y);
-                } else if (roll < 70) {
-                    FXGL.spawn("enemy", x, y);
-                } else if (roll < 80) {
-                    FXGL.spawn("ExplodedEnemy", x, y);
-                } else if (roll < 98) {
-                    FXGL.spawn("splitenemy", x, y);
-                } else {
-                    this. spawnZigzagEnemies();
-                }
-
+                 }
 
                 //System.out.println("Spawned enemy at (" + x + ", " + y + "), distance=" + distance);
                 return;
@@ -115,6 +210,50 @@ public class SpawnManager {
 
         System.out.println("⚠ 无法在允许范围内找到合适刷怪点");
     }
+    private void spawnAIEnemy() {
+        var areas = ResourceLoader.getSpawnAreas();
+        if (areas.isEmpty()) {
+            System.out.println("没有刷怪区域！");
+            return;
+        }
+        // 当前相机视野
+        var viewport = FXGL.getGameScene().getViewport();
+        double camX = viewport.getX();
+        double camY = viewport.getY();
+        double camW = FXGL.getAppWidth();
+        double camH = FXGL.getAppHeight();
+        // 镜头中心
+        double camCenterX = camX + camW / 2.0;
+        double camCenterY = camY + camH / 2.0;
+        // 设置怪物最小距离和最大距离
+        double minDist = 800;  // 怪物距离中心至少800像素
+        double maxDist = 1500;  // 怪物距离中心最多1500像素
+        int tries = 0;
+        while (tries < 100) { // 最多尝试100次
+            tries++;
+            // 随机选一个刷怪区域
+            var areaOpt = FXGLMath.random(areas);
+            if (areaOpt.isEmpty())
+                continue;
+            SpawnArea area = areaOpt.get();
+            // 在该区域内随机生成点
+            double x = FXGLMath.random(area.x, area.x + area.width);
+            double y = FXGLMath.random(area.y, area.y + area.height);
+            // 计算点到镜头中心的距离
+            double dx = x - camCenterX;
+            double dy = y - camCenterY;
+            double distance = Math.sqrt(dx * dx + dy * dy);
+            // 判定是否在允许距离范围之外
+            if (distance >= minDist && distance <= maxDist) {
+                if (FXGL.getGameWorld().getEntities().size() <= 1000) {
+                    FXGL.spawn("AIEnemy", x, y);
+                }
+            }
+            return;
+        }
+        System.out.println("⚠ 无法在允许范围内找到合适刷怪点");
+    }
+
 
     private void spawnZigzagEnemies() {
         // 获取屏幕的宽度和高度
@@ -156,8 +295,6 @@ public class SpawnManager {
                     spawnY = camY + camH * 0.2 + offsetY;
                     break;
             }
-
-
 
             // 在边缘生成怪物并设置偏移
             FXGL.spawn("Armyenemy", spawnX, spawnY+300);

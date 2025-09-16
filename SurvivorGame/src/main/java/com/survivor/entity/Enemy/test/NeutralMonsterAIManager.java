@@ -21,7 +21,7 @@ public class NeutralMonsterAIManager {
     }
 
     public void onUpdate(double tpf) {
-        //System.out.println("[NeutralMonsterAIManager] onUpdate called, cooldown=" + queryCooldown);
+        System.out.println("[NeutralMonsterAIManager] onUpdate called, cooldown=" + queryCooldown);
         queryCooldown -= tpf;
         if (queryCooldown <= 0) {
             queryCooldown = queryInterval;
@@ -29,11 +29,10 @@ public class NeutralMonsterAIManager {
             // === 收集全局状态 ===
             int playerHp = FXGL.getGameWorld().getSingleton(EntityType.PLAYER)
                     .getComponent(HealthComponent.class).getHP();
-            int playerHpPercent = (int)(playerHp / 10000);
 
             long monsterCount = FXGL.getGameWorld().getEntitiesByType(EntityType.ENEMY).size();
 
-            String message = "Answer only one word. If you are in my game. The hero's health is "+playerHpPercent+". The number of monster is "+monsterCount+". You should attack monster if number of monster is large. Who will you choose to attack, hero or monster?";
+            String message = "Answer only one word. If you are in my game. The hero's health is "+playerHp+". The number of monster is "+monsterCount+". Who will you attack, hero or monster?";
             System.out.println("[NeutralMonsterAIManager] Submitting query: " + message);
             executor.submit(() -> {
                 String action = SmartEnemyAI.sendMessage(message);
@@ -47,9 +46,6 @@ public class NeutralMonsterAIManager {
                             globalDecision = action.toLowerCase().trim();
                         }
                         switch (action) {
-                            case "attack":
-                                globalDecision = "attack_monster";
-                                break;
                             case "hero":
                                 globalDecision = "attack_player";
                                 break;

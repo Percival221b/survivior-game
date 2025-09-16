@@ -15,8 +15,6 @@ import com.survivor.entity.interfaces.Renderable;
 import com.survivor.main.EntityType;
 import javafx.geometry.Point2D;
 
-import javax.print.attribute.standard.MediaSize;
-
 public abstract class Projectile extends Component implements Renderable {
     protected  float damage;
     //    protected Entity entity;
@@ -53,7 +51,7 @@ public abstract class Projectile extends Component implements Renderable {
         physics.addSensor(hitBox, new SensorCollisionHandler() {
             @Override
             protected void onCollisionBegin(Entity other) {
-                if ((other.isType(EntityType.ENEMY) || other.isType(EntityType.AIENEMY)) && entity.isType(EntityType.PROJECTILE)) {
+                if ((other.isType(EntityType.ENEMY)||other.isType(EntityType.AIENEMY))&&entity.isType(EntityType.PROJECTILE)) {
                     handleMonsterCollision(other);
                 }
                 if (other.isType(EntityType.PLAYER)&&entity.isType(EntityType.PROJECTILEENEMY)) {
@@ -91,7 +89,7 @@ public abstract class Projectile extends Component implements Renderable {
     protected abstract void handleHeroCollision(Entity hero);
 
     protected abstract void handleMonsterCollision(Entity monster);
-    protected void explode() {
+    public void explode() {
         if (entity != null) {
             if (isTransparent) {
 

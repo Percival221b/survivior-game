@@ -79,12 +79,14 @@ public class Bullet2 extends Projectile{
 
     @Override
     protected void handleMonsterCollision(Entity monster) {
-        Vec2 impulse = new Vec2(-1000, -1000);
-        Vec2 point = new Vec2(monster.getCenter());
+        if(PlayerMovementComponent.speacil) {
+            Vec2 impulse = new Vec2(-1000, -1000);
+            Vec2 point = new Vec2(monster.getCenter());
+            physics.applyBodyLinearImpulse(impulse, point, true);
+        }
 
 
 
-        physics.applyBodyLinearImpulse(impulse, point, true);
 
         if(monster.hasComponent(SprintEnemyCompontBat.class)) {
             monster.getComponent(SprintEnemyCompontBat.class).takeDamage(PlayerMovementComponent.attack);

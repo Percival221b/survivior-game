@@ -55,7 +55,7 @@ public class XPComponent extends Component {
             currentXP -= xpToNextLevel; // 减去所需的经验值
 
             // 增加下一级所需的经验值（例如，指数增长）
-            xpToNextLevel = (int) (100 * Math.pow(1.3, level));
+            xpToNextLevel = (int) (100 * Math.pow(1.2, level));
             System.out.println("Level up triggered. Current Level: " + level);
             if (onLevelUp != null) {
                 System.out.println("Calling onLevelUp callback - Consumer class: " + onLevelUp.getClass().getName());  // 打印 Consumer 类型（应是 $$Lambda$... 或您的类）

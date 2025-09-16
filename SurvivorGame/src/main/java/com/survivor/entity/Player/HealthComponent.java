@@ -82,19 +82,17 @@ public class HealthComponent extends Component {
 
     public void takeDamage(int dmg) {
         if(PlayerMovementComponent.dashing)return;
-
+        if (shield > 0) {
+            shield--;
+            notifyHealthChange();
+            FXGL.getNotificationService().pushNotification("格挡");
+            return;
+        }
+        if (shield == 0) {
+            FXGL.getNotificationService().pushNotification("护盾被击破！");
+        }
         hp -= dmg;
         if (hp <= 0) {
-            if (shield > 0) {
-                shield--;
-                notifyHealthChange();
-                FXGL.getNotificationService().pushNotification("格挡");
-                if (shield == 0) {
-                    FXGL.getNotificationService().pushNotification("护盾被击破！");
-                }
-                hp = (int) (maxHp*0.3);
-                return;
-            }
             hp = 0;
             FXGL.getNotificationService().pushNotification("玩家死亡！");
         }

@@ -14,6 +14,7 @@ import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.survivor.entity.Player.HealthComponent;
 import com.survivor.entity.Player.XPComponent;
+import com.survivor.entity.Projectile;
 import com.survivor.main.EntityType;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
@@ -38,7 +39,7 @@ public class zhiEnemyComponent extends Component {
 
     private boolean isAttacking = false;
 
-    private int attack  = 2000;
+    private int attack  = 3000;
     private double speed = 1200;
     private double attackRange = 250;
     private long lastAttackTime = 0;
@@ -47,6 +48,14 @@ public class zhiEnemyComponent extends Component {
 
     @Override
     public void onAdded() {
+        FXGL.getGameTimer().runOnceAfter(() -> {
+            var playerOpt= FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
+                    .stream().findFirst();
+            playerOpt.get().getComponent(XPComponent.class).gainXP(30);
+            entity.removeFromWorld();
+
+
+        }, Duration.seconds(3));
         float hitBoxW = 38f;
         float hitBoxH = 25f;
         float hitBoxX = -100f;
@@ -83,10 +92,10 @@ public class zhiEnemyComponent extends Component {
             physics.getBody().setFixedRotation(true);
         });
         // 初始化动画
-        idleAnim = new AnimationChannel(FXGL.image("Lancer-Idle.png"),
+        idleAnim = new AnimationChannel(FXGL.image("1.png"),
                 6, 100, 100, Duration.seconds(1), 0, 5);
-        moveAnim = new AnimationChannel(FXGL.image("Lancer-Walk02.png"),
-                8, 100, 100, Duration.seconds(0.3), 0, 7);
+        moveAnim = new AnimationChannel(FXGL.image("1.png"),
+                6, 64, 64, Duration.seconds(0.3), 0, 5);
         attackAnim = new AnimationChannel(FXGL.image("Lancer-Attack02.png"),
                 9, 100, 100, Duration.seconds(0.8), 0, 8);
         deadAnim = new AnimationChannel(FXGL.image("Lancer-Death.png"),

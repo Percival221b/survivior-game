@@ -1,32 +1,32 @@
 [
   {
     "id": "atk_up",
-    "title": "死亡斩击",
-    "description": "基础攻击力 +20%。",
+    "title": "体魄强化",
+    "description": "基础攻击力 +40%。",
     "icon": "ui/upgrades/blade.png"
   },
   {
     "id": "spd_up",
     "title": "疾风步",
-    "description": "移动速度 +10%，冲刺冷却 -20%。",
+    "description": "移动速度 +40%，冲刺冷却 -20%。",
     "icon": "ui/upgrades/dash.png"
   },
   {
     "id": "hp_up",
     "title": "不屈之心",
-    "description": "最大生命 +20，并立即回复 50 生命。",
+    "description": "最大生命 +50，并立即回复 %50 生命。",
     "icon": "ui/upgrades/heart.png"
   },
   {
-    "id": "crit_up",
-    "title": "致命打击",
-    "description": "暴击机率+5%",
+    "id": "attcktime_up",
+    "title": "迅捷之刃",
+    "description": "攻速加+20%",
     "icon": "ui/upgrades/smash.png"
   },
   {
     "id": "regen_up",
     "title": "坚毅体魄",
-    "description": "每 5 秒恢复 10 点生命值。",
+    "description": "增加每 5 秒恢复 20% 点生命值。",
     "icon": "ui/upgrades/muscle.png"
   },
   {
@@ -37,26 +37,33 @@
   },
   {
     "id": "tool_up",
-    "title": "贪婪之手",
-    "description": "击败敌人时掉落道具的概率增加10%。",
+    "title": "多重打击",
+    "description": "增加发射子弹数量",
     "icon": "ui/upgrades/rich.png"
   },
   {
-    "id": "shield_up",
-    "title": "守护屏障",
-    "description": "获得一层护盾，为你抵挡3次伤害。",
-    "icon": "ui/upgrades/shield.png"
-  },
-  {
-    "id": "cooldown_up",
-    "title": "魔力流转",
-    "description": "普通攻击冷却时间缩短 20%。",
+    "id": "blood-increase",
+    "title": "魔力增强",
+    "description": "提高法阵的速度与攻击力",
     "icon": "ui/upgrades/fire.png"
   },
   {
-    "id": "xp_up",
-    "title": "学识渊博",
-    "description": "获得经验值增加 25%。",
+    "id": "blood_up",
+    "title": "魔力流转",
+    "description": "强化魔法能力",
+    "icon": "ui/upgrades/fire.png"
+  },
+  {
+    "id": "waterwindspeed_up",
+    "title": "飞驰之矢",
+    "description": "剑气速度增加",
     "icon": "ui/upgrades/smart.png"
+  },
+  {
+    "id": "speacil",
+    "title": "相位攻击",
+    "description": "剑气会移动位置多次攻击",
+    "icon": "ui/upgrades/rich.png"
   }
+
 ]

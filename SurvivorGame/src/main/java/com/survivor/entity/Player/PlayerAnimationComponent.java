@@ -166,7 +166,7 @@ public class PlayerAnimationComponent extends Component {
         FXGL.runOnce(() -> {
             if (leftAttack) {;
                 System.out.println(movement.getScaleX());
-                if(movement.getNumbers()>=1)FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
+                if(movement.getNumbers()>=1){FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
                         .put("startPos",entity.getPosition().add(new Point2D(-25f,40f)))
                         .put("damage", 10f)
                         .put("speed",movement.getScaleSpeed())
@@ -176,8 +176,8 @@ public class PlayerAnimationComponent extends Component {
                         .put("duration",6f)
                         .put("targetPos",entity.getPosition().add(new Point2D(-25f,40f)).add(new Point2D(-1,0)))
                         .put("scaleX", movement.getScaleX())
-                        .put("scaleY", movement.getScaleY()));
-                 if(movement.getNumbers()>=2)FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
+                        .put("scaleY", movement.getScaleY()));}
+                if(movement.getNumbers()>=2) {FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
                         .put("startPos",entity.getPosition().add(new Point2D(-25f,40f)))
                         .put("damage", 10f)
                         .put("speed",movement.getScaleSpeed())
@@ -185,10 +185,10 @@ public class PlayerAnimationComponent extends Component {
                         .put("hitCenter", new Point2D(0f, 0f))
                         .put("offsetPos", new Point2D(0f, 0f))
                         .put("duration",6f)
-                        .put("targetPos",entity.getPosition().add(new Point2D(-25f,40f)).add(new Point2D(-2,1)))
+                        .put("targetPos",entity.getPosition().add(new Point2D(-25f,40f)).add(new Point2D(-3,1)))
                         .put("scaleX", movement.getScaleX())
                         .put("scaleY", movement.getScaleX()));
-                 if(movement.getNumbers()>=3)  FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
+                         FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
                         .put("startPos",entity.getPosition().add(new Point2D(-25f,40f)))
                         .put("damage", 10f)
                         .put("speed",movement.getScaleSpeed())
@@ -196,9 +196,32 @@ public class PlayerAnimationComponent extends Component {
                         .put("hitCenter", new Point2D(0f, 0f))
                         .put("offsetPos", new Point2D(0f, 0f))
                         .put("duration",6f)
-                        .put("targetPos",entity.getPosition().add(new Point2D(-25f,40f)).add(new Point2D(-2,-1)))
+                        .put("targetPos",entity.getPosition().add(new Point2D(-25f,40f)).add(new Point2D(-3,-1)))
                         .put("scaleX", movement.getScaleX())
-                        .put("scaleY", movement.getScaleY()));
+                        .put("scaleY", movement.getScaleY()));}
+                if(movement.getNumbers()>=3) {FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
+                        .put("startPos",entity.getPosition().add(new Point2D(-25f,40f)))
+                        .put("damage", 10f)
+                        .put("speed",movement.getScaleSpeed())
+                        .put("hitRadius", 5f)
+                        .put("hitCenter", new Point2D(0f, 0f))
+                        .put("offsetPos", new Point2D(0f, 0f))
+                        .put("duration",6f)
+                        .put("targetPos",entity.getPosition().add(new Point2D(-25f,40f)).add(new Point2D(-1,1)))
+                        .put("scaleX", movement.getScaleX())
+                        .put("scaleY", movement.getScaleX()));
+                    FXGL.spawn("bullet2", new SpawnData(entity.getPosition())
+                            .put("startPos",entity.getPosition().add(new Point2D(-25f,40f)))
+                            .put("damage", 10f)
+                            .put("speed",movement.getScaleSpeed())
+                            .put("hitRadius", 5f)
+                            .put("hitCenter", new Point2D(0f, 0f))
+                            .put("offsetPos", new Point2D(0f, 0f))
+                            .put("duration",6f)
+                            .put("targetPos",entity.getPosition().add(new Point2D(-25f,40f)).add(new Point2D(-1,-1)))
+                            .put("scaleX", movement.getScaleX())
+                            .put("scaleY", movement.getScaleY()));}
+
                 FXGL.spawn("blade", new SpawnData( entity.getCenter())
                         .put("startPos",  entity.getCenter())
                         .put("damage", 10f)
@@ -210,6 +233,61 @@ public class PlayerAnimationComponent extends Component {
                 entity.getComponent(PlayerSoundComponent.class).playAttack();
 
             } else if (rightAttack) {
+                if(movement.getNumbers()>=1){FXGL.spawn("bullet2", new SpawnData(entity.getPosition().add(60f,0f))
+                        .put("startPos",entity.getPosition().add(new Point2D(60f,40f)))
+                        .put("damage", 10f)
+                        .put("speed",movement.getScaleSpeed())
+                        .put("hitRadius", 25f)
+                        .put("hitCenter", new Point2D(0f, 0f))
+                        .put("offsetPos", new Point2D(0f, 0f))
+                        .put("duration",6f)
+                        .put("targetPos",entity.getPosition().add(new Point2D(60f,40f)).add(new Point2D(1,0)))
+                        .put("scaleX", movement.getScaleX())
+                        .put("scaleY", movement.getScaleY()));}
+                if(movement.getNumbers()>=2) {FXGL.spawn("bullet2", new SpawnData(entity.getPosition().add(60f,0f))
+                        .put("startPos",entity.getPosition().add(new Point2D(60f,40f)))
+                        .put("damage", 10f)
+                        .put("speed",movement.getScaleSpeed())
+                        .put("hitRadius", 5f)
+                        .put("hitCenter", new Point2D(0f, 0f))
+                        .put("offsetPos", new Point2D(0f, 0f))
+                        .put("duration",6f)
+                        .put("targetPos",entity.getPosition().add(new Point2D(60f,40f)).add(new Point2D(3,1)))
+                        .put("scaleX", movement.getScaleX())
+                        .put("scaleY", movement.getScaleX()));
+                    FXGL.spawn("bullet2", new SpawnData(entity.getPosition().add(60f,0f))
+                            .put("startPos",entity.getPosition().add(new Point2D(60f,40f)))
+                            .put("damage", 10f)
+                            .put("speed",movement.getScaleSpeed())
+                            .put("hitRadius", 5f)
+                            .put("hitCenter", new Point2D(0f, 0f))
+                            .put("offsetPos", new Point2D(0f, 0f))
+                            .put("duration",6f)
+                            .put("targetPos",entity.getPosition().add(new Point2D(60f,40f)).add(new Point2D(3,-1)))
+                            .put("scaleX", movement.getScaleX())
+                            .put("scaleY", movement.getScaleY()));}
+                if(movement.getNumbers()>=3) {FXGL.spawn("bullet2", new SpawnData(entity.getPosition().add(60f,0f))
+                        .put("startPos",entity.getPosition().add(new Point2D(60f,40f)))
+                        .put("damage", 10f)
+                        .put("speed",movement.getScaleSpeed())
+                        .put("hitRadius", 5f)
+                        .put("hitCenter", new Point2D(0f, 0f))
+                        .put("offsetPos", new Point2D(0f, 0f))
+                        .put("duration",6f)
+                        .put("targetPos",entity.getPosition().add(new Point2D(60f,40f)).add(new Point2D(1,1)))
+                        .put("scaleX", movement.getScaleX())
+                        .put("scaleY", movement.getScaleX()));
+                    FXGL.spawn("bullet2", new SpawnData(entity.getPosition().add(60f,0f))
+                            .put("startPos",entity.getPosition().add(new Point2D(60f,40f)))
+                            .put("damage", 10f)
+                            .put("speed",movement.getScaleSpeed())
+                            .put("hitRadius", 5f)
+                            .put("hitCenter", new Point2D(0f, 0f))
+                            .put("offsetPos", new Point2D(0f, 0f))
+                            .put("duration",6f)
+                            .put("targetPos",entity.getPosition().add(new Point2D(60f,40f)).add(new Point2D(1,-1)))
+                            .put("scaleX", movement.getScaleX())
+                            .put("scaleY", movement.getScaleY()));}
                 FXGL.spawn("blade", new SpawnData( entity.getCenter())
                         .put("startPos",  entity.getCenter())
                         .put("damage", 10f)
@@ -218,7 +296,7 @@ public class PlayerAnimationComponent extends Component {
                         .put("offsetPos",new Point2D(0f,0f))
                         .put("duration",0.1f));
                 entity.getComponent(PlayerSoundComponent.class).playAttack();
-                entity.getComponent(PlayerSoundComponent.class).playAttack();
+
             }
         }, Duration.seconds(newattackInterval2*0.6)); // 动画一半时出招
 

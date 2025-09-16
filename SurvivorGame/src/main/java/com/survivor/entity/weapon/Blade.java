@@ -44,7 +44,9 @@ public class Blade extends Projectile {
 
     @Override
     protected void handleHeroCollision(Entity hero) {
+
         hero.getComponent(HealthComponent.class).takeDamage(4000);
+
     }
 
     @Override
@@ -63,9 +65,10 @@ public class Blade extends Projectile {
         else if (monster.hasComponent(SelfExplodingEnemyComponent.class)) {
             monster.getComponent(SelfExplodingEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
         }
-        else if(monster.hasComponent(SmartEnemyAI.class)) {
+        else if(monster.hasComponent(SmartEnemyAI.class)){
             monster.getComponent(SmartEnemyAI.class).takeDamage((int) PlayerMovementComponent.attack);
         }
+
     }
 }
 

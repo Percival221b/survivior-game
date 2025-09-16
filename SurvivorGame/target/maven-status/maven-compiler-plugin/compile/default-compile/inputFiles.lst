@@ -1,5 +1,7 @@
+C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Enemy\BossComponent.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\weapon\BloodCircle.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\weapon\Bullet2.java
+C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\core\spawnTile.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Enemy\zhiEnemyComponent.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\weapon\Fire.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Enemy\test\SmartEnemyAI.java
@@ -9,6 +11,7 @@ C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\surviv
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\ExperienceOrb.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\core\AudioManager.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ui\upgrades\UpgradeRepository.java
+C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\util\aStarGrid.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\util\Vector2D.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ui\HUD.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\core\GameSceneManager.java
@@ -24,6 +27,7 @@ C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\surviv
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\weapon\NeutralBlade.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Enemy\SplitEnemyComponent.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Player\PlayerAnimationComponent.java
+C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Enemy\SlimeEnemyComponent.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\Player\PlayerMovementComponent.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\entity\weapon\interfaces\Weapon.java
 C:\Users\perci\IdeaProjects\survivior-game\SurvivorGame\src\main\java\com\survivor\ui\MenuUI.java

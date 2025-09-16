@@ -8,14 +8,20 @@ import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.survivor.entity.Player.XPComponent;
 import com.survivor.main.EntityType;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
+
+import static com.almasb.fxgl.dsl.FXGLForKtKt.getGameScene;
 
 
 public class SplitEnemyComponent extends Component {
 
 
-    private double health=1500;
+    private double health=6000;
     private boolean dead = false;
 
     private PhysicsComponent physics;  // FXGL 会自动注入
@@ -32,7 +38,7 @@ public class SplitEnemyComponent extends Component {
 
     private int attack  =8;
     private double speed = 50;
-    private double attackRange = 100;
+    private double attackRange = 50;
     private long lastAttackTime = 0;
     private long attackCooldown = 1500; // 毫秒
 
@@ -128,6 +134,7 @@ public class SplitEnemyComponent extends Component {
     }
 
     public void takeDamage(double damage) {
+        this.showDamage(damage,entity.getX(),entity.getY());
         System.out.println(dead);
         if (dead==true) {return; }// 已经死亡不再处理}
 
@@ -139,13 +146,24 @@ public class SplitEnemyComponent extends Component {
                     .stream().findFirst();
             playerOpt.get().getComponent(XPComponent.class).gainXP(100);
             spawnSmallEnemies();
-            entity.removeFromWorld();
+            dead = true;
+            speed = 0;
+            isAttacking = false;
+            //entity.removeComponent(PhysicsComponent.class);
 
+            texture.playAnimationChannel(deadAnim);
 
-                    // 分裂成两个小怪物
-
-
-
+            // 在动画最后一帧播完时回调
+            texture.setOnCycleFinished(() -> {
+                if (texture.getAnimationChannel() == deadAnim) {
+                    // 清空回调，避免死循环
+                    texture.setOnCycleFinished(() -> {
+                    });
+                    if (entity != null) {
+                        entity.removeFromWorld();
+                    }
+                }
+            });
         } else {
             // TODO: 可以在这里加受伤动画或闪烁效果
             // 例如 texture.loopAnimationChannel(hurtAnim);
@@ -184,9 +202,9 @@ public class SplitEnemyComponent extends Component {
         double offsetY = 25; // 偏移量
 
         // 生成第一个小怪物，稍微偏移
-        FXGL.spawn("small_enemy", x + offsetX, y + offsetY);  // 小怪物生成位置偏移
+        FXGL.spawn("small_enemy", x -20, y -150);  // 小怪物生成位置偏移
         // 生成第二个小怪物，稍微偏移
-        FXGL.spawn("small_enemy", x - offsetX, y - offsetY);  // 小怪物生成位置偏移
+        FXGL.spawn("small_enemy", x-20 , y -125);  // 小怪物生成位置偏移
 
         System.out.println("Small enemies spawned at two locations near (" + x + ", " + y + ")");
     }
@@ -197,5 +215,50 @@ public class SplitEnemyComponent extends Component {
 
     public void setAttack(int attack) {
         this.attack = attack;
+    }
+    public void showDamage(double dmg, double x, double y) {
+        Text text = new Text(String.valueOf((int) dmg));
+        if(dmg<260){
+            text.setFill(Color.WHITE);
+            //text.setStyle("-fx-font-size: 12px");
+            text.setFont(Font.font("Impact", 20));
+        } else if (dmg<400) {
+            text.setFill(Color.YELLOW);
+            text.setFont(Font.font("Impact", 32));
+            //text.setStyle("-fx-font-size: 20px");
+        }else {
+            text.setFill(Color.RED);
+            text.setFont(Font.font("Impact", 40));
+        }
+        var playerOpt = FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
+                .stream().findFirst();
+        Point2D playerPos = playerOpt.get().getCenter();
+        double dx=playerPos.getX()-x;
+        double dy=playerPos.getY()-y;
+
+        text.setTranslateX(1280-dx-200);
+        text.setTranslateY(640-dy-150); // 往上偏移 40 像素
+
+
+        text.setScaleX(0.1);
+        text.setScaleY(0.1);
+
+// 放大动画
+        ScaleTransition st = new ScaleTransition(Duration.seconds(0.2), text);
+        st.setFromX(0.1);
+        st.setFromY(0.1);
+        st.setToX(1.0);
+        st.setToY(1.0);
+        st.play();
+
+
+        getGameScene().addUINode(text);
+
+        // 1 秒后移除
+        FXGL.runOnce(() -> getGameScene().removeUINode(text), Duration.seconds(0.3));
+
+        // 1 秒后移除
+
+
     }
 }

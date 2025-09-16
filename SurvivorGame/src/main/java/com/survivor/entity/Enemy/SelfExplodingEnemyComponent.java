@@ -8,14 +8,20 @@ import com.almasb.fxgl.physics.PhysicsComponent;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.survivor.main.EntityType;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
+
+import static com.almasb.fxgl.dsl.FXGLForKtKt.getGameScene;
 
 @Required(PhysicsComponent.class)   // ⚠️ 声明依赖
 public class SelfExplodingEnemyComponent extends Component {
 
 
-    private double health=40;
+    private double health=1500;
     private boolean dead = false;
 
     private PhysicsComponent physics;  // FXGL 会自动注入
@@ -30,7 +36,7 @@ public class SelfExplodingEnemyComponent extends Component {
 
     private boolean isAttacking = false;
 
-    private double speed = 100;
+    private double speed = 340;
     private double attackRange = 80;
     private long lastAttackTime = 0;
     private long attackCooldown = 1500; // 毫秒
@@ -104,7 +110,7 @@ public class SelfExplodingEnemyComponent extends Component {
                         .put("startPos",  center)
                         .put("damage", 10f)
                         .put("hitCenter",(new Point2D(-60f,-37f)))
-                        .put("hitRadius", 50f)
+                        .put("hitRadius", 80f)
                         .put("offsetPos",new Point2D(0f,0f))
                         .put("duration",0.1f));
             }, Duration.seconds(0.4));
@@ -130,6 +136,7 @@ public class SelfExplodingEnemyComponent extends Component {
     }
 
     public void takeDamage(double damage) {
+        this.showDamage(damage,entity.getX(),entity.getY());
         System.out.println(dead);
         if (dead==true) {return; }// 已经死亡不再处理}
         Point2D center =entity.getCenter();
@@ -205,5 +212,45 @@ public class SelfExplodingEnemyComponent extends Component {
 
     public void setSpeed(double speed) {
         this.speed = speed;
+    }
+    public void showDamage(double dmg, double x, double y) {
+        Text text = new Text(String.valueOf((int) dmg));
+        if(dmg<260){
+            text.setFill(Color.WHITE);
+            //text.setStyle("-fx-font-size: 12px");
+            text.setFont(Font.font("Impact", 20));
+        } else if (dmg<400) {
+            text.setFill(Color.YELLOW);
+            text.setFont(Font.font("Impact", 32));
+            //text.setStyle("-fx-font-size: 20px");
+        }else {
+            text.setFill(Color.RED);
+            text.setFont(Font.font("Impact", 40));
+        }
+        var playerOpt = FXGL.getGameWorld().getEntitiesByType(EntityType.PLAYER)
+                .stream().findFirst();
+        Point2D playerPos = playerOpt.get().getCenter();
+        double dx=playerPos.getX()-x;
+        double dy=playerPos.getY()-y;
+
+        text.setTranslateX(1280-dx-100);
+        text.setTranslateY(640-dy-40); // 往上偏移 40 像素
+        text.setScaleX(0.1);
+        text.setScaleY(0.1);
+
+// 放大动画
+        ScaleTransition st = new ScaleTransition(Duration.seconds(0.2), text);
+        st.setFromX(0.1);
+        st.setFromY(0.1);
+        st.setToX(1.0);
+        st.setToY(1.0);
+        st.play();
+
+
+        getGameScene().addUINode(text);
+
+        // 1 秒后移除
+        FXGL.runOnce(() -> getGameScene().removeUINode(text), Duration.seconds(0.3));
+
     }
 }

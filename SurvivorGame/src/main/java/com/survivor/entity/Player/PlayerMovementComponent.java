@@ -25,7 +25,7 @@ public class PlayerMovementComponent extends Component {
     public PlayerState state = PlayerState.IDLE;
 
     private double speed = 400; // 单位：像素/秒
-    public static double attack = 3000;       // 基础攻击
+    public static double attack = 50;       // 基础攻击
 
     // 移动方向状态
     private boolean movingUp = false;
@@ -42,7 +42,7 @@ public class PlayerMovementComponent extends Component {
     private double dashOrbTimer = 0;
     private double dashOrbInterval = 0.03;
 
-    private double dashCooldownMax = 0.5; // 冲刺冷却 2 秒
+    private double dashCooldownMax = 1.5; // 冲刺冷却 2 秒
     private double dashCooldownTimer = 0; // 冷却计时器
     private boolean dashSoundPlayed = false;  // 新增字段
 
@@ -54,14 +54,16 @@ public class PlayerMovementComponent extends Component {
 
     private double scaleX = 0.5;//角色飞行物大小
     private double scaleY = 0.5;
-    private float scaleSpeed = 800.0f;
-    private double numbers=3;
+    private float scaleSpeed = 300.0f;
+    private double numbers=0;
 
     private boolean hadBloodCircle=false;//环绕物
     private double scaleBloodCircleX=1.0;
     private double scaleBloodCircleY=1.0;
     private double timeBloodCircle=1.0;
     private double timerBloodCircle = 0.0;
+
+    public static boolean speacil=false;
 
     // 新增暂停标志
     private boolean paused = false;
@@ -72,7 +74,6 @@ public class PlayerMovementComponent extends Component {
         this.physics = entity.getComponent(PhysicsComponent.class);
         physics.setOnPhysicsInitialized(() -> {
             physics.getBody().setFixedRotation(true);
-
         });
     }
     @Override
@@ -130,7 +131,7 @@ public class PlayerMovementComponent extends Component {
             }
             dashOrbTimer -= tpf;
             if (dashOrbTimer <= 0) {
-                FXGL.spawn("xpOrb", new SpawnData(entity.getCenter()).put("xpAmount", 1));
+               //    FXGL.spawn("xpOrb", new SpawnData(entity.getCenter()).put("xpAmount", 1));
                 dashOrbTimer = dashOrbInterval; // 重置间隔
             }
         } else if (attackSlowTimer > 0) {
@@ -161,7 +162,6 @@ public class PlayerMovementComponent extends Component {
 
     }
 
-
     // --- 公共方法供动画或其他组件调用 ---
 
     public boolean isMoving() {return movingUp || movingDown || movingLeft || movingRight;}
@@ -188,13 +188,16 @@ public class PlayerMovementComponent extends Component {
     }
 
     public void increaseSpeed(double percent) {
-        speed *= (1 + percent);
+        this.setSpeed(this.getSpeed() *(1+ percent));
     }
 
     public void decreaseDashCooldown(double percent) {
-        dashCooldownMax *= (1 + percent);
+        dashCooldownMax *= (1 - percent);
     }
 
+    public void decreaseattackInterval(double percent) {
+        setAttackInterval(attackInterval*=1-percent);
+    }
 
     public void stop() {
         movingUp = movingDown = movingLeft = movingRight = false;
@@ -208,7 +211,12 @@ public class PlayerMovementComponent extends Component {
         }
     }
 
-    public void setSpeed(double speed) { this.speed = speed; }
+
+    public void setSpeed(double newspeed) { this.speed = newspeed;
+        if (onSpeedChange != null) {
+            onSpeedChange.accept(newspeed);
+        }
+    }
 
     public void resetAttack() {
         attackingLeft = false;
@@ -234,8 +242,6 @@ public class PlayerMovementComponent extends Component {
             dashSoundPlayed = false;
 
             // 🚀 冲刺时关闭碰撞
-
-
             FXGL.getNotificationService().pushNotification("冲刺！");
         }
     }
@@ -310,5 +316,14 @@ public class PlayerMovementComponent extends Component {
 
     public void setNumbers(double numbers) {
         this.numbers = numbers;
+    }
+
+    public void increaseScale(double percent) {
+        this.scaleX *= 1+percent;
+        this.scaleY *= 1+percent;
+    }
+
+    public void increasenumbers(double number) {
+        this.numbers += number;
     }
 }

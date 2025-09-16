@@ -5,6 +5,7 @@ import com.almasb.fxgl.entity.Entity;
 import com.almasb.fxgl.texture.AnimatedTexture;
 import com.almasb.fxgl.texture.AnimationChannel;
 import com.survivor.entity.Enemy.*;
+import com.survivor.entity.Player.PlayerMovementComponent;
 import com.survivor.entity.Projectile;
 import javafx.geometry.Point2D;
 import javafx.util.Duration;
@@ -74,16 +75,20 @@ public class BloodCircle extends Projectile {
     @Override
     protected void handleMonsterCollision(Entity monster) {
         if(monster.hasComponent(SprintEnemyCompontBat.class)) {
-            monster.getComponent(SprintEnemyCompontBat.class).takeDamage(4000);
+            monster.getComponent(SprintEnemyCompontBat.class).takeDamage(300);
         }else if (monster.hasComponent(SplitEnemyComponent.class)){
-            monster.getComponent(SplitEnemyComponent.class).takeDamage(4000);
+            monster.getComponent(SplitEnemyComponent.class).takeDamage(300);
         }else if (monster.hasComponent(zhiEnemyComponent.class)){
-            monster.getComponent(zhiEnemyComponent.class).takeDamage(4000);
+            monster.getComponent(zhiEnemyComponent.class).takeDamage(300);
         }else if(monster.hasComponent(SmallSplitEnemyComponent.class)) {
-            monster.getComponent(SmallSplitEnemyComponent.class).takeDamage(4000);
+            monster.getComponent(SmallSplitEnemyComponent.class).takeDamage(300);
         }else if (monster.hasComponent(RangedEnemyComponent.class)) {
-            monster.getComponent(RangedEnemyComponent.class).takeDamage(4000);
-        }else{
+            monster.getComponent(RangedEnemyComponent.class).takeDamage(300);
+        }
+        else if (monster.hasComponent(SelfExplodingEnemyComponent.class)) {
+            monster.getComponent(SelfExplodingEnemyComponent.class).takeDamage(PlayerMovementComponent.attack);
+        }
+        else{
 
         }
     }

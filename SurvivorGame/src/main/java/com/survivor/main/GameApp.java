@@ -53,6 +53,7 @@ public class GameApp extends GameApplication {
 
     @Override
     protected void initGame() {
+        System.out.println(FXGL.getGameWorld().getEntities().size());;
         sceneManager = new GameSceneManager(this);
         sceneManager.showMenu();
 
@@ -66,11 +67,7 @@ public class GameApp extends GameApplication {
 
         // 生成玩家
         player = FXGL.spawn("player", 6000, 3000);
-        FXGL.spawn("AIEnemy", 6050, 3000);
-        FXGL.spawn("AIEnemy", 6040, 3000);
-        FXGL.spawn("AIEnemy", 6060, 3000);
-        FXGL.spawn("AIEnemy", 6070, 3000);
-        FXGL.spawn("AIEnemy", 6080, 3000);
+
 
         FXGL.run(() -> {
             player.getComponentOptional(com.survivor.entity.Player.XPComponent.class)
@@ -91,10 +88,11 @@ public class GameApp extends GameApplication {
 //        }, Duration.seconds(1));
 //        FXGL.run(() -> {
 //            player.getComponentOptional(com.survivor.entity.Player.PlayerMovementComponent.class).
-//                    ifPresent(xp -> xp.setScaleY(xp.getScaleY()+0.4));
+//                    ifPresent(xp -> xp.setSpeed(xp.getSpeed()*1.2));
 //        }, Duration.seconds(1));
 
         FXGL.getGameScene().getViewport().bindToEntity(player, FXGL.getAppWidth() / 2, FXGL.getAppHeight() / 2);
+        System.out.println("shuliang"+FXGL.getGameWorld().getEntities().size());;
     }
 
     @Override
@@ -185,12 +183,12 @@ public class GameApp extends GameApplication {
     @Override
     protected void onUpdate(double tpf) {
         //sceneManager.getGameLoop().update(tpf);
-        NeutralMonsterAIManager.getInstance().onUpdate(tpf);
         if (sceneManager != null) {
             sceneManager.update(tpf);
         }
         if(!sceneManager.getGameLoop().isRunning()){
             player.getComponent(PlayerMovementComponent.class).setPaused(true);
+            NeutralMonsterAIManager.getInstance().onUpdate(tpf);
         }
         else {
             player.getComponent(PlayerMovementComponent.class).setPaused(false);
